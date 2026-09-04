@@ -130,3 +130,14 @@ Foi executada uma bateria de testes funcionais via API HTTP REST validando todos
 * `ARQUITETURA_TECNICA.md`: Atualizado com os modelos `User.js` e `Role.js`, endpoints de autenticação, arquitetura de assinatura JWT e guardas RBAC.
 * `MANUAL_SYNOLOGY.md`: Atualizado com a especificação das variáveis de ambiente (`JWT_SECRET`, `PORT`, `DATA_DIR`) e nota de zero dependências externas adicionais.
 * `docs/README.md`: Atualizado para refletir o estado de conclusão da Fase 5.
+
+---
+
+## 6. Resolução de Incidentes no Front-End
+
+* **Diagnóstico**: Durante os primeiros testes no navegador, foi detetado um erro de parsing (`SyntaxError: Identifier 'currentProjectIdInModal' has already been declared`), que impedia o runtime JavaScript do browser de executar o bloco `<script>`, inibindo o registo de todos os event listeners dos links e modais.
+* **Resolução**:
+  1. Removida a declaração redundante da variável `currentProjectIdInModal`.
+  2. Adicionada proteção com bloco `try/catch` na desserialização de `localStorage` para `currentUser` e `currentPermissions`.
+  3. Ligados explicitamente os ouvintes de clique para toda a navegação da barra lateral (`nav-dashboard`, `nav-projetos`, `nav-signage`, `nav-playlists`, `nav-custos`, `nav-roles`, `nav-users` e widget de perfil).
+  4. Validação estática executada com sucesso via motor V8/Node.js confirmando sintaxe 100% íntegra.
