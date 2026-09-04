@@ -528,13 +528,13 @@
   </div>
 
   <!-- =========================================================================
-       MODAL: DETALHE DE PROJETO / MARCOS
+       MODAL: DETALHE DE PROJETO / MARCOS TÉCNICOS & DIGITAL SIGNAGE
        ========================================================================= -->
   <div class="modal-backdrop" id="modalDetalheProjeto">
-    <div class="modal-card">
+    <div class="modal-card modal-large">
       <div class="modal-header">
         <div class="modal-title" id="modalDetalheTitle">
-          <span>Detalhes da Abertura</span>
+          <span>Gestão da Abertura & Checklist Multimédia</span>
         </div>
         <button class="modal-close-btn" id="btnCloseDetalheModal" aria-label="Fechar">
           <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -550,6 +550,7 @@
       </div>
     </div>
   </div>
+
 
   <!-- =========================================================================
        SCRIPT DINÂMICO COMPLETO (INTEGRAÇÃO API REST + BASE DE DADOS SQLITE)
@@ -923,58 +924,194 @@
     const modalDetalheTitle = document.getElementById('modalDetalheTitle');
     const modalDetalheBody = document.getElementById('modalDetalheBody');
 
+    let currentProjectIdInModal = null;
+
     async function openProjectDetails(id) {
+      currentProjectIdInModal = id;
       try {
         const res = await fetch(`/api/v1/projects/${id}`);
         const json = await res.json();
         if (json.success && json.data) {
           const p = json.data;
+          const brandClass = p.brand?.toLowerCase().includes('darty') ? 'darty' : 'fnac';
+          
           modalDetalheTitle.innerHTML = `
-            <span>${p.name}</span>
-            <span class="brand-badge ${p.brand?.toLowerCase()}">${p.code}</span>
+            <div style="display: flex; align-items: center; gap: 10px;">
+              <span>${p.name}</span>
+              <span class="brand-badge ${brandClass}">${p.code}</span>
+              <span class="brand-badge ${brandClass}">${p.store_format || 'Standard'}</span>
+            </div>
           `;
 
-          let tasksHtml = '';
-          if (p.tasks && p.tasks.length > 0) {
-            tasksHtml = p.tasks.map(t => `
-              <div style="padding: 10px 14px; background: var(--bg-base); border: 1px solid var(--border-subtle); border-radius: 6px; margin-bottom: 8px;">
-                <div style="display: flex; justify-content: space-between; align-items: center;">
-                  <strong style="color: var(--text-white); font-size: 13px;">${t.title}</strong>
-                  <span class="status-badge ${t.status === 'concluido' ? 'badge-signage-ok' : 'badge-signage-testing'}">${t.status}</span>
+          const tasks = p.tasks || [];
+          const totalTasks = tasks.length;
+          const completedTasks = tasks.filter(t => t.status === 'concluido').length;
+          const progressPercent = totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : (p.status === 'em_curso' ? 75 : 25);
+
+          // Renderizar lista de tarefas
+          let tasksListHtml = '';
+          if (tasks.length > 0) {
+            tasksListHtml = tasks.map(t => {
+              const isDone = t.status === 'concluido';
+              let priorityClass = 'tag-media';
+              let priorityLabel = 'Média';
+              if (t.priority === 'critical') { priorityClass = 'tag-critica'; priorityLabel = 'Crítica'; }
+              else if (t.priority === 'high') { priorityClass = 'tag-alta'; priorityLabel = 'Alta'; }
+              else if (t.priority === 'low') { priorityClass = 'tag-baixa'; priorityLabel = 'Baixa'; }
+
+              return `
+                <div class="task-item ${isDone ? 'completed' : ''}" id="task-item-${t.id}">
+                  <input type="checkbox" class="task-checkbox" ${isDone ? 'checked' : ''} onchange="toggleTask(${t.id}, ${p.id})" title="Marcar como concluído">
+                  <div class="task-content">
+                    <div class="task-header-row">
+                      <span class="task-title">${t.title}</span>
+                      <div class="task-meta-tags">
+                        <span class="task-tag ${priorityClass}">${priorityLabel}</span>
+                        <span class="brand-badge fnac" style="font-size: 10px;">${t.department}</span>
+                        <button class="task-del-btn" onclick="deleteTask(${t.id}, ${p.id})" title="Eliminar marco">
+                          <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                          </svg>
+                        </button>
+                      </div>
+                    </div>
+                    ${t.description ? `<div class="task-desc">${t.description}</div>` : ''}
+                    <div class="task-footer-info">
+                      <span>Prazo: <strong>${formatDate(t.due_date)}</strong></span>
+                      <span style="color: ${isDone ? 'var(--status-success)' : 'var(--text-dim)'};">${isDone ? '✓ Concluído' : 'Pendente'}</span>
+                    </div>
+                  </div>
                 </div>
-                <div style="font-size: 11.5px; color: var(--text-muted); margin-top: 4px;">${t.description || ''}</div>
-                <div style="font-size: 11px; color: var(--text-dim); margin-top: 6px;">Departamento: ${t.department} • Prazo: ${formatDate(t.due_date)}</div>
-              </div>
-            `).join('');
+              `;
+            }).join('');
           } else {
-            tasksHtml = `<div style="font-size: 12px; color: var(--text-dim);">Sem marcos registados para esta loja.</div>`;
+            tasksListHtml = `
+              <div style="text-align: center; padding: 24px; color: var(--text-dim); font-size: 13px;">
+                Nenhum marco técnico registado para esta loja. Adiciona o primeiro marco abaixo!
+              </div>
+            `;
           }
 
           modalDetalheBody.innerHTML = `
+            <!-- Progresso Geral da Loja -->
+            <div style="margin-bottom: 20px;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                <span style="font-size: 13px; font-weight: 700; color: var(--text-white);">Progresso Global de Abertura</span>
+                <span style="font-size: 13px; font-family: 'JetBrains Mono', monospace; font-weight: 700; color: var(--fnac-gold);">${progressPercent}% (${completedTasks} de ${totalTasks} concluídos)</span>
+              </div>
+              <div class="progress-track" style="height: 9px;">
+                <div class="progress-fill-bar ${brandClass === 'darty' ? 'progress-fill-red' : 'progress-fill-gold'}" style="width: ${progressPercent}%;"></div>
+              </div>
+            </div>
+
+            <!-- Resumo de Prazos e Custos -->
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px;">
               <div style="padding: 14px; background: var(--bg-base); border-radius: 8px; border: 1px solid var(--border-subtle);">
                 <div style="font-size: 11px; text-transform: uppercase; color: var(--text-dim); font-weight: 700;">Inauguração Oficial</div>
                 <div style="font-size: 16px; font-weight: 700; color: var(--text-white); margin-top: 4px;">${formatDate(p.go_live_date)}</div>
-                <div style="font-size: 12px; color: var(--text-muted); margin-top: 2px;">${getDaysRemaining(p.go_live_date)} dias restantes</div>
+                <div style="font-size: 12px; color: var(--text-muted); margin-top: 2px;">${getDaysRemaining(p.go_live_date)} dias restantes • ${p.location}</div>
               </div>
               <div style="padding: 14px; background: var(--bg-base); border-radius: 8px; border: 1px solid var(--border-subtle);">
-                <div style="font-size: 11px; text-transform: uppercase; color: var(--text-dim); font-weight: 700;">Custo Diário Alocado</div>
-                <div style="font-size: 16px; font-weight: 700; color: var(--fnac-gold); margin-top: 4px;">${formatCurrency(p.daily_cost)} / dia</div>
-                <div style="font-size: 12px; color: var(--text-muted); margin-top: 2px;">Orçamento Total: ${formatCurrency(p.total_budget)}</div>
+                <div style="font-size: 11px; text-transform: uppercase; color: var(--text-dim); font-weight: 700;">Custo Diário & Orçamento</div>
+                <div style="font-size: 16px; font-weight: 700; color: var(--fnac-gold); margin-top: 4px;">${formatCurrency(p.daily_cost)} <span style="font-size: 12px; color: var(--text-dim);">/ dia</span></div>
+                <div style="font-size: 12px; color: var(--text-muted); margin-top: 2px;">Budget Alocado: ${formatCurrency(p.total_budget)}</div>
               </div>
             </div>
 
-            <div style="margin-bottom: 20px;">
-              <h4 style="font-size: 13px; text-transform: uppercase; color: var(--text-dim); margin-bottom: 10px;">Localização & Configuração Signage</h4>
-              <div style="padding: 12px 14px; background: var(--bg-base); border-radius: 8px; border: 1px solid var(--border-subtle); font-size: 13px;">
-                <div>📍 <strong>Morada:</strong> ${p.location}</div>
-                <div style="margin-top: 6px;">📺 <strong>Playlist:</strong> ${p.playlist_version} (${p.signage_status})</div>
+            <!-- Secção 1: Configuração Digital Signage & Playlist -->
+            <div class="modal-section-card" style="margin-bottom: 20px;">
+              <div class="modal-section-title">
+                <span>Configuração de Digital Signage & Broadcast</span>
+                <span class="status-badge ${p.signage_status === 'pronto' ? 'badge-signage-ok' : 'badge-signage-testing'}">${p.signage_status}</span>
               </div>
+              <form id="formUpdateSignage" onsubmit="handleUpdateSignage(event, ${p.id})" style="display: grid; grid-template-columns: 1fr 1fr auto; gap: 12px; align-items: flex-end;">
+                <div class="form-group" style="margin-bottom: 0;">
+                  <label class="form-label">Estado de Signage</label>
+                  <select id="editSignageStatus" class="form-select">
+                    <option value="pendente" ${p.signage_status === 'pendente' ? 'selected' : ''}>Pendente de Instalação</option>
+                    <option value="configuracao" ${p.signage_status === 'configuracao' ? 'selected' : ''}>Em Configuração de IPs</option>
+                    <option value="validacao" ${p.signage_status === 'validacao' ? 'selected' : ''}>Em Validação de Telas</option>
+                    <option value="pronto" ${p.signage_status === 'pronto' ? 'selected' : ''}>Pronto para Broadcast</option>
+                  </select>
+                </div>
+                <div class="form-group" style="margin-bottom: 0;">
+                  <label class="form-label">Versão da Playlist</label>
+                  <input type="text" id="editPlaylistVersion" class="form-input" value="${p.playlist_version || 'v1.0'}" required>
+                </div>
+                <button type="submit" class="btn-primary" style="height: 42px; padding: 0 16px;">
+                  <svg width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                  </svg>
+                  <span>Atualizar</span>
+                </button>
+              </form>
             </div>
 
-            <div>
-              <h4 style="font-size: 13px; text-transform: uppercase; color: var(--text-dim); margin-bottom: 10px;">Marcos Técnicos Multimédia (${p.tasks ? p.tasks.length : 0})</h4>
-              ${tasksHtml}
+            <!-- Secção 2: Checklist de Marcos Multimédia -->
+            <div class="modal-section-card">
+              <div class="modal-section-title">
+                <span>Checklist de Marcos Técnicos (${completedTasks}/${totalTasks} concluídos)</span>
+                <button type="button" class="add-task-toggle" onclick="toggleAddTaskForm()">
+                  <svg width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4.5v15m7.5-7.5h-15"></path>
+                  </svg>
+                  <span>Novo Marco Técnico</span>
+                </button>
+              </div>
+
+              <!-- Formulário Desdobrável para Novo Marco -->
+              <div class="add-task-card" id="addTaskCard" style="display: none;">
+                <form id="formCreateTask" onsubmit="handleCreateTask(event, ${p.id})">
+                  <div class="form-grid-2">
+                    <div class="form-group">
+                      <label class="form-label">Título do Marco Técnico *</label>
+                      <input type="text" id="newTaskTitle" class="form-input" placeholder="Ex: Calibração de Áudio Bose / JBL" required>
+                    </div>
+                    <div class="form-group">
+                      <label class="form-label">Departamento</label>
+                      <select id="newTaskDept" class="form-select">
+                        <option value="Multimédia & Telas" selected>Multimédia & Telas</option>
+                        <option value="Redes & IT">Redes & IT</option>
+                        <option value="Som & Iluminação">Som & Iluminação</option>
+                        <option value="Operações & Obras">Operações & Obras</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <div class="form-grid-2" style="margin-top: 10px;">
+                    <div class="form-group">
+                      <label class="form-label">Prioridade</label>
+                      <select id="newTaskPriority" class="form-select">
+                        <option value="critical">Crítica</option>
+                        <option value="high" selected>Alta</option>
+                        <option value="medium">Média</option>
+                        <option value="low">Baixa</option>
+                      </select>
+                    </div>
+                    <div class="form-group">
+                      <label class="form-label">Prazo de Entrega</label>
+                      <input type="date" id="newTaskDueDate" class="form-input" value="${p.target_completion_date || p.go_live_date}">
+                    </div>
+                  </div>
+
+                  <div class="form-group" style="margin-top: 10px;">
+                    <label class="form-label">Descrição / Observações Técnicas</label>
+                    <input type="text" id="newTaskDesc" class="form-input" placeholder="Ex: Garantir teste de volume nas zonas de Caixas e Livraria">
+                  </div>
+
+                  <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 14px;">
+                    <button type="button" class="btn-secondary" onclick="toggleAddTaskForm()">Cancelar</button>
+                    <button type="submit" class="btn-primary">
+                      <span>Guardar Marco</span>
+                    </button>
+                  </div>
+                </form>
+              </div>
+
+              <!-- Lista de Tarefas -->
+              <div class="task-list" id="modalTaskList" style="margin-top: 12px;">
+                ${tasksListHtml}
+              </div>
             </div>
           `;
 
@@ -985,8 +1122,112 @@
       }
     }
 
+    // Toggle Formulário de Nova Tarefa
+    function toggleAddTaskForm() {
+      const card = document.getElementById('addTaskCard');
+      if (card) {
+        card.style.display = card.style.display === 'none' ? 'block' : 'none';
+        if (card.style.display === 'block') {
+          document.getElementById('newTaskTitle')?.focus();
+        }
+      }
+    }
+
+    // Ação: Alternar Estado da Tarefa (Checkbox)
+    async function toggleTask(taskId, projectId) {
+      try {
+        const res = await fetch(`/api/v1/tasks/${taskId}/toggle`, { method: 'PATCH' });
+        const json = await res.json();
+        if (json.success) {
+          showToast(json.message, 'success');
+          // Atualizar modal de detalhes e tabela principal
+          await openProjectDetails(projectId);
+          await loadProjects();
+        } else {
+          showToast(json.message || 'Erro ao alterar marco', 'error');
+        }
+      } catch (err) {
+        showToast('Erro de comunicação: ' + err.message, 'error');
+      }
+    }
+
+    // Ação: Eliminar Tarefa
+    async function deleteTask(taskId, projectId) {
+      if (!confirm('Tens a certeza que desejas remover este marco técnico?')) return;
+      try {
+        const res = await fetch(`/api/v1/tasks/${taskId}`, { method: 'DELETE' });
+        const json = await res.json();
+        if (json.success) {
+          showToast(json.message, 'success');
+          await openProjectDetails(projectId);
+          await loadProjects();
+        } else {
+          showToast(json.message || 'Erro ao remover marco', 'error');
+        }
+      } catch (err) {
+        showToast('Erro de comunicação: ' + err.message, 'error');
+      }
+    }
+
+    // Ação: Criar Nova Tarefa para a Loja
+    async function handleCreateTask(e, projectId) {
+      e.preventDefault();
+      const title = document.getElementById('newTaskTitle').value;
+      const department = document.getElementById('newTaskDept').value;
+      const priority = document.getElementById('newTaskPriority').value;
+      const due_date = document.getElementById('newTaskDueDate').value;
+      const description = document.getElementById('newTaskDesc').value;
+
+      try {
+        const res = await fetch(`/api/v1/projects/${projectId}/tasks`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ title, department, priority, due_date, description })
+        });
+
+        const json = await res.json();
+        if (json.success) {
+          showToast('Novo marco técnico adicionado!', 'success');
+          await openProjectDetails(projectId);
+          await loadProjects();
+        } else {
+          showToast(json.message || 'Erro ao criar marco', 'error');
+        }
+      } catch (err) {
+        showToast('Erro de comunicação: ' + err.message, 'error');
+      }
+    }
+
+    // Ação: Atualizar Signage & Playlist
+    async function handleUpdateSignage(e, projectId) {
+      e.preventDefault();
+      const signage_status = document.getElementById('editSignageStatus').value;
+      const playlist_version = document.getElementById('editPlaylistVersion').value;
+
+      try {
+        const res = await fetch(`/api/v1/projects/${projectId}/signage`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ signage_status, playlist_version })
+        });
+
+        const json = await res.json();
+        if (json.success) {
+          showToast('Configuração de Signage atualizada com sucesso!', 'success');
+          await openProjectDetails(projectId);
+          await loadProjects();
+          await loadKpis();
+        } else {
+          showToast(json.message || 'Erro ao atualizar signage', 'error');
+        }
+      } catch (err) {
+        showToast('Erro de comunicação: ' + err.message, 'error');
+      }
+    }
+
     if (btnCloseDetalhe) btnCloseDetalhe.addEventListener('click', () => modalDetalhe.classList.remove('active'));
     if (btnFecharDetalhe) btnFecharDetalhe.addEventListener('click', () => modalDetalhe.classList.remove('active'));
+
 
     // Filtros de Tabela
     document.querySelectorAll('.filter-chip').forEach(btn => {

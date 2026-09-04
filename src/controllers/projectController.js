@@ -99,7 +99,28 @@ const projectController = {
       console.error('[projectController.getDashboardMetrics]', error);
       return res.status(500).json({ success: false, message: error.message });
     }
+  },
+
+  // Atualização rápida de Signage e Playlist de uma loja
+  updateSignage: async (req, res) => {
+    try {
+      const { id } = req.params;
+      const { signage_status, playlist_version } = req.body || {};
+      const updated = await Project.update(id, { signage_status, playlist_version });
+      if (!updated) {
+        return res.status(404).json({ success: false, message: 'Projeto não encontrado' });
+      }
+      return res.status(200).json({
+        success: true,
+        message: 'Configuração de Digital Signage atualizada com sucesso!',
+        data: updated
+      });
+    } catch (error) {
+      console.error('[projectController.updateSignage]', error);
+      return res.status(400).json({ success: false, message: error.message });
+    }
   }
 };
 
 module.exports = projectController;
+

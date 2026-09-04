@@ -10,12 +10,14 @@ const url = require('url');
 const config = require('./config/app');
 const projectController = require('./src/controllers/projectController');
 
+const taskController = require('./src/controllers/taskController');
+
 // Helper para responder JSON em servidor HTTP nativo
 function sendJson(res, statusCode, data) {
   res.writeHead(statusCode, {
     'Content-Type': 'application/json; charset=utf-8',
     'Access-Control-Allow-Origin': '*',
-    'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+    'Access-Control-Allow-Methods': 'GET, POST, PUT, PATCH, DELETE, OPTIONS',
     'Access-Control-Allow-Headers': 'Content-Type, Authorization'
   });
   res.end(JSON.stringify(data));
@@ -31,7 +33,7 @@ const server = http.createServer(async (req, res) => {
   if (method === 'OPTIONS') {
     res.writeHead(204, {
       'Access-Control-Allow-Origin': '*',
-      'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+      'Access-Control-Allow-Methods': 'GET, POST, PUT, PATCH, DELETE, OPTIONS',
       'Access-Control-Allow-Headers': 'Content-Type, Authorization'
     });
     res.end();
@@ -42,18 +44,14 @@ const server = http.createServer(async (req, res) => {
   if (pathname.startsWith('/api/v1/projects')) {
     // 1. GET /api/v1/projects/kpis
     if (pathname === '/api/v1/projects/kpis' && method === 'GET') {
-      const mockRes = {
-        status: (code) => ({ json: (data) => sendJson(res, code, data) })
-      };
+      const mockRes = { status: (code) => ({ json: (data) => sendJson(res, code, data) }) };
       return projectController.getDashboardMetrics(req, mockRes);
     }
 
     // 2. GET /api/v1/projects (listagem com query params)
     if ((pathname === '/api/v1/projects' || pathname === '/api/v1/projects/') && method === 'GET') {
       req.query = parsedUrl.query;
-      const mockRes = {
-        status: (code) => ({ json: (data) => sendJson(res, code, data) })
-      };
+      const mockRes = { status: (code) => ({ json: (data) => sendJson(res, code, data) }) };
       return projectController.getAll(req, mockRes);
     }
 
@@ -64,9 +62,7 @@ const server = http.createServer(async (req, res) => {
       req.on('end', async () => {
         try {
           req.body = body ? JSON.parse(body) : {};
-          const mockRes = {
-            status: (code) => ({ json: (data) => sendJson(res, code, data) })
-          };
+          const mockRes = { status: (code) => ({ json: (data) => sendJson(res, code, data) }) };
           await projectController.create(req, mockRes);
         } catch (err) {
           sendJson(res, 400, { success: false, message: 'JSON Inválido: ' + err.message });
@@ -75,25 +71,101 @@ const server = http.createServer(async (req, res) => {
       return;
     }
 
-    // 4. GET /api/v1/projects/:id
+    // 4. GET /api/v1/projects/:id/tasks
+    const tasksMatch = pathname.match(/^\/api\/v1\/projects\/([^\/]+)\/tasks$/);
+    if (tasksMatch && method === 'GET') {
+      req.params = { projectId: tasksMatch[1] };
+      const mockRes = { status: (code) => ({ json: (data) => sendJson(res, code, data) }) };
+      return taskController.getByProject(req, mockRes);
+    }
+
+    // 5. POST /api/v1/projects/:id/tasks (criar tarefa para projeto)
+    if (tasksMatch && method === 'POST') {
+      req.params = { projectId: tasksMatch[1] };
+      let body = '';
+      req.on('data', chunk => { body += chunk.toString(); });
+      req.on('end', async () => {
+        try {
+          req.body = body ? JSON.parse(body) : {};
+          const mockRes = { status: (code) => ({ json: (data) => sendJson(res, code, data) }) };
+          await taskController.create(req, mockRes);
+        } catch (err) {
+          sendJson(res, 400, { success: false, message: 'JSON Inválido: ' + err.message });
+        }
+      });
+      return;
+    }
+
+    // 6. PATCH ou PUT /api/v1/projects/:id/signage (atualizar signage e playlist)
+    const signageMatch = pathname.match(/^\/api\/v1\/projects\/([^\/]+)\/signage$/);
+    if (signageMatch && (method === 'PATCH' || method === 'PUT')) {
+      req.params = { id: signageMatch[1] };
+      let body = '';
+      req.on('data', chunk => { body += chunk.toString(); });
+      req.on('end', async () => {
+        try {
+          req.body = body ? JSON.parse(body) : {};
+          const mockRes = { status: (code) => ({ json: (data) => sendJson(res, code, data) }) };
+          await projectController.updateSignage(req, mockRes);
+        } catch (err) {
+          sendJson(res, 400, { success: false, message: 'JSON Inválido: ' + err.message });
+        }
+      });
+      return;
+    }
+
+    // 7. GET /api/v1/projects/:id
     const singleMatch = pathname.match(/^\/api\/v1\/projects\/([^\/]+)$/);
     if (singleMatch && method === 'GET') {
       req.params = { id: singleMatch[1] };
-      const mockRes = {
-        status: (code) => ({ json: (data) => sendJson(res, code, data) })
-      };
+      const mockRes = { status: (code) => ({ json: (data) => sendJson(res, code, data) }) };
       return projectController.getById(req, mockRes);
     }
 
-    // 5. DELETE /api/v1/projects/:id
+    // 8. DELETE /api/v1/projects/:id
     if (singleMatch && method === 'DELETE') {
       req.params = { id: singleMatch[1] };
-      const mockRes = {
-        status: (code) => ({ json: (data) => sendJson(res, code, data) })
-      };
+      const mockRes = { status: (code) => ({ json: (data) => sendJson(res, code, data) }) };
       return projectController.delete(req, mockRes);
     }
   }
+
+  // --- API ROUTES: /api/v1/tasks ---
+  if (pathname.startsWith('/api/v1/tasks')) {
+    // 1. PATCH /api/v1/tasks/:id/toggle
+    const toggleMatch = pathname.match(/^\/api\/v1\/tasks\/([^\/]+)\/toggle$/);
+    if (toggleMatch && (method === 'PATCH' || method === 'POST')) {
+      req.params = { id: toggleMatch[1] };
+      const mockRes = { status: (code) => ({ json: (data) => sendJson(res, code, data) }) };
+      return taskController.toggle(req, mockRes);
+    }
+
+    // 2. PUT ou PATCH /api/v1/tasks/:id
+    const singleTaskMatch = pathname.match(/^\/api\/v1\/tasks\/([^\/]+)$/);
+    if (singleTaskMatch && (method === 'PUT' || method === 'PATCH')) {
+      req.params = { id: singleTaskMatch[1] };
+      let body = '';
+      req.on('data', chunk => { body += chunk.toString(); });
+      req.on('end', async () => {
+        try {
+          req.body = body ? JSON.parse(body) : {};
+          const mockRes = { status: (code) => ({ json: (data) => sendJson(res, code, data) }) };
+          await taskController.update(req, mockRes);
+        } catch (err) {
+          sendJson(res, 400, { success: false, message: 'JSON Inválido: ' + err.message });
+        }
+      });
+      return;
+    }
+
+    // 3. DELETE /api/v1/tasks/:id
+    if (singleTaskMatch && method === 'DELETE') {
+      req.params = { id: singleTaskMatch[1] };
+      const mockRes = { status: (code) => ({ json: (data) => sendJson(res, code, data) }) };
+      return taskController.delete(req, mockRes);
+    }
+  }
+
 
   // --- STATIC ASSETS ---
   if (pathname.startsWith('/css/') || pathname.startsWith('/public/css/')) {

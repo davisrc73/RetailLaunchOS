@@ -136,10 +136,11 @@ erDiagram
 
 ---
 
-## 3. Camada de Modelos (`src/models/Project.js`)
+## 3. Camada de Modelos (`src/models/Project.js` e `src/models/Task.js`)
 
-O modelo encapsula toda a lógica de negócio e queries parametrizadas (evitando SQL Injection):
+Os modelos encapsulam a lógica de negócio e queries SQL parametrizadas (evitando SQL Injection):
 
+### 3.1. Modelo `Project.js`
 * **`Project.findAll({ brand, status })`**:
   * Realiza `SELECT` com agregação de tarefas associadas (`total_tasks` e `completed_tasks`).
   * Calcula a percentagem real de progresso: `progress = round((completed_tasks / total_tasks) * 100)`.
@@ -153,12 +154,26 @@ O modelo encapsula toda a lógica de negócio e queries parametrizadas (evitando
   * Identifica a próxima abertura ativa: `SELECT * FROM projects WHERE go_live_date >= DATE('now') ORDER BY go_live_date ASC LIMIT 1`.
   * Calcula médias de custos diários, orçamentos globais e volume acumulado no mês.
 
+### 3.2. Modelo `Task.js` (Fase 2)
+* **`Task.findByProject(projectId)`**:
+  * Lista todas as tarefas associadas a uma loja, ordenadas por prioridade (`critical`, `high`, `medium`, `low`) e prazo de entrega.
+  * Realiza `LEFT JOIN` com `users` para obter o nome do responsável.
+* **`Task.create(data)`**:
+  * Regista uma nova tarefa técnica vinculada a `project_id`.
+* **`Task.toggleStatus(id)`**:
+  * Alterna instantaneamente entre `concluido` (definindo `completed_at = CURRENT_TIMESTAMP`) e `pendente`.
+* **`Task.update(id, data)` / `Task.delete(id)`**:
+  * Atualiza metadados da tarefa ou elimina o registo.
+* **`Task.getStats(projectId)`**:
+  * Retorna contagens agregadas `{ total, completed, inProgress, pending, progress }` para recálculo imediato na interface.
+
 ---
 
-## 4. Controladores e API REST (`src/controllers/projectController.js`)
+## 4. Controladores e API REST (`projectController.js` e `taskController.js`)
 
 A API segue os padrões RESTful com payloads JSON e códigos de resposta HTTP semânticos:
 
+### 4.1. Endpoints de Lojas (`/api/v1/projects`)
 | Método | Endpoint | Parâmetros | Descrição |
 | :--- | :--- | :--- | :--- |
 | **GET** | `/api/v1/projects` | `?brand=Fnac&status=em_curso` | Lista todas as lojas com progresso e filtros opcionais |
@@ -166,7 +181,18 @@ A API segue os padrões RESTful com payloads JSON e códigos de resposta HTTP se
 | **GET** | `/api/v1/projects/:id` | `:id` (ID ou Código) | Detalha a loja, marcos técnicos e histórico de custos |
 | **POST** | `/api/v1/projects` | Body JSON com dados da loja | Cria uma nova abertura de loja na base de dados |
 | **PUT** | `/api/v1/projects/:id` | Body JSON com campos a alterar | Atualiza campos de uma abertura existente |
+| **PATCH**| `/api/v1/projects/:id/signage` | `{ signage_status, playlist_version }` | Atualiza parâmetros de Digital Signage e Playlist |
 | **DELETE**| `/api/v1/projects/:id` | `:id` | Remove um projeto e dependências em cascata |
+
+### 4.2. Endpoints de Tarefas e Marcos (`/api/v1/projects/:id/tasks` & `/api/v1/tasks`)
+| Método | Endpoint | Parâmetros | Descrição |
+| :--- | :--- | :--- | :--- |
+| **GET** | `/api/v1/projects/:id/tasks` | `:id` (Project ID) | Lista tarefas e estatísticas de progresso da loja |
+| **POST** | `/api/v1/projects/:id/tasks` | Body JSON com dados do marco | Adiciona um novo marco técnico à loja |
+| **PATCH**| `/api/v1/tasks/:id/toggle` | `:id` (Task ID) | Alterna estado de conclusão (pendente/concluído) com 1 clique |
+| **PUT** | `/api/v1/tasks/:id` | Body JSON com alterações | Atualiza detalhes de uma tarefa específica |
+| **DELETE**| `/api/v1/tasks/:id` | `:id` (Task ID) | Elimina um marco técnico da base de dados |
+
 
 ---
 

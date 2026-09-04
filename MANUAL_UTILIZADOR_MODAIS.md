@@ -55,22 +55,47 @@ No canto superior direito do Dashboard, clica no botão dourado **"+ Nova Abertu
 
 ---
 
-## 3. Modal / Gaveta: Detalhes da Abertura & Marcos Técnicos
+## 3. Modal de Gestão Técnica da Loja & Checklist Multimédia
 
 ### 3.1. Como Aceder
-Na tabela **"Aberturas em Curso"**, clica no botão **"Gerir"** situado na última coluna de qualquer linha de projeto.
+Na tabela **"Aberturas em Curso"**, clica no botão **"Gerir"** situado na coluna de ações de qualquer loja. O modal expandido (*large*) abrir-se-á com todas as ferramentas técnicas de controlo.
 
-### 3.2. Informação Disponibilizada no Modal
-* **Cabeçalho**: Nome da loja acompanhado do código oficial (ex: `FNAC-CAS-2026`).
-* **Cartões de Resumo**:
-  * **Inauguração Oficial**: Data formatada e contagem decrescente dos dias restantes.
-  * **Custo Diário & Orçamento**: Diária contratual e teto orçamental alocado.
-  * **Localização Física**: Morada completa e identificação de piso/loja.
-  * **Digital Signage**: Versão de playlist associada e respetivo estado técnico.
-* **Lista de Marcos Técnicos Multimédia (`tasks`)**:
-  * Tarefas atribuídas ao Gabinete Multimédia (ex: *Configuração de Video Wall 4x4*, *Deploy de Playlist 4K*, *Certificação da VLAN de Signage*).
-  * Prioridade (Crítica, Alta, Média) e status (*Concluído*, *Em Progresso*, *Pendente*).
-  * Prazo de entrega de cada marco técnico.
+### 3.2. Estrutura e Funcionalidades do Modal
+
+#### A. Barra de Progresso Global em Tempo Real
+No topo do modal, é exibida a barra de progresso da abertura e o rácio de cumprimento:
+* **Exemplo**: `75% (3 de 4 concluídos)`.
+* O cálculo é feito instantaneamente na base de dados: `Progresso = (Tarefas Concluídas / Total de Tarefas) * 100`.
+
+#### B. Painel de Configuração de Digital Signage & Playlists
+Permite ao Gabinete Multimédia atualizar os parâmetros de transmissão audiovisual da loja sem sair do ecrã:
+1. **Estado de Signage**: Seleciona entre `Pendente de Instalação`, `Em Configuração de IPs`, `Em Validação de Telas` ou `Pronto para Broadcast`.
+2. **Versão da Playlist**: Altera o identificador da campanha/conteúdo (ex: `v2.5-gold-cascais`).
+3. **Botão "Atualizar"**: Clica para gravar de imediato via `PATCH /api/v1/projects/:id/signage`. O indicador no Dashboard e o cálculo de prontidão de signage (*Signage Readiness*) atualizam-se instantaneamente!
+
+#### C. Checklist Interativa de Marcos Técnicos (`tasks`)
+Apresenta a lista ordenada de tarefas técnicas da loja:
+* **Conclusão com 1 Clique (Checkbox)**: Clica na caixa de seleção à esquerda da tarefa. 
+  * A tarefa é riscada e marcada com `✓ Concluído`.
+  * A barra de progresso da loja atualiza-se de imediato tanto no modal como na tabela principal do Dashboard!
+  * Um novo clique reabre a tarefa para o estado `Pendente`.
+* **Identificadores Visuais**:
+  * **Prioridade**: Badges coloridos para `Crítica` (vermelho), `Alta` (âmbar), `Média` (azul) e `Baixa` (cinzento).
+  * **Departamento**: Tag com a área responsável (`Multimédia & Telas`, `Redes & IT`, `Som & Iluminação`, `Operações & Obras`).
+  * **Prazo**: Data prevista de conclusão do marco técnico.
+* **Eliminação de Tarefas**: Clica no ícone do caixote do lixo para remover o marco técnico após confirmação.
+
+#### D. Adicionar Novo Marco Técnico
+Para acrescentar uma nova tarefa à checklist da loja:
+1. Clica no botão **"+ Novo Marco Técnico"** no cabeçalho da checklist para abrir o formulário desdobrável.
+2. Preenche os campos:
+   * **Título do Marco Técnico*** (obrigatório, ex: *"Calibração de Áudio Bose / JBL"*).
+   * **Departamento** (Multimédia & Telas, Redes & IT, Som & Iluminação, Operações).
+   * **Prioridade** (Crítica, Alta, Média, Baixa).
+   * **Prazo de Entrega** (por defeito pré-preenchido com a data limite técnica da loja).
+   * **Descrição / Observações Técnicas** (opcional, ex: *"Verificar níveis de SPL junto à Linha de Caixas"*).
+3. Clica em **"Guardar Marco"**: a tarefa é inserida na base de dados SQLite via `POST /api/v1/projects/:id/tasks` e surge imediatamente na lista com o progresso recalculado.
+
 
 ---
 
