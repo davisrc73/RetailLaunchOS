@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RetailLaunchOS • Painel de Aberturas de Lojas | Fnac Darty</title>
+  <meta name="description" content="Sistema de gestão de aberturas de lojas Fnac e Darty para o Gabinete Multimédia. Acompanhamento de infraestrutura, digital signage e custos diários.">
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  <!-- Stylesheets (suporta carregamento local direto e servido por backend) -->
+  <link rel="stylesheet" href="../../../public/css/dashboard.css">
+  <link rel="stylesheet" href="/css/dashboard.css">
+</head>
+<body>
+
+  <!-- Efeitos de iluminação ambiente -->
+  <div class="ambient-glow-1"></div>
+  <div class="ambient-glow-2"></div>
+
+  <!-- =========================================================================
+       1. SIDEBAR DE NAVEGAÇÃO
+       ========================================================================= -->
+  <aside class="app-sidebar" id="sidebar">
+    <!-- Brand / Logótipo -->
+    <div class="sidebar-brand">
+      <div class="brand-icon">
+        <span>RL</span>
+      </div>
+      <div class="brand-info">
+        <h1>RetailLaunchOS</h1>
+        <div class="brand-badges">
+          <span class="brand-badge fnac">Fnac</span>
+          <span class="brand-badge darty">Darty</span>
+        </div>
+        <div class="sidebar-dept-tag">Gabinete Multimédia</div>
+      </div>
+    </div>
+
+    <!-- Navegação Principal -->
+    <div class="nav-section">
+      <div class="nav-section-title">Operações Piloto</div>
+      <ul class="sidebar-nav">
+        <li>
+          <a href="#" class="nav-link active" id="nav-dashboard">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6A2.25 2.25 0 016 3.75h2.25A2.25 2.25 0 0110.5 6v2.25a2.25 2.25 0 01-2.25 2.25H6a2.25 2.25 0 01-2.25-2.25V6zM3.75 15.75A2.25 2.25 0 016 13.5h2.25a2.25 2.25 0 012.25 2.25V18a2.25 2.25 0 01-2.25 2.25H6A2.25 2.25 0 013.75 18v-2.25zM13.5 6a2.25 2.25 0 012.25-2.25H18A2.25 2.25 0 0120.25 6v2.25A2.25 2.25 0 0118 10.5h-2.25a2.25 2.25 0 01-2.25-2.25V6zM13.5 15.75a2.25 2.25 0 012.25-2.25H18a2.25 2.25 0 012.25 2.25V18A2.25 2.25 0 0118 20.25h-2.25A2.25 2.25 0 0113.5 18v-2.25z"></path>
+            </svg>
+            <span>Dashboard Geral</span>
+          </a>
+        </li>
+        <li>
+          <a href="#aberturas-section" class="nav-link" id="nav-projetos">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 21v-7.5a.75.75 0 01.75-.75h3a.75.75 0 01.75.75V21m-4.5 0H2.36m11.14 0H18m0 0h3.64m-1.39 0V9.349m-16.5 11.65V9.35m0 0a3.001 3.001 0 003.75-.614A2.993 2.993 0 009 9.35c.801 0 1.554-.316 2.12-.876a3.004 3.004 0 004.24 0c.567.56 1.32.876 2.12.876 1.042 0 2.012-.534 2.58-1.401"></path>
+            </svg>
+            <span>Lojas & Aberturas</span>
+            <span class="badge-count">3</span>
+          </a>
+        </li>
+        <li>
+          <a href="#" class="nav-link" id="nav-signage">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M6 20.25h12m-7.5-3v3m3-3v3m-10.125-3h17.25c.621 0 1.125-.504 1.125-1.125V4.875c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125z"></path>
+            </svg>
+            <span>Digital Signage / Telas</span>
+          </a>
+        </li>
+        <li>
+          <a href="#" class="nav-link" id="nav-playlists">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 12h16.5m-16.5 3.75h16.5M3.75 19.5h16.5M5.625 4.5h12.75a1.875 1.875 0 010 3.75H5.625a1.875 1.875 0 010-3.75z"></path>
+            </svg>
+            <span>Playlists & Conteúdos</span>
+          </a>
+        </li>
+        <li>
+          <a href="#" class="nav-link" id="nav-custos">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 18.75a60.07 60.07 0 0115.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 013 6h-.75m0 0v-.375c0-.621.504-1.125 1.125-1.125H20.25M2.25 6v9m18-10.5v.75c0 .414.336.75.75.75h.75m-1.5-1.5h.375c.621 0 1.125.504 1.125 1.125v9.75c0 .621-.504 1.125-1.125 1.125h-.375m1.5-1.5H21a.75.75 0 00-.75.75v.75m0 0H3.75m0 0h-.375a1.125 1.125 0 01-1.125-1.125V15m1.5 1.5v-.75A.75.75 0 003 15h-.75"></path>
+            </svg>
+            <span>Custos & Diárias</span>
+          </a>
+        </li>
+      </ul>
+    </div>
+
+    <!-- Administração / Permissões (RBAC) -->
+    <div class="nav-section">
+      <div class="nav-section-title">Controlo de Acessos</div>
+      <ul class="sidebar-nav">
+        <li>
+          <a href="#" class="nav-link" id="nav-roles">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z"></path>
+            </svg>
+            <span>Perfis & Permissões</span>
+          </a>
+        </li>
+        <li>
+          <a href="#" class="nav-link" id="nav-users">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z"></path>
+            </svg>
+            <span>Utilizadores Gabinete</span>
+          </a>
+        </li>
+      </ul>
+    </div>
+
+    <!-- Perfil do Utilizador no Rodapé -->
+    <div class="sidebar-footer">
+      <div class="user-card">
+        <div class="user-avatar">
+          <span>AM</span>
+          <span class="status-dot-online" title="Online"></span>
+        </div>
+        <div class="user-meta">
+          <div class="user-name">Admin Multimédia</div>
+          <div class="user-role">Gabinete Multimédia (PT)</div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- =========================================================================
+       2. CORPO PRINCIPAL (HEADER + DASHBOARD)
+       ========================================================================= -->
+  <main class="app-main">
+    <!-- Header Superior -->
+    <header class="app-header">
+      <div class="header-left">
+        <h2 class="page-title">Piloto Multimédia • Aberturas de Lojas</h2>
+        <div class="system-status-pill">
+          <span class="pulse-dot"></span>
+          <span>Rede Signage Ativa (BrightSign / Samsung SSP)</span>
+        </div>
+      </div>
+
+      <div class="header-right">
+        <!-- Barra de Pesquisa Rápida -->
+        <div class="search-box">
+          <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+          </svg>
+          <input type="text" id="projectSearch" placeholder="Pesquisar loja, insígnia...">
+          <span class="kbd-shortcut">⌘K</span>
+        </div>
+
+        <!-- Botão de Notificações -->
+        <button class="btn-icon" aria-label="Notificações" title="Alertas de Abertura">
+          <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0"></path>
+          </svg>
+        </button>
+
+        <!-- Ação Primária -->
+        <button class="btn-primary" id="btnNovaAbertura">
+          <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4.5v15m7.5-7.5h-15"></path>
+          </svg>
+          <span>Nova Abertura</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- Content Container -->
+    <div class="dashboard-container">
+
+      <!-- =====================================================================
+           PAINEL DE KPIS PRINCIPAIS
+           ===================================================================== -->
+      <section class="kpi-grid" aria-label="Indicadores Chave de Desempenho">
+        
+        <!-- KPI 1: Próxima Abertura com Contagem Decrescente -->
+        <div class="kpi-card hero-countdown">
+          <div class="kpi-header">
+            <span class="kpi-label">Próxima Abertura</span>
+            <span class="brand-badge fnac">Fnac Flagship</span>
+          </div>
+          
+          <div class="store-title" style="font-size: 16px; margin-bottom: 4px;">Fnac Cascais</div>
+          <div class="kpi-subtitle">CascaiShopping • Inauguração Oficial</div>
+
+          <!-- Relógio de Contagem Decrescente Live -->
+          <div class="countdown-box" id="countdownTimer">
+            <div class="time-segment">
+              <span class="time-val" id="daysCount">18</span>
+              <span class="time-unit">Dias</span>
+            </div>
+            <div class="time-segment">
+              <span class="time-val" id="hoursCount">06</span>
+              <span class="time-unit">Horas</span>
+            </div>
+            <div class="time-segment">
+              <span class="time-val" id="minCount">42</span>
+              <span class="time-unit">Min</span>
+            </div>
+            <div class="time-segment">
+              <span class="time-val" id="secCount">15</span>
+              <span class="time-unit">Seg</span>
+            </div>
+          </div>
+
+          <div class="target-store-meta">
+            <span>Entrega Técnica: <strong>14 Dias</strong></span>
+            <span class="status-badge badge-signage-testing">Validação Final</span>
+          </div>
+        </div>
+
+        <!-- KPI 2: Estado de Playlists & Digital Signage -->
+        <div class="kpi-card">
+          <div class="kpi-header">
+            <span class="kpi-label">Playlists & Signage</span>
+            <div class="kpi-icon-wrap" style="background: rgba(16, 185, 129, 0.12); color: #10B981;">
+              <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+            </div>
+          </div>
+          
+          <div class="kpi-val">87%</div>
+          <div class="kpi-subtitle">Conteúdos e Telas Prontas para Broadcast</div>
+
+          <!-- Barra de Progresso do Signage -->
+          <div class="signage-meter-wrap">
+            <div class="signage-progress-bar">
+              <div class="signage-progress-fill" style="width: 87%;"></div>
+            </div>
+          </div>
+
+          <div class="signage-sub-stats">
+            <span><strong>24</strong> Players Sincronizados</span>
+            <span><strong>2</strong> Em Teste Técnico</span>
+            <span style="color: #10B981;"><strong>0</strong> Falhas</span>
+          </div>
+        </div>
+
+        <!-- KPI 3: Custo Diário Médio -->
+        <div class="kpi-card">
+          <div class="kpi-header">
+            <span class="kpi-label">Custo Diário Médio</span>
+            <div class="kpi-icon-wrap" style="background: rgba(245, 158, 11, 0.12); color: var(--fnac-gold);">
+              <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v12m-3-2.818l.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+            </div>
+          </div>
+
+          <div class="kpi-val">€ 378,50</div>
+          <div class="kpi-trend positive">
+            <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4.5 19.5l15-15m0 0H8.25m11.25 0v11.25"></path>
+            </svg>
+            <span>Alocado a 3 lojas ativas</span>
+          </div>
+          <div class="kpi-subtitle" style="margin-top: 8px;">
+            Total faturado no mês: <strong style="color: var(--text-white);">€ 11.355,00</strong>
+          </div>
+        </div>
+
+        <!-- KPI 4: Orçamento Total em Execução -->
+        <div class="kpi-card">
+          <div class="kpi-header">
+            <span class="kpi-label">Budget Global Alocado</span>
+            <div class="kpi-icon-wrap" style="background: rgba(59, 130, 246, 0.12); color: #60A5FA;">
+              <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.75 3v11.25A2.25 2.25 0 006 16.5h2.25M3.75 3h-1.5m1.5 0h16.5m0 0h1.5m-1.5 0v11.25A2.25 2.25 0 0118 16.5h-2.25m-7.5 0h7.5m-7.5 0l-1 3m8.5-3l1 3m0 0l.5 1.5m-.5-1.5h-9.5m0 0l-.5 1.5M9 11.25v1.5M12 9v3.75m3-6v6"></path>
+              </svg>
+            </div>
+          </div>
+
+          <div class="kpi-val">€ 98.500,00</div>
+          <div class="kpi-trend" style="color: var(--text-muted);">
+            <span>Executado: <strong style="color: var(--fnac-gold);">54.2%</strong> (€ 53.387)</span>
+          </div>
+          <div class="kpi-subtitle" style="margin-top: 8px;">
+            Multimédia, Áudio e Infraestrutura
+          </div>
+        </div>
+
+      </section>
+
+      <!-- =====================================================================
+           TABELA: ABERTURAS EM CURSO
+           ===================================================================== -->
+      <section class="table-section" id="aberturas-section">
+        <div class="section-header">
+          <div class="section-title-wrap">
+            <h2>Aberturas em Curso • Piloto Gabinete Multimédia</h2>
+            <p>Monitorização de marcos de inauguração, prontidão audiovisual e custos por dia</p>
+          </div>
+
+          <!-- Filtros Rápidos -->
+          <div class="table-filter-bar">
+            <div class="filter-chip-group">
+              <button class="filter-chip active" data-filter="all">Todas (3)</button>
+              <button class="filter-chip" data-filter="Fnac">Fnac (2)</button>
+              <button class="filter-chip" data-filter="Darty">Darty (1)</button>
+            </div>
+            <button class="btn-secondary" id="btnExport">
+              <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="vertical-align: -2px; margin-right: 4px;">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3"></path>
+              </svg>
+              Exportar CSV
+            </button>
+          </div>
+        </div>
+
+        <!-- Tabela Responsiva de Projetos -->
+        <div class="responsive-table-wrap">
+          <table class="data-table" id="projectsTable">
+            <thead>
+              <tr>
+                <th>Projeto & Loja</th>
+                <th>Insígnia / Formato</th>
+                <th>Go-Live Previsto</th>
+                <th>Custo / Dia</th>
+                <th>Estado Signage</th>
+                <th>Progresso</th>
+                <th>Ações</th>
+              </tr>
+            </thead>
+            <tbody>
+              
+              <!-- Linha 1: Fnac Cascais -->
+              <tr data-brand="Fnac" data-status="em_curso">
+                <td>
+                  <div class="store-cell">
+                    <div class="store-brand-pill fnac">FNAC</div>
+                    <div>
+                      <div class="store-title">Fnac Cascais</div>
+                      <div class="store-sub">CascaiShopping • Piso 1, Loja 142</div>
+                    </div>
+                  </div>
+                </td>
+                <td>
+                  <span class="brand-badge fnac">Flagship</span>
+                </td>
+                <td>
+                  <div class="date-pill">
+                    <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5"></path>
+                    </svg>
+                    <span>22 Set 2026</span>
+                    <span class="date-countdown-tag tag-urgent">18 dias</span>
+                  </div>
+                </td>
+                <td>
+                  <div class="cost-day-cell">€ 485,50 <span class="cost-period">/ dia</span></div>
+                  <div class="cost-period">Budget: € 45.000</div>
+                </td>
+                <td>
+                  <span class="status-badge badge-signage-testing">
+                    <span class="pulse-dot" style="width: 5px; height: 5px; background: var(--fnac-gold); box-shadow: none;"></span>
+                    Validação Telas
+                  </span>
+                  <div style="font-size: 11px; color: var(--text-dim); margin-top: 4px;">Playlist v2.4</div>
+                </td>
+                <td>
+                  <div class="progress-bar-container">
+                    <div class="progress-track">
+                      <div class="progress-fill-bar progress-fill-gold" style="width: 82%;"></div>
+                    </div>
+                    <span class="progress-percent-label">82%</span>
+                  </div>
+                </td>
+                <td>
+                  <div class="action-btn-group">
+                    <button class="btn-secondary" title="Gerir Telas e Marcos">Gerir</button>
+                    <button class="btn-icon" style="width: 28px; height: 28px;" title="Mais opções">
+                      <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.75a.75.75 0 110-1.5.75.75 0 010 1.5zM12 12.75a.75.75 0 110-1.5.75.75 0 010 1.5zM12 18.75a.75.75 0 110-1.5.75.75 0 010 1.5z"></path>
+                      </svg>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+
+              <!-- Linha 2: Darty Parque das Nações -->
+              <tr data-brand="Darty" data-status="planeamento">
+                <td>
+                  <div class="store-cell">
+                    <div class="store-brand-pill darty">DARTY</div>
+                    <div>
+                      <div class="store-title">Darty Parque das Nações</div>
+                      <div class="store-sub">Av. D. João II, Lisboa</div>
+                    </div>
+                  </div>
+                </td>
+                <td>
+                  <span class="brand-badge darty">Standard</span>
+                </td>
+                <td>
+                  <div class="date-pill">
+                    <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5"></path>
+                    </svg>
+                    <span>16 Out 2026</span>
+                    <span class="date-countdown-tag tag-normal">42 dias</span>
+                  </div>
+                </td>
+                <td>
+                  <div class="cost-day-cell">€ 390,00 <span class="cost-period">/ dia</span></div>
+                  <div class="cost-period">Budget: € 32.000</div>
+                </td>
+                <td>
+                  <span class="status-badge badge-signage-testing">
+                    <span class="pulse-dot" style="width: 5px; height: 5px; background: #3B82F6; box-shadow: none;"></span>
+                    Configuração IP
+                  </span>
+                  <div style="font-size: 11px; color: var(--text-dim); margin-top: 4px;">Playlist v1.1</div>
+                </td>
+                <td>
+                  <div class="progress-bar-container">
+                    <div class="progress-track">
+                      <div class="progress-fill-bar progress-fill-red" style="width: 48%;"></div>
+                    </div>
+                    <span class="progress-percent-label">48%</span>
+                  </div>
+                </td>
+                <td>
+                  <div class="action-btn-group">
+                    <button class="btn-secondary" title="Gerir Telas e Marcos">Gerir</button>
+                    <button class="btn-icon" style="width: 28px; height: 28px;" title="Mais opções">
+                      <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.75a.75.75 0 110-1.5.75.75 0 010 1.5zM12 12.75a.75.75 0 110-1.5.75.75 0 010 1.5zM12 18.75a.75.75 0 110-1.5.75.75 0 010 1.5z"></path>
+                      </svg>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+
+              <!-- Linha 3: Fnac Porto Boavista -->
+              <tr data-brand="Fnac" data-status="planeamento">
+                <td>
+                  <div class="store-cell">
+                    <div class="store-brand-pill fnac">FNAC</div>
+                    <div>
+                      <div class="store-title">Fnac Porto Boavista</div>
+                      <div class="store-sub">Avenida da Boavista, Porto</div>
+                    </div>
+                  </div>
+                </td>
+                <td>
+                  <span class="brand-badge fnac">Express</span>
+                </td>
+                <td>
+                  <div class="date-pill">
+                    <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5"></path>
+                    </svg>
+                    <span>08 Nov 2026</span>
+                    <span class="date-countdown-tag tag-relaxed">65 dias</span>
+                  </div>
+                </td>
+                <td>
+                  <div class="cost-day-cell">€ 260,00 <span class="cost-period">/ dia</span></div>
+                  <div class="cost-period">Budget: € 21.500</div>
+                </td>
+                <td>
+                  <span class="status-badge badge-signage-pending">
+                    Planeamento
+                  </span>
+                  <div style="font-size: 11px; color: var(--text-dim); margin-top: 4px;">Playlist v1.0</div>
+                </td>
+                <td>
+                  <div class="progress-bar-container">
+                    <div class="progress-track">
+                      <div class="progress-fill-bar progress-fill-gold" style="width: 25%;"></div>
+                    </div>
+                    <span class="progress-percent-label">25%</span>
+                  </div>
+                </td>
+                <td>
+                  <div class="action-btn-group">
+                    <button class="btn-secondary" title="Gerir Telas e Marcos">Gerir</button>
+                    <button class="btn-icon" style="width: 28px; height: 28px;" title="Mais opções">
+                      <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.75a.75.75 0 110-1.5.75.75 0 010 1.5zM12 12.75a.75.75 0 110-1.5.75.75 0 010 1.5zM12 18.75a.75.75 0 110-1.5.75.75 0 010 1.5z"></path>
+                      </svg>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- =====================================================================
+           ATIVIDADE EM TEMPO REAL & GABINETE MULTIMÉDIA
+           ===================================================================== -->
+      <section class="bottom-grid">
+        
+        <!-- Feed de Operações Recentes -->
+        <div class="feed-card">
+          <div class="section-title-wrap">
+            <h2 style="font-size: 15px; font-weight: 700; color: var(--text-white);">Atividade Recente • Gabinete Multimédia</h2>
+            <p style="font-size: 12px; color: var(--text-muted);">Sincronização de equipamentos, testes de som e validação de players</p>
+          </div>
+
+          <div class="feed-item-list">
+            <div class="feed-item">
+              <div class="feed-item-icon" style="background: rgba(16, 185, 129, 0.12); color: #10B981;">
+                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                </svg>
+              </div>
+              <div class="feed-item-text">
+                <div><strong>Video Wall de Entrada (4x4)</strong> validado com sucesso em <strong>Fnac Cascais</strong>.</div>
+                <div class="feed-timestamp">Há 25 minutos • BrightSign UHD Player #01</div>
+              </div>
+            </div>
+
+            <div class="feed-item">
+              <div class="feed-item-icon" style="background: rgba(245, 158, 11, 0.12); color: var(--fnac-gold);">
+                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+              </div>
+              <div class="feed-item-text">
+                <div>Atualização de diária de testes lançada: <strong>€ 485,50</strong> atribuídos a <strong>Fnac Cascais</strong>.</div>
+                <div class="feed-timestamp">Há 2 horas • Lançado por Admin Multimédia</div>
+              </div>
+            </div>
+
+            <div class="feed-item">
+              <div class="feed-item-icon" style="background: rgba(59, 130, 246, 0.12); color: #60A5FA;">
+                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.19 8.688a4.5 4.5 0 011.242 7.244l-4.5 4.5a4.5 4.5 0 01-6.364-6.364l1.757-1.757m13.35-.622l1.757-1.757a4.5 4.5 0 00-6.364-6.364l-4.5 4.5a4.5 4.5 0 001.242 7.244"></path>
+                </svg>
+              </div>
+              <div class="feed-item-text">
+                <div>Topologia de rede e switch PoE provisionados para <strong>Darty Parque das Nações</strong>.</div>
+                <div class="feed-timestamp">Ontem às 17:40 • Departamento Redes & IT</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Resumo Rápido de Infraestrutura -->
+        <div class="feed-card">
+          <div class="section-title-wrap">
+            <h2 style="font-size: 15px; font-weight: 700; color: var(--text-white);">Infraestrutura Multimédia</h2>
+            <p style="font-size: 12px; color: var(--text-muted);">Sumário de inventário alocado ao piloto</p>
+          </div>
+
+          <div class="stats-summary-box">
+            <div class="stat-row">
+              <span>Ecrãs LED / Displays 4K</span>
+              <strong>36 Unidades</strong>
+            </div>
+            <div class="stat-row">
+              <span>Players Digitais BrightSign</span>
+              <strong>18 Ativos</strong>
+            </div>
+            <div class="stat-row">
+              <span>Sistemas de Áudio Zoneado</span>
+              <strong>3 Lojas</strong>
+            </div>
+            <div class="stat-row">
+              <span>Versão Central de Playlists</span>
+              <strong style="color: var(--fnac-gold);">v2.4-RC1</strong>
+            </div>
+          </div>
+        </div>
+
+      </section>
+
+    </div>
+  </main>
+
+  <!-- =========================================================================
+       SCRIPT DINÂMICO (CONTAGEM DECRESCENTE + FILTRAGEM DE TABELA)
+       ========================================================================= -->
+  <script>
+    // 1. Contador em Tempo Real para a Próxima Abertura (Fnac Cascais - 18 dias a partir de agora)
+    (function initCountdown() {
+      // Define data alvo: 18 dias, 6 horas, 42 minutos à frente
+      const targetDate = new Date();
+      targetDate.setDate(targetDate.getDate() + 18);
+      targetDate.setHours(targetDate.getHours() + 6);
+      targetDate.setMinutes(targetDate.getMinutes() + 42);
+
+      const daysEl = document.getElementById('daysCount');
+      const hoursEl = document.getElementById('hoursCount');
+      const minEl = document.getElementById('minCount');
+      const secEl = document.getElementById('secCount');
+
+      function updateClock() {
+        const now = new Date().getTime();
+        const diff = targetDate.getTime() - now;
+
+        if (diff <= 0) {
+          if (daysEl) daysEl.innerText = '00';
+          if (hoursEl) hoursEl.innerText = '00';
+          if (minEl) minEl.innerText = '00';
+          if (secEl) secEl.innerText = '00';
+          return;
+        }
+
+        const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const mins = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+        const secs = Math.floor((diff % (1000 * 60)) / 1000);
+
+        if (daysEl) daysEl.innerText = String(days).padStart(2, '0');
+        if (hoursEl) hoursEl.innerText = String(hours).padStart(2, '0');
+        if (minEl) minEl.innerText = String(mins).padStart(2, '0');
+        if (secEl) secEl.innerText = String(secs).padStart(2, '0');
+      }
+
+      updateClock();
+      setInterval(updateClock, 1000);
+    })();
+
+    // 2. Filtragem de Tabela por Insígnia (Todas, Fnac, Darty)
+    const filterButtons = document.querySelectorAll('.filter-chip');
+    const tableRows = document.querySelectorAll('#projectsTable tbody tr');
+
+    filterButtons.forEach(button => {
+      button.addEventListener('click', () => {
+        filterButtons.forEach(btn => btn.classList.remove('active'));
+        button.classList.add('active');
+
+        const filterValue = button.getAttribute('data-filter');
+        tableRows.forEach(row => {
+          const brand = row.getAttribute('data-brand');
+          if (filterValue === 'all' || brand === filterValue) {
+            row.style.display = '';
+          } else {
+            row.style.display = 'none';
+          }
+        });
+      });
+    });
+
+    // 3. Pesquisa Rápida na Tabela
+    const searchInput = document.getElementById('projectSearch');
+    if (searchInput) {
+      searchInput.addEventListener('input', (e) => {
+        const query = e.target.value.toLowerCase();
+        tableRows.forEach(row => {
+          const text = row.innerText.toLowerCase();
+          row.style.display = text.includes(query) ? '' : 'none';
+        });
+      });
+    }
+
+    // 4. Modal/Feedback para o botão "Nova Abertura"
+    const btnNovaAbertura = document.getElementById('btnNovaAbertura');
+    if (btnNovaAbertura) {
+      btnNovaAbertura.addEventListener('click', () => {
+        alert('Módulo de Abertura: A preparar formulário de novo projeto com suporte para controladores REST...');
+      });
+    }
+  </script>
+</body>
+</html>

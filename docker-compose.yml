@@ -1,0 +1,17 @@
+services:
+  retaillaunch:
+    build: .
+    container_name: retaillaunch-app
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+      - DB_DIALECT=sqlite
+      - DB_STORAGE=/app/database/retaillaunch.sqlite
+    volumes:
+      - retaillaunch_data:/app/database
+
+volumes:
+  retaillaunch_data:

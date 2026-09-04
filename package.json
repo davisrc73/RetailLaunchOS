@@ -1,0 +1,20 @@
+{
+  "name": "retaillaunch-os",
+  "version": "1.0.0",
+  "description": "Plataforma de Gestão de Aberturas de Lojas (Fnac/Darty) para o Gabinete Multimédia",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js"
+  },
+  "keywords": [
+    "retail",
+    "fnac",
+    "darty",
+    "digital-signage",
+    "store-openings",
+    "multimedia"
+  ],
+  "author": "Gabinete Multimédia - Fnac Darty",
+  "license": "ISC"
+}

@@ -1,0 +1,32 @@
+# Dependências
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Variáveis de ambiente e segredos
+.env
+.env.local
+.env.*.local
+
+# Ficheiros do Sistema Operativo
+.DS_Store
+Thumbs.db
+
+# Base de dados local de desenvolvimento
+database/*.sqlite
+database/*.sqlite-journal
+database/*.db
+
+# Logs e ficheiros temporários
+logs/
+*.log
+scratch/
+tmp/
+.cache/
+
+# IDE e editores
+.vscode/
+.idea/
+*.swp
+*.swo
