@@ -12,6 +12,7 @@ const projectController = require('./src/controllers/projectController');
 
 const taskController = require('./src/controllers/taskController');
 const costController = require('./src/controllers/costController');
+const signageController = require('./src/controllers/signageController');
 
 // Helper para responder JSON em servidor HTTP nativo
 function sendJson(res, statusCode, data) {
@@ -122,7 +123,33 @@ const server = http.createServer(async (req, res) => {
       return;
     }
 
-    // 8. PATCH ou PUT /api/v1/projects/:id/signage (atualizar signage e playlist)
+    // 8. GET /api/v1/projects/:id/players
+    const playersMatch = pathname.match(/^\/api\/v1\/projects\/([^\/]+)\/players$/);
+    if (playersMatch && method === 'GET') {
+      req.params = { projectId: playersMatch[1] };
+      const mockRes = { status: (code) => ({ json: (data) => sendJson(res, code, data) }) };
+      return signageController.getByProject(req, mockRes);
+    }
+
+    // 9. POST /api/v1/projects/:id/players (registar display/player para loja)
+    if (playersMatch && method === 'POST') {
+      req.params = { projectId: playersMatch[1] };
+      let body = '';
+      req.on('data', chunk => { body += chunk.toString(); });
+      req.on('end', async () => {
+        try {
+          req.body = body ? JSON.parse(body) : {};
+          req.body.project_id = req.params.projectId;
+          const mockRes = { status: (code) => ({ json: (data) => sendJson(res, code, data) }) };
+          await signageController.createPlayer(req, mockRes);
+        } catch (err) {
+          sendJson(res, 400, { success: false, message: 'JSON Inválido: ' + err.message });
+        }
+      });
+      return;
+    }
+
+    // 10. PATCH ou PUT /api/v1/projects/:id/signage (atualizar signage e playlist)
     const signageMatch = pathname.match(/^\/api\/v1\/projects\/([^\/]+)\/signage$/);
     if (signageMatch && (method === 'PATCH' || method === 'PUT')) {
       req.params = { id: signageMatch[1] };
@@ -140,7 +167,7 @@ const server = http.createServer(async (req, res) => {
       return;
     }
 
-    // 9. GET /api/v1/projects/:id
+    // 11. GET /api/v1/projects/:id
     const singleMatch = pathname.match(/^\/api\/v1\/projects\/([^\/]+)$/);
     if (singleMatch && method === 'GET') {
       req.params = { id: singleMatch[1] };
@@ -148,11 +175,132 @@ const server = http.createServer(async (req, res) => {
       return projectController.getById(req, mockRes);
     }
 
-    // 10. DELETE /api/v1/projects/:id
+    // 12. DELETE /api/v1/projects/:id
     if (singleMatch && method === 'DELETE') {
       req.params = { id: singleMatch[1] };
       const mockRes = { status: (code) => ({ json: (data) => sendJson(res, code, data) }) };
       return projectController.delete(req, mockRes);
+    }
+  }
+
+  // --- API ROUTES: /api/v1/signage ---
+  if (pathname.startsWith('/api/v1/signage')) {
+    // 1. GET /api/v1/signage/stats
+    if (pathname === '/api/v1/signage/stats' && method === 'GET') {
+      const mockRes = { status: (code) => ({ json: (data) => sendJson(res, code, data) }) };
+      return signageController.getStats(req, mockRes);
+    }
+
+    // 2. GET /api/v1/signage/playlists
+    if ((pathname === '/api/v1/signage/playlists' || pathname === '/api/v1/signage/playlists/') && method === 'GET') {
+      req.query = parsedUrl.query;
+      const mockRes = { status: (code) => ({ json: (data) => sendJson(res, code, data) }) };
+      return signageController.getPlaylists(req, mockRes);
+    }
+
+    // 3. POST /api/v1/signage/playlists
+    if ((pathname === '/api/v1/signage/playlists' || pathname === '/api/v1/signage/playlists/') && method === 'POST') {
+      let body = '';
+      req.on('data', chunk => { body += chunk.toString(); });
+      req.on('end', async () => {
+        try {
+          req.body = body ? JSON.parse(body) : {};
+          const mockRes = { status: (code) => ({ json: (data) => sendJson(res, code, data) }) };
+          await signageController.createPlaylist(req, mockRes);
+        } catch (err) {
+          sendJson(res, 400, { success: false, message: 'JSON Inválido: ' + err.message });
+        }
+      });
+      return;
+    }
+
+    // 4. PATCH /api/v1/signage/playlists/:id/status
+    const playlistStatusMatch = pathname.match(/^\/api\/v1\/signage\/playlists\/([^\/]+)\/status$/);
+    if (playlistStatusMatch && (method === 'PATCH' || method === 'POST')) {
+      req.params = { id: playlistStatusMatch[1] };
+      let body = '';
+      req.on('data', chunk => { body += chunk.toString(); });
+      req.on('end', async () => {
+        try {
+          req.body = body ? JSON.parse(body) : {};
+          const mockRes = { status: (code) => ({ json: (data) => sendJson(res, code, data) }) };
+          await signageController.updatePlaylistStatus(req, mockRes);
+        } catch (err) {
+          sendJson(res, 400, { success: false, message: 'JSON Inválido: ' + err.message });
+        }
+      });
+      return;
+    }
+
+    // 5. GET /api/v1/signage/playlists/:id
+    const singlePlaylistMatch = pathname.match(/^\/api\/v1\/signage\/playlists\/([^\/]+)$/);
+    if (singlePlaylistMatch && method === 'GET') {
+      req.params = { id: singlePlaylistMatch[1] };
+      const mockRes = { status: (code) => ({ json: (data) => sendJson(res, code, data) }) };
+      return signageController.getPlaylistById(req, mockRes);
+    }
+
+    // 6. DELETE /api/v1/signage/playlists/:id
+    if (singlePlaylistMatch && method === 'DELETE') {
+      req.params = { id: singlePlaylistMatch[1] };
+      const mockRes = { status: (code) => ({ json: (data) => sendJson(res, code, data) }) };
+      return signageController.deletePlaylist(req, mockRes);
+    }
+
+    // 7. GET /api/v1/signage/players
+    if ((pathname === '/api/v1/signage/players' || pathname === '/api/v1/signage/players/') && method === 'GET') {
+      req.query = parsedUrl.query;
+      const mockRes = { status: (code) => ({ json: (data) => sendJson(res, code, data) }) };
+      return signageController.getPlayers(req, mockRes);
+    }
+
+    // 8. POST /api/v1/signage/players
+    if ((pathname === '/api/v1/signage/players' || pathname === '/api/v1/signage/players/') && method === 'POST') {
+      let body = '';
+      req.on('data', chunk => { body += chunk.toString(); });
+      req.on('end', async () => {
+        try {
+          req.body = body ? JSON.parse(body) : {};
+          const mockRes = { status: (code) => ({ json: (data) => sendJson(res, code, data) }) };
+          await signageController.createPlayer(req, mockRes);
+        } catch (err) {
+          sendJson(res, 400, { success: false, message: 'JSON Inválido: ' + err.message });
+        }
+      });
+      return;
+    }
+
+    // 9. POST /api/v1/signage/players/:id/ping
+    const playerPingMatch = pathname.match(/^\/api\/v1\/signage\/players\/([^\/]+)\/ping$/);
+    if (playerPingMatch && method === 'POST') {
+      req.params = { id: playerPingMatch[1] };
+      const mockRes = { status: (code) => ({ json: (data) => sendJson(res, code, data) }) };
+      return signageController.pingPlayer(req, mockRes);
+    }
+
+    // 10. PATCH ou PUT /api/v1/signage/players/:id
+    const singlePlayerMatch = pathname.match(/^\/api\/v1\/signage\/players\/([^\/]+)$/);
+    if (singlePlayerMatch && (method === 'PATCH' || method === 'PUT')) {
+      req.params = { id: singlePlayerMatch[1] };
+      let body = '';
+      req.on('data', chunk => { body += chunk.toString(); });
+      req.on('end', async () => {
+        try {
+          req.body = body ? JSON.parse(body) : {};
+          const mockRes = { status: (code) => ({ json: (data) => sendJson(res, code, data) }) };
+          await signageController.updatePlayer(req, mockRes);
+        } catch (err) {
+          sendJson(res, 400, { success: false, message: 'JSON Inválido: ' + err.message });
+        }
+      });
+      return;
+    }
+
+    // 11. DELETE /api/v1/signage/players/:id
+    if (singlePlayerMatch && method === 'DELETE') {
+      req.params = { id: singlePlayerMatch[1] };
+      const mockRes = { status: (code) => ({ json: (data) => sendJson(res, code, data) }) };
+      return signageController.deletePlayer(req, mockRes);
     }
   }
 

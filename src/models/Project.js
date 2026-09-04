@@ -181,21 +181,30 @@ class Project {
       WHERE strftime('%Y-%m', entry_date) = strftime('%Y-%m', 'now')
     `);
 
-    // 4. Prontidão Digital Signage
-    const signageMetrics = db.get(`
+    // 4. Prontidão Digital Signage (baseada em signage_players)
+    const playerMetrics = db.get(`
       SELECT 
-        COUNT(*) as total_projects,
-        SUM(CASE WHEN signage_status = 'pronto' OR signage_status = 'validacao' THEN 1 ELSE 0 END) as ready_projects
-      FROM projects
+        COUNT(*) as total_players,
+        SUM(CASE WHEN status = 'online' OR status = 'syncing' THEN 1 ELSE 0 END) as ready_players,
+        SUM(CASE WHEN status = 'online' THEN 1 ELSE 0 END) as online_players,
+        SUM(CASE WHEN status = 'testing' THEN 1 ELSE 0 END) as testing_players,
+        SUM(CASE WHEN status = 'offline' THEN 1 ELSE 0 END) as offline_players
+      FROM signage_players
     `);
 
-    const signageReadiness = signageMetrics && signageMetrics.total_projects > 0 
-      ? Math.round((signageMetrics.ready_projects / signageMetrics.total_projects) * 100)
-      : 87;
+    const totalPl = playerMetrics?.total_players || 0;
+    const readyPl = playerMetrics?.ready_players || 0;
+    const signageReadiness = totalPl > 0 ? Math.round((readyPl / totalPl) * 100) : 87;
 
     return {
       nextOpening,
       signageReadiness,
+      signageStats: {
+        total: totalPl,
+        online: playerMetrics?.online_players || 0,
+        testing: playerMetrics?.testing_players || 0,
+        offline: playerMetrics?.offline_players || 0
+      },
       avgDailyCost: financials?.avg_daily_cost || 378.50,
       totalDailyCost: financials?.total_daily_cost || 1135.50,
       totalBudget: financials?.total_budget || 98500.00,

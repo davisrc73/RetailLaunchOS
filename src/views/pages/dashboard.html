@@ -233,9 +233,9 @@
           </div>
 
           <div class="signage-sub-stats">
-            <span><strong>24</strong> Players Ativos</span>
-            <span><strong>2</strong> Em Teste</span>
-            <span style="color: #10B981;"><strong>0</strong> Falhas</span>
+            <span id="kpiSignageActive"><strong>4</strong> Players Ativos</span>
+            <span id="kpiSignageTesting"><strong>0</strong> Em Teste</span>
+            <span id="kpiSignageOffline" style="color: #10B981;"><strong>0</strong> Falhas</span>
           </div>
         </div>
 
@@ -551,6 +551,35 @@
     </div>
   </div>
 
+  <!-- =========================================================================
+       MODAL: HUB CENTRAL DE DIGITAL SIGNAGE & CATÁLOGO DE PLAYLISTS
+       ========================================================================= -->
+  <div class="modal-backdrop" id="modalHubSignage">
+    <div class="modal-card modal-extra-large">
+      <div class="modal-header">
+        <div class="modal-title">
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="color: var(--fnac-gold);">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 20.25h12m-7.5-3v3m3-3v3m-10.125-3h17.25c.621 0 1.125-.504 1.125-1.125V4.875c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125z"></path>
+            </svg>
+            <span>Hub Central • Digital Signage & Playlists Fnac / Darty</span>
+          </div>
+        </div>
+        <button class="modal-close-btn" id="btnCloseHubSignage" aria-label="Fechar">
+          <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+          </svg>
+        </button>
+      </div>
+      <div class="modal-body" id="modalHubSignageBody">
+        <!-- Preenchido dinamicamente via JS -->
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn-secondary" id="btnFecharHubSignage">Fechar</button>
+      </div>
+    </div>
+  </div>
+
 
   <!-- =========================================================================
        SCRIPT DINÂMICO COMPLETO (INTEGRAÇÃO API REST + BASE DE DADOS SQLITE)
@@ -801,11 +830,24 @@
           const budgetEl = document.getElementById('kpiTotalBudget');
           if (budgetEl) budgetEl.innerText = formatCurrency(kpis.totalBudget);
 
-          // Atualizar Signage Readiness
+          // Atualizar Signage Readiness & Sub-estatísticas
           const signageVal = document.getElementById('kpiSignageReadiness');
           const signageFill = document.getElementById('kpiSignageFill');
           if (signageVal) signageVal.innerText = `${kpis.signageReadiness || 87}%`;
           if (signageFill) signageFill.style.width = `${kpis.signageReadiness || 87}%`;
+
+          if (kpis.signageStats) {
+            const actEl = document.getElementById('kpiSignageActive');
+            const testEl = document.getElementById('kpiSignageTesting');
+            const offEl = document.getElementById('kpiSignageOffline');
+            if (actEl) actEl.innerHTML = `<strong>${kpis.signageStats.online || 0}</strong> Players Ativos`;
+            if (testEl) testEl.innerHTML = `<strong>${kpis.signageStats.testing || 0}</strong> Em Teste`;
+            if (offEl) {
+              const fails = kpis.signageStats.offline || 0;
+              offEl.style.color = fails > 0 ? 'var(--darty-red)' : '#10B981';
+              offEl.innerHTML = `<strong>${fails}</strong> Falhas`;
+            }
+          }
 
           // Custo Mensal
           const monthlyEl = document.getElementById('kpiMonthlyCost');
@@ -940,13 +982,17 @@
     async function openProjectDetails(id) {
       currentProjectIdInModal = id;
       try {
-        const [resProj, resCosts] = await Promise.all([
+        const [resProj, resCosts, resPlayers, resPlaylists] = await Promise.all([
           fetch(`/api/v1/projects/${id}`),
-          fetch(`/api/v1/projects/${id}/costs`)
+          fetch(`/api/v1/projects/${id}/costs`),
+          fetch(`/api/v1/projects/${id}/players`),
+          fetch(`/api/v1/signage/playlists`)
         ]);
         
         const jsonProj = await resProj.json();
         const jsonCosts = await resCosts.json();
+        const jsonPlayers = await resPlayers.json();
+        const jsonPlaylists = await resPlaylists.json();
 
         if (jsonProj.success && jsonProj.data) {
           const p = jsonProj.data;
@@ -957,6 +1003,8 @@
             budgetExecutionPercent: 0,
             costs: []
           };
+          const players = (jsonPlayers.success && Array.isArray(jsonPlayers.data)) ? jsonPlayers.data : [];
+          const playlists = (jsonPlaylists.success && Array.isArray(jsonPlaylists.data)) ? jsonPlaylists.data : [];
 
           const brandClass = p.brand?.toLowerCase().includes('darty') ? 'darty' : 'fnac';
           
@@ -1063,6 +1111,72 @@
           if (fin.budgetExecutionPercent > 85) budgetColor = 'var(--darty-red)';
           else if (fin.budgetExecutionPercent > 65) budgetColor = 'var(--fnac-gold)';
 
+          // Renderizar lista de ecrãs/players da loja (Fase 4)
+          let playersListHtml = '';
+          if (players.length > 0) {
+            playersListHtml = players.map(sp => {
+              let resClass = 'tag-res-4k';
+              if (sp.resolution?.includes('FHD') || sp.resolution?.includes('1080')) resClass = 'tag-res-fhd';
+              else if (sp.resolution?.includes('LED')) resClass = 'tag-res-led';
+
+              const playlistOptions = playlists.map(pl => `
+                <option value="${pl.id}" ${sp.playlist_id === pl.id ? 'selected' : ''}>${pl.name} (${pl.version})</option>
+              `).join('');
+
+              return `
+                <div class="player-list-item" id="player-item-${sp.id}">
+                  <div class="player-main-info">
+                    <div class="player-icon-box">
+                      <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                      </svg>
+                    </div>
+                    <div>
+                      <div style="display: flex; align-items: center; gap: 8px;">
+                        <strong style="color: var(--text-white); font-size: 14px;">${sp.name}</strong>
+                        <span class="tag-res ${resClass}">${sp.resolution}</span>
+                        <span class="tag-hw-model">${sp.device_model}</span>
+                      </div>
+                      <div style="font-size: 12px; color: var(--text-muted); margin-top: 3px;">
+                        Zona: <strong>${sp.zone_location}</strong> • IP: <code style="color: var(--fnac-gold); font-family: 'JetBrains Mono', monospace;">${sp.ip_address || 'DHCP'}</code> • MAC: ${sp.mac_address || 'N/A'}
+                      </div>
+                      <div style="display: flex; align-items: center; gap: 8px; margin-top: 6px;">
+                        <span style="font-size: 11px; color: var(--text-dim);">Playlist:</span>
+                        <select class="form-select" style="padding: 2px 8px; font-size: 11px; height: 26px; width: auto;" onchange="changePlayerPlaylist(${sp.id}, this.value, ${p.id})">
+                          <option value="">-- Nenhuma Playlist --</option>
+                          ${playlistOptions}
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+                  <div style="display: flex; align-items: center; gap: 10px;">
+                    <div class="player-status-badge ${sp.status}" id="player-badge-${sp.id}">
+                      <span class="status-dot-ping"></span>
+                      <span>${sp.status}</span>
+                    </div>
+                    <button class="btn-ping" onclick="pingPlayer(${sp.id}, ${p.id})" title="Enviar sinal de teste / ping">
+                      <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                      </svg>
+                      <span>Ping</span>
+                    </button>
+                    <button class="task-del-btn" onclick="deletePlayer(${sp.id}, ${p.id})" title="Remover ecrã">
+                      <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+              `;
+            }).join('');
+          } else {
+            playersListHtml = `
+              <div style="text-align: center; padding: 24px; color: var(--text-dim); font-size: 13px;">
+                Sem ecrãs ou players registados para esta loja. Clica em "+ Associar Novo Ecrã / Player" abaixo!
+              </div>
+            `;
+          }
+
           modalDetalheBody.innerHTML = `
             <!-- Abas de Navegação do Modal -->
             <div class="modal-nav-tabs">
@@ -1077,6 +1191,12 @@
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v12m-3-2.818l.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                 </svg>
                 <span>Custos, Diárias & Orçamento</span>
+              </button>
+              <button type="button" class="modal-tab-btn ${currentActiveTab === 'tabPlayers' ? 'active' : ''}" onclick="switchModalTab('tabPlayers', this)">
+                <svg width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 20.25h12m-7.5-3v3m3-3v3m-10.125-3h17.25c.621 0 1.125-.504 1.125-1.125V4.875c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125z"></path>
+                </svg>
+                <span>Telas & Players (${players.length})</span>
               </button>
             </div>
 
@@ -1302,6 +1422,86 @@
               </div>
 
             </div>
+
+            <!-- =================================================================
+                 ABA 3: TELAS & PLAYERS DA LOJA (FASE 4)
+                 ================================================================= -->
+            <div class="tab-pane ${currentActiveTab === 'tabPlayers' ? 'active' : ''}" id="tabPlayers">
+              <div class="modal-section-card">
+                <div class="modal-section-title">
+                  <span>Parque de Displays & Media Players (${players.length} ecrãs)</span>
+                  <button type="button" class="add-task-toggle" onclick="toggleAddPlayerForm()">
+                    <svg width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4.5v15m7.5-7.5h-15"></path>
+                    </svg>
+                    <span>Associar Novo Ecrã / Player</span>
+                  </button>
+                </div>
+
+                <!-- Formulário Desdobrável para Novo Player -->
+                <div class="add-task-card" id="addPlayerCard" style="display: none; margin-bottom: 14px;">
+                  <form id="formCreatePlayer" onsubmit="handleCreatePlayer(event, ${p.id})">
+                    <div class="form-grid-2">
+                      <div class="form-group">
+                        <label class="form-label">Nome do Ecrã / Ponto de Exibição *</label>
+                        <input type="text" id="newPlayerName" class="form-input" placeholder="Ex: Video Wall Entrada 4x4" required>
+                      </div>
+                      <div class="form-group">
+                        <label class="form-label">Zona / Localização na Loja *</label>
+                        <input type="text" id="newPlayerZone" class="form-input" placeholder="Ex: Montra Principal ou Linha de Caixas" required>
+                      </div>
+                    </div>
+
+                    <div class="form-grid-2" style="margin-top: 10px;">
+                      <div class="form-group">
+                        <label class="form-label">Modelo de Hardware</label>
+                        <select id="newPlayerModel" class="form-select">
+                          <option value="BrightSign XT1144 4K" selected>BrightSign XT1144 4K (Ultra HD)</option>
+                          <option value="BrightSign HD224">BrightSign HD224 (Full HD)</option>
+                          <option value="Samsung SSP (Tizen 6.5)">Samsung SSP Tizen SoC</option>
+                          <option value="LG webOS Signage 6.0">LG webOS Signage Display</option>
+                          <option value="Philips D-Line Android">Philips D-Line Android</option>
+                        </select>
+                      </div>
+                      <div class="form-group">
+                        <label class="form-label">Resolução de Saída</label>
+                        <select id="newPlayerResolution" class="form-select">
+                          <option value="3840x2160 (4K)" selected>3840x2160 (4K UHD)</option>
+                          <option value="1920x1080 (FHD)">1920x1080 (Full HD)</option>
+                          <option value="Video Wall LED">Video Wall LED Personalizado</option>
+                        </select>
+                      </div>
+                    </div>
+
+                    <div class="form-grid-2" style="margin-top: 10px;">
+                      <div class="form-group">
+                        <label class="form-label">Endereço IP (VLAN Técnica)</label>
+                        <input type="text" id="newPlayerIp" class="form-input" placeholder="Ex: 192.168.142.20">
+                      </div>
+                      <div class="form-group">
+                        <label class="form-label">Playlist a Associar</label>
+                        <select id="newPlayerPlaylist" class="form-select">
+                          <option value="">-- Nenhuma Playlist --</option>
+                          ${playlists.map(pl => `<option value="${pl.id}">${pl.name} (${pl.version})</option>`).join('')}
+                        </select>
+                      </div>
+                    </div>
+
+                    <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 14px;">
+                      <button type="button" class="btn-secondary" onclick="toggleAddPlayerForm()">Cancelar</button>
+                      <button type="submit" class="btn-primary">
+                        <span>Gravar Ecrã</span>
+                      </button>
+                    </div>
+                  </form>
+                </div>
+
+                <!-- Lista de Players -->
+                <div class="task-list" id="modalPlayerList" style="margin-top: 12px; gap: 10px; display: flex; flex-direction: column;">
+                  ${playersListHtml}
+                </div>
+              </div>
+            </div>
           `;
 
           modalDetalhe.classList.add('active');
@@ -1474,6 +1674,490 @@
 
     if (btnCloseDetalhe) btnCloseDetalhe.addEventListener('click', () => modalDetalhe.classList.remove('active'));
     if (btnFecharDetalhe) btnFecharDetalhe.addEventListener('click', () => modalDetalhe.classList.remove('active'));
+
+
+
+    // =========================================================================
+    // FASE 4: GESTÃO DE PLAYERS, TELAS E HUB CENTRAL DE DIGITAL SIGNAGE
+    // =========================================================================
+
+    // Toggle Formulário de Novo Player na Loja
+    function toggleAddPlayerForm() {
+      const card = document.getElementById('addPlayerCard');
+      if (card) {
+        card.style.display = card.style.display === 'none' ? 'block' : 'none';
+        if (card.style.display === 'block') {
+          document.getElementById('newPlayerName')?.focus();
+        }
+      }
+    }
+
+    // Ação: Criar Novo Ecrã/Player para a Loja
+    async function handleCreatePlayer(e, projectId) {
+      e.preventDefault();
+      const name = document.getElementById('newPlayerName').value;
+      const zone_location = document.getElementById('newPlayerZone').value;
+      const device_model = document.getElementById('newPlayerModel').value;
+      const resolution = document.getElementById('newPlayerResolution').value;
+      const ip_address = document.getElementById('newPlayerIp').value;
+      const playlist_id = document.getElementById('newPlayerPlaylist').value;
+
+      try {
+        const res = await fetch(`/api/v1/projects/${projectId}/players`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name, zone_location, device_model, resolution, ip_address, playlist_id: playlist_id ? parseInt(playlist_id, 10) : null })
+        });
+
+        const json = await res.json();
+        if (json.success) {
+          showToast('Novo ecrã/player associado com sucesso!', 'success');
+          await openProjectDetails(projectId);
+          await loadKpis();
+        } else {
+          showToast(json.message || 'Erro ao associar ecrã', 'error');
+        }
+      } catch (err) {
+        showToast('Erro de comunicação: ' + err.message, 'error');
+      }
+    }
+
+    // Ação: Teste de Conectividade / Ping ao Player
+    async function pingPlayer(playerId, projectId) {
+      try {
+        const res = await fetch(`/api/v1/signage/players/${playerId}/ping`, { method: 'POST' });
+        const json = await res.json();
+        if (json.success) {
+          showToast(`📡 Ping OK: ${json.message}`, 'success');
+          await openProjectDetails(projectId);
+          await loadKpis();
+        } else {
+          showToast(json.message || 'Erro no teste de ping', 'error');
+        }
+      } catch (err) {
+        showToast('Erro de comunicação: ' + err.message, 'error');
+      }
+    }
+
+    // Ação: Mudar Playlist Vinculada ao Player
+    async function changePlayerPlaylist(playerId, playlistId, projectId) {
+      try {
+        const res = await fetch(`/api/v1/signage/players/${playerId}`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ playlist_id: playlistId ? parseInt(playlistId, 10) : null })
+        });
+        const json = await res.json();
+        if (json.success) {
+          showToast('Playlist atualizada no player!', 'success');
+          await openProjectDetails(projectId);
+        } else {
+          showToast(json.message || 'Erro ao alterar playlist', 'error');
+        }
+      } catch (err) {
+        showToast('Erro de comunicação: ' + err.message, 'error');
+      }
+    }
+
+    // Ação: Eliminar Player da Loja
+    async function deletePlayer(playerId, projectId) {
+      if (!confirm('Tens a certeza que desejas remover este ecrã do parque da loja?')) return;
+      try {
+        const res = await fetch(`/api/v1/signage/players/${playerId}`, { method: 'DELETE' });
+        const json = await res.json();
+        if (json.success) {
+          showToast(json.message, 'success');
+          await openProjectDetails(projectId);
+          await loadKpis();
+        } else {
+          showToast(json.message || 'Erro ao remover ecrã', 'error');
+        }
+      } catch (err) {
+        showToast('Erro de comunicação: ' + err.message, 'error');
+      }
+    }
+
+    // =========================================================================
+    // MODAL HUB CENTRAL DE DIGITAL SIGNAGE & PLAYLISTS
+    // =========================================================================
+    const modalHubSignage = document.getElementById('modalHubSignage');
+    const btnCloseHubSignage = document.getElementById('btnCloseHubSignage');
+    const btnFecharHubSignage = document.getElementById('btnFecharHubSignage');
+    const modalHubSignageBody = document.getElementById('modalHubSignageBody');
+
+    let currentHubTab = 'hubPlaylists';
+
+    function switchHubTab(tabId, btn) {
+      currentHubTab = tabId;
+      document.querySelectorAll('.hub-tab-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.hub-pane').forEach(pane => pane.classList.remove('active'));
+      
+      if (btn) btn.classList.add('active');
+      const activePane = document.getElementById(tabId);
+      if (activePane) activePane.classList.add('active');
+    }
+
+    async function openSignageHub(initialTab = 'hubPlaylists') {
+      currentHubTab = initialTab;
+      try {
+        const [resPl, resSp, resStats] = await Promise.all([
+          fetch('/api/v1/signage/playlists'),
+          fetch('/api/v1/signage/players'),
+          fetch('/api/v1/signage/stats')
+        ]);
+
+        const jsonPl = await resPl.json();
+        const jsonSp = await resSp.json();
+        const jsonStats = await resStats.json();
+
+        const playlists = jsonPl.data || [];
+        const players = jsonSp.data || [];
+        const stats = jsonStats.data || {};
+
+        // Renderizar Grid de Playlists
+        let playlistCardsHtml = playlists.map(pl => {
+          let statusBadgeClass = 'badge-signage-ok';
+          let statusLabel = 'Publicada';
+          if (pl.status === 'draft') { statusBadgeClass = 'badge-signage-testing'; statusLabel = 'Rascunho'; }
+          else if (pl.status === 'em_validacao') { statusBadgeClass = 'badge-signage-testing'; statusLabel = 'Em Validação'; }
+          else if (pl.status === 'arquivada') { statusBadgeClass = 'tag-baixa'; statusLabel = 'Arquivada'; }
+
+          let brandBadgeClass = pl.brand?.toLowerCase() === 'darty' ? 'darty' : 'fnac';
+
+          return `
+            <div class="playlist-card">
+              <div>
+                <div class="playlist-card-header">
+                  <span class="playlist-title">${pl.name}</span>
+                  <span class="brand-badge ${brandBadgeClass}">${pl.brand}</span>
+                </div>
+                <div style="font-size: 11px; color: var(--text-dim); margin-bottom: 8px;">
+                  Código: <strong style="font-family: 'JetBrains Mono', monospace; color: var(--text-white);">${pl.code}</strong>
+                </div>
+                <div class="playlist-meta-row">
+                  <span class="tag-res tag-res-4k">${pl.resolution}</span>
+                  <span class="tag-hw-model">⏱️ ${Math.floor(pl.duration_seconds / 60)}m ${pl.duration_seconds % 60}s</span>
+                  <span class="tag-hw-model">🎬 ${pl.media_count} vídeos</span>
+                </div>
+                ${pl.notes ? `<div style="font-size: 11px; color: var(--text-muted); margin-top: 8px; line-height: 1.4;">${pl.notes}</div>` : ''}
+              </div>
+
+              <div class="playlist-stats-footer">
+                <div style="display: flex; align-items: center; gap: 6px;">
+                  <span style="font-size: 11px; color: var(--text-muted);">Estado:</span>
+                  <select class="form-select" style="padding: 2px 6px; font-size: 11px; height: 26px; width: auto;" onchange="updatePlaylistStatus(${pl.id}, this.value)">
+                    <option value="publicada" ${pl.status === 'publicada' ? 'selected' : ''}>Publicada</option>
+                    <option value="em_validacao" ${pl.status === 'em_validacao' ? 'selected' : ''}>Em Validação</option>
+                    <option value="draft" ${pl.status === 'draft' ? 'selected' : ''}>Rascunho</option>
+                    <option value="arquivada" ${pl.status === 'arquivada' ? 'selected' : ''}>Arquivada</option>
+                  </select>
+                </div>
+                <div style="display: flex; align-items: center; gap: 10px;">
+                  <span style="color: var(--fnac-gold); font-weight: 700;">📺 ${pl.linked_players_count || 0} telas</span>
+                  <button class="task-del-btn" onclick="deletePlaylist(${pl.id})" title="Remover playlist">
+                    <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                    </svg>
+                  </button>
+                </div>
+              </div>
+            </div>
+          `;
+        }).join('');
+
+        // Renderizar Tabela Global de Players
+        let globalPlayersHtml = players.map(sp => {
+          let brandClass = sp.store_brand?.toLowerCase() === 'darty' ? 'darty' : 'fnac';
+          let resClass = sp.resolution?.includes('FHD') || sp.resolution?.includes('1080') ? 'tag-res-fhd' : 'tag-res-4k';
+
+          return `
+            <tr>
+              <td>
+                <div style="font-weight: 700; color: var(--text-white);">${sp.store_name}</div>
+                <span class="brand-badge ${brandClass}" style="font-size: 10px; margin-top: 2px;">${sp.store_brand}</span>
+              </td>
+              <td>
+                <div style="font-weight: 600; color: var(--text-white);">${sp.name}</div>
+                <div style="font-size: 11px; color: var(--text-dim);">${sp.zone_location}</div>
+              </td>
+              <td>
+                <div class="tag-hw-model">${sp.device_model}</div>
+                <span class="tag-res ${resClass}" style="margin-top: 4px; display: inline-block;">${sp.resolution}</span>
+              </td>
+              <td>
+                <code style="color: var(--fnac-gold); font-family: 'JetBrains Mono', monospace; font-size: 12px;">${sp.ip_address || 'DHCP'}</code>
+                <div style="font-size: 10px; color: var(--text-dim);">${sp.current_firmware || 'v9.0'}</div>
+              </td>
+              <td>
+                <div style="font-size: 12px; font-weight: 600; color: var(--text-white);">${sp.playlist_name || 'Sem Playlist'}</div>
+                <div style="font-size: 10px; color: var(--text-dim); font-family: 'JetBrains Mono', monospace;">${sp.playlist_version_code || ''}</div>
+              </td>
+              <td>
+                <div class="player-status-badge ${sp.status}">
+                  <span class="status-dot-ping"></span>
+                  <span>${sp.status}</span>
+                </div>
+              </td>
+              <td>
+                <button class="btn-ping" onclick="pingPlayerFromHub(${sp.id})" title="Enviar sinal de teste / ping">
+                  <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                  </svg>
+                  <span>Ping</span>
+                </button>
+              </td>
+            </tr>
+          `;
+        }).join('');
+
+        modalHubSignageBody.innerHTML = `
+          <!-- Indicadores de Topo do Hub -->
+          <div class="financial-kpi-grid" style="margin-bottom: 20px;">
+            <div class="fin-card">
+              <div class="fin-label">Total de Displays</div>
+              <div class="fin-value">${stats.totalPlayers || 0} ecrãs</div>
+            </div>
+            <div class="fin-card">
+              <div class="fin-label">Players Online</div>
+              <div class="fin-value remaining">${stats.onlinePlayers || 0} ativos</div>
+            </div>
+            <div class="fin-card">
+              <div class="fin-label">Playlists no Catálogo</div>
+              <div class="fin-value" style="color: var(--fnac-gold);">${stats.totalPlaylists || 0} versões</div>
+            </div>
+            <div class="fin-card">
+              <div class="fin-label">Prontidão Global</div>
+              <div class="fin-value" style="color: var(--status-success);">${stats.signageReadiness || 0}%</div>
+            </div>
+          </div>
+
+          <!-- Abas de Navegação do Hub -->
+          <div class="modal-nav-tabs">
+            <button type="button" class="modal-tab-btn hub-tab-btn ${currentHubTab === 'hubPlaylists' ? 'active' : ''}" onclick="switchHubTab('hubPlaylists', this)">
+              <svg width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.75 12h16.5m-16.5 3.75h16.5M3.75 19.5h16.5M5.625 4.5h12.75a1.875 1.875 0 010 3.75H5.625a1.875 1.875 0 010-3.75z"></path>
+              </svg>
+              <span>Catálogo de Playlists & Versões (${playlists.length})</span>
+            </button>
+            <button type="button" class="modal-tab-btn hub-tab-btn ${currentHubTab === 'hubPlayers' ? 'active' : ''}" onclick="switchHubTab('hubPlayers', this)">
+              <svg width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 20.25h12m-7.5-3v3m3-3v3m-10.125-3h17.25c.621 0 1.125-.504 1.125-1.125V4.875c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125z"></path>
+              </svg>
+              <span>Parque Global de Displays (${players.length})</span>
+            </button>
+          </div>
+
+          <!-- ABA A: CATÁLOGO DE PLAYLISTS -->
+          <div class="tab-pane hub-pane ${currentHubTab === 'hubPlaylists' ? 'active' : ''}" id="hubPlaylists">
+            <div class="modal-section-card">
+              <div class="modal-section-title">
+                <span>Versões de Conteúdo Publicitário & Institucional</span>
+                <button type="button" class="add-task-toggle" onclick="toggleAddPlaylistForm()">
+                  <svg width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4.5v15m7.5-7.5h-15"></path>
+                  </svg>
+                  <span>Nova Versão de Playlist</span>
+                </button>
+              </div>
+
+              <!-- Formulário Desdobrável para Nova Playlist -->
+              <div class="add-task-card" id="addPlaylistCard" style="display: none; margin-bottom: 16px;">
+                <form id="formCreatePlaylist" onsubmit="handleCreatePlaylist(event)">
+                  <div class="form-grid-2">
+                    <div class="form-group">
+                      <label class="form-label">Nome da Campanha / Playlist *</label>
+                      <input type="text" id="newPlName" class="form-input" placeholder="Ex: Fnac Gaming Experience 4K" required>
+                    </div>
+                    <div class="form-group">
+                      <label class="form-label">Insígnia Alvo</label>
+                      <select id="newPlBrand" class="form-select">
+                        <option value="Fnac" selected>Fnac</option>
+                        <option value="Darty">Darty</option>
+                        <option value="Todas">Todas (Grupo Fnac Darty)</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <div class="form-grid-2" style="margin-top: 10px;">
+                    <div class="form-group">
+                      <label class="form-label">Versão Semântica *</label>
+                      <input type="text" id="newPlVersion" class="form-input" placeholder="Ex: v3.1-inauguracao" required>
+                    </div>
+                    <div class="form-group">
+                      <label class="form-label">Resolução Alvo</label>
+                      <select id="newPlResolution" class="form-select">
+                        <option value="3840x2160 (4K)" selected>3840x2160 (4K UHD)</option>
+                        <option value="1920x1080 (FHD)">1920x1080 (Full HD)</option>
+                        <option value="Video Wall LED">Video Wall LED Personalizado</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <div class="form-grid-2" style="margin-top: 10px;">
+                    <div class="form-group">
+                      <label class="form-label">Duração do Ciclo de Loop (Segundos)</label>
+                      <input type="number" id="newPlDuration" class="form-input" value="180" placeholder="180">
+                    </div>
+                    <div class="form-group">
+                      <label class="form-label">Quantidade de Vídeos / Spots</label>
+                      <input type="number" id="newPlMediaCount" class="form-input" value="12" placeholder="12">
+                    </div>
+                  </div>
+
+                  <div class="form-group" style="margin-top: 10px;">
+                    <label class="form-label">Notas do Gabinete Multimédia</label>
+                    <input type="text" id="newPlNotes" class="form-input" placeholder="Ex: Inclui novo jingle Fnac e transições de montra">
+                  </div>
+
+                  <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 14px;">
+                    <button type="button" class="btn-secondary" onclick="toggleAddPlaylistForm()">Cancelar</button>
+                    <button type="submit" class="btn-primary">
+                      <span>Criar Playlist</span>
+                    </button>
+                  </div>
+                </form>
+              </div>
+
+              <!-- Lista de Cartões de Playlists -->
+              <div class="playlist-grid">
+                ${playlistCardsHtml}
+              </div>
+            </div>
+          </div>
+
+          <!-- ABA B: PARQUE GLOBAL DE DISPLAYS -->
+          <div class="tab-pane hub-pane ${currentHubTab === 'hubPlayers' ? 'active' : ''}" id="hubPlayers">
+            <div class="responsive-table-wrap">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Loja</th>
+                    <th>Ponto de Exibição</th>
+                    <th>Hardware & Resolução</th>
+                    <th>IP / Firmware</th>
+                    <th>Playlist Atual</th>
+                    <th>Conectividade</th>
+                    <th>Ações</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  ${globalPlayersHtml}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        `;
+
+        modalHubSignage.classList.add('active');
+      } catch (err) {
+        showToast('Erro ao abrir Hub de Signage: ' + err.message, 'error');
+      }
+    }
+
+    // Toggle Formulário de Nova Playlist
+    function toggleAddPlaylistForm() {
+      const card = document.getElementById('addPlaylistCard');
+      if (card) {
+        card.style.display = card.style.display === 'none' ? 'block' : 'none';
+        if (card.style.display === 'block') {
+          document.getElementById('newPlName')?.focus();
+        }
+      }
+    }
+
+    // Ação: Criar Playlist no Catálogo
+    async function handleCreatePlaylist(e) {
+      e.preventDefault();
+      const name = document.getElementById('newPlName').value;
+      const brand = document.getElementById('newPlBrand').value;
+      const version = document.getElementById('newPlVersion').value;
+      const resolution = document.getElementById('newPlResolution').value;
+      const duration_seconds = parseInt(document.getElementById('newPlDuration').value, 10) || 180;
+      const media_count = parseInt(document.getElementById('newPlMediaCount').value, 10) || 12;
+      const notes = document.getElementById('newPlNotes').value;
+
+      try {
+        const res = await fetch('/api/v1/signage/playlists', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name, brand, version, resolution, duration_seconds, media_count, notes, status: 'publicada' })
+        });
+
+        const json = await res.json();
+        if (json.success) {
+          showToast('Nova versão de playlist registada no catálogo!', 'success');
+          await openSignageHub('hubPlaylists');
+          await loadKpis();
+        } else {
+          showToast(json.message || 'Erro ao criar playlist', 'error');
+        }
+      } catch (err) {
+        showToast('Erro de comunicação: ' + err.message, 'error');
+      }
+    }
+
+    // Ação: Atualizar Estado da Playlist
+    async function updatePlaylistStatus(playlistId, status) {
+      try {
+        const res = await fetch(`/api/v1/signage/playlists/${playlistId}/status`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ status })
+        });
+        const json = await res.json();
+        if (json.success) {
+          showToast(json.message, 'success');
+        } else {
+          showToast(json.message || 'Erro ao alterar estado', 'error');
+        }
+      } catch (err) {
+        showToast('Erro de comunicação: ' + err.message, 'error');
+      }
+    }
+
+    // Ação: Eliminar Playlist
+    async function deletePlaylist(playlistId) {
+      if (!confirm('Tens a certeza que desejas remover esta playlist do catálogo?')) return;
+      try {
+        const res = await fetch(`/api/v1/signage/playlists/${playlistId}`, { method: 'DELETE' });
+        const json = await res.json();
+        if (json.success) {
+          showToast(json.message, 'success');
+          await openSignageHub('hubPlaylists');
+        } else {
+          showToast(json.message || 'Erro ao remover playlist', 'error');
+        }
+      } catch (err) {
+        showToast('Erro de comunicação: ' + err.message, 'error');
+      }
+    }
+
+    // Ação: Ping a partir do Hub
+    async function pingPlayerFromHub(playerId) {
+      try {
+        const res = await fetch(`/api/v1/signage/players/${playerId}/ping`, { method: 'POST' });
+        const json = await res.json();
+        if (json.success) {
+          showToast(`📡 ${json.message}`, 'success');
+          await openSignageHub('hubPlayers');
+          await loadKpis();
+        } else {
+          showToast(json.message || 'Erro ao testar ping', 'error');
+        }
+      } catch (err) {
+        showToast('Erro de comunicação: ' + err.message, 'error');
+      }
+    }
+
+    // Fecho do Modal Hub
+    if (btnCloseHubSignage) btnCloseHubSignage.addEventListener('click', () => modalHubSignage.classList.remove('active'));
+    if (btnFecharHubSignage) btnFecharHubSignage.addEventListener('click', () => modalHubSignage.classList.remove('active'));
+
+    // Navegação Sidebar: Abrir Hub de Digital Signage & Playlists
+    const navSignage = document.getElementById('nav-signage');
+    const navPlaylists = document.getElementById('nav-playlists');
+    if (navSignage) navSignage.addEventListener('click', (e) => { e.preventDefault(); openSignageHub('hubPlayers'); });
+    if (navPlaylists) navPlaylists.addEventListener('click', (e) => { e.preventDefault(); openSignageHub('hubPlaylists'); });
 
 
 

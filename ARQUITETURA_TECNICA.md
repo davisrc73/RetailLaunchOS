@@ -25,7 +25,8 @@ RetailLaunchOS/
 │   ├── controllers/                 # Controladores REST e lógica de endpoints
 │   │   ├── projectController.js     # Gestão de aberturas de lojas e métricas
 │   │   ├── taskController.js        # Checklist de marcos técnicos e progresso
-│   │   └── costController.js        # Registo de custos, diárias e sumários orçamentais
+│   │   ├── costController.js        # Registo de custos, diárias e sumários orçamentais
+│   │   └── signageController.js     # Catálogo de playlists, versionamento e monitorização de telas
 │   ├── database/                    # Abstração de ligação e auto-bootstrap da BD
 │   │   └── db.js                    # Conexão nativa via node:sqlite com WAL e PRAGMAs
 │   ├── middleware/                  # Intercetores de pedidos
@@ -33,7 +34,9 @@ RetailLaunchOS/
 │   ├── models/                      # Camada de acesso aos dados (Data Access Objects)
 │   │   ├── Project.js               # Consultas parametrizadas, criação e KPIs
 │   │   ├── Task.js                  # Marcos técnicos e toggle de estado
-│   │   └── Cost.js                  # Custos diários, agregações e sumário financeiro
+│   │   ├── Cost.js                  # Custos diários, agregações e sumário financeiro
+│   │   ├── Playlist.js              # Versões de playlists, resoluções e catálogo central
+│   │   └── SignagePlayer.js         # Parque de telas, associação de playlists e telemetria ping
 │   ├── routes/                      # Definição e mapeamento de rotas
 │   │   ├── api/                     # Rotas de dados JSON (/api/v1/...)
 │   │   │   └── projects.js          # Endpoints REST de projetos
@@ -78,8 +81,11 @@ erDiagram
     USERS ||--o{ PROJECTS : "cria"
     PROJECTS ||--o{ TASKS : "possui"
     PROJECTS ||--o{ PROJECT_COSTS : "regista"
+    PROJECTS ||--o{ SIGNAGE_PLAYERS : "aloja"
+    PLAYLISTS ||--o{ SIGNAGE_PLAYERS : "reproduz_em"
     USERS ||--o{ TASKS : "responsavel"
     USERS ||--o{ PROJECT_COSTS : "lanca"
+    USERS ||--o{ PLAYLISTS : "aprova"
 
     ROLES {
         int id PK
@@ -136,11 +142,42 @@ erDiagram
         string description
         int logged_by FK
     }
+
+    PLAYLISTS {
+        int id PK
+        string name
+        string version UK
+        string brand
+        string resolution
+        int loop_duration_sec
+        string status
+        string storage_path
+        timestamp published_at
+        int approved_by FK
+    }
+
+    SIGNAGE_PLAYERS {
+        int id PK
+        int project_id FK
+        string player_code UK
+        string name
+        string zone
+        string resolution
+        string orientation
+        string ip_address
+        string mac_address
+        string hardware_model
+        string os_version
+        int current_playlist_id FK
+        string status
+        timestamp last_ping_at
+        text notes
+    }
 ```
 
 ---
 
-## 3. Camada de Modelos (`src/models/Project.js` e `src/models/Task.js`)
+## 3. Camada de Modelos (`src/models/`)
 
 Os modelos encapsulam a lógica de negócio e queries SQL parametrizadas (evitando SQL Injection):
 
@@ -150,13 +187,14 @@ Os modelos encapsulam a lógica de negócio e queries SQL parametrizadas (evitan
   * Calcula a percentagem real de progresso: `progress = round((completed_tasks / total_tasks) * 100)`.
 * **`Project.findById(id)`**:
   * Suporta busca tanto por ID numérico como pelo código alfanumérico da loja (ex: `FNAC-CAS-2026`).
-  * Agrupa os marcos técnicos (`tasks`) e os custos diários registados (`project_costs`).
+  * Agrupa os marcos técnicos (`tasks`), os custos diários registados (`project_costs`) e a contagem de ecrãs de Digital Signage.
 * **`Project.create(data)`**:
   * Gera códigos de loja normalizados: `[MARCA]-[CIDADE]-[ANO]-[ALEATÓRIO]`.
   * Sanitiza e insere valores padrão para datas e orçamentos.
 * **`Project.getKpis()`**:
   * Identifica a próxima abertura ativa: `SELECT * FROM projects WHERE go_live_date >= DATE('now') ORDER BY go_live_date ASC LIMIT 1`.
   * Calcula médias de custos diários, orçamentos globais e volume acumulado no mês.
+  * Agrega em tempo real o rácio global de prontidão das telas (`signageReadiness`) e contadores operacionais (`signageStats`) diretamente a partir da tabela `signage_players`.
 
 ### 3.2. Modelo `Task.js` (Fase 2)
 * **`Task.findByProject(projectId)`**:
@@ -185,9 +223,38 @@ Os modelos encapsulam a lógica de negócio e queries SQL parametrizadas (evitan
 * **`Cost.getGlobalSummary()`**:
   * Agrega os totais financeiros de todo o ecossistema: total gasto, despesa acumulada no mês corrente e distribuição de gastos por tipo de custo.
 
+### 3.4. Modelo `Playlist.js` (Fase 4)
+* **`Playlist.findAll({ brand, status, resolution })`**:
+  * Lista todas as playlists do catálogo central com suporte a filtros dinâmicos por insígnia, estado de publicação e resolução.
+  * Realiza agregação relacional com `signage_players` para contabilizar o número de telas associadas a cada playlist (`assigned_players_count`).
+* **`Playlist.findById(id)`**:
+  * Obtém os metadados da playlist pelo ID primário, incluindo o nome do utilizador aprovador (`approved_by_name`).
+* **`Playlist.create(data)`**:
+  * Regista uma nova versão de playlist (`name`, `version`, `brand`, `resolution`, `loop_duration_sec`, `storage_path`, `approved_by`).
+* **`Playlist.updateStatus(id, status)`**:
+  * Altera o ciclo de vida da playlist (`rascunho`, `aprovado`, `em_revisao`, `obsoleto`), registando o timestamp `published_at = CURRENT_TIMESTAMP` no ato de aprovação.
+* **`Playlist.getStats()`**:
+  * Fornece estatísticas consolidadas do repositório: total de playlists, ativas/aprovadas, em rascunho e obsoletas.
+
+### 3.5. Modelo `SignagePlayer.js` (Fase 4)
+* **`SignagePlayer.findByProject(projectId)`**:
+  * Lista todas as telas/players instalados numa loja específica, com dados completos da playlist associada (`playlist_version`, `playlist_name`, `resolution`).
+* **`SignagePlayer.findAll({ status, brand, projectId })`**:
+  * Retorna o parque global de ecrãs de todas as lojas, com detalhes do projeto (loja, código, insígnia) e playlist vinculada.
+* **`SignagePlayer.create(data)`**:
+  * Adiciona um novo ecrã ao projeto com validação e geração automática de código (`player_code`), zona, orientação, IP, MAC e modelo de hardware.
+* **`SignagePlayer.update(id, data)`**:
+  * Permite reatribuir playlists, atualizar endereços IP, notas de instalação ou alterar o estado operacional.
+* **`SignagePlayer.ping(id)`**:
+  * Simula/executa telemetria e teste de conectividade com o player, atualizando `last_ping_at = CURRENT_TIMESTAMP` e definindo o estado como `online`.
+* **`SignagePlayer.delete(id)`**:
+  * Remove o registo de um ecrã/player da base de dados.
+* **`SignagePlayer.getGlobalSignageStats()`**:
+  * Consolida métricas em tempo real de todo o parque: total de ecrãs, contagem por estado (`online`, `offline`, `syncing`, `testing`) e rácio de prontidão (`readiness_percentage`).
+
 ---
 
-## 4. Controladores e API REST (`projectController.js`, `taskController.js` e `costController.js`)
+## 4. Controladores e API REST (`projectController.js`, `taskController.js`, `costController.js` e `signageController.js`)
 
 A API segue os padrões RESTful com payloads JSON e códigos de resposta HTTP semânticos:
 
@@ -219,6 +286,18 @@ A API segue os padrões RESTful com payloads JSON e códigos de resposta HTTP se
 | **GET** | `/api/v1/costs/summary` | — | Sumário financeiro global consolidado e distribuição por categoria |
 | **DELETE**| `/api/v1/costs/:id` | `:id` (Cost ID) | Elimina um registo de despesa e devolve o sumário recalculado |
 
+### 4.4. Endpoints de Digital Signage & Playlists (`/api/v1/signage` & `/api/v1/projects/:id/players`) (Fase 4)
+| Método | Endpoint | Parâmetros | Descrição |
+| :--- | :--- | :--- | :--- |
+| **GET** | `/api/v1/signage/stats` | — | Métricas globais de Digital Signage (ecrãs online/offline, taxa de prontidão e playlists) |
+| **GET** | `/api/v1/signage/playlists`| `?brand=Fnac&status=aprovado` | Catálogo de playlists com contagem de telas vinculadas e filtros |
+| **POST** | `/api/v1/signage/playlists`| Body JSON com versão/resolução | Cria uma nova versão de playlist no catálogo central |
+| **PATCH**| `/api/v1/signage/playlists/:id/status` | `{ status }` | Altera estado da playlist (aprovação, rascunho, obsoleto) |
+| **GET** | `/api/v1/signage/players` | `?status=online&projectId=1` | Inventário global de ecrãs/players de todas as lojas |
+| **GET** | `/api/v1/projects/:id/players` | `:id` (Project ID) | Lista os ecrãs e players instalados na loja |
+| **POST** | `/api/v1/projects/:id/players` | Body JSON com dados da tela | Associa um novo ecrã/player à loja especificada |
+| **POST** | `/api/v1/signage/players/:id/ping` | `:id` (Player ID) | Executa teste de conectividade (ping) e atualiza telemetria da tela |
+| **DELETE**| `/api/v1/signage/players/:id` | `:id` (Player ID) | Remove uma tela/player do parque de equipamentos |
 
 ---
 

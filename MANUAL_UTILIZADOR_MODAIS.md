@@ -8,12 +8,17 @@ Este manual destina-se aos utilizadores e operadores do **Gabinete Multimédia**
 ## Índice
 1. [Visão Geral do Dashboard](#1-visão-geral-do-dashboard)
 2. [Modal: Registar Nova Abertura de Loja](#2-modal-registar-nova-abertura-de-loja)
-3. [Modal / Gaveta: Gestão da Loja (Abas: Marcos Técnicos & Custos)](#3-modal--gaveta-gestão-da-loja-abas-marcos-técnicos--custos)
+3. [Modal / Gaveta: Gestão da Loja (Abas: Marcos Técnicos, Custos e Telas)](#3-modal--gaveta-gestão-da-loja-abas-marcos-técnicos-custos-e-telas)
    - [3.2. Aba 1: Marcos Técnicos & Digital Signage](#32-aba-1-marcos-técnicos--digital-signage)
    - [3.3. Aba 2: Custos, Diárias & Orçamento (Fase 3)](#33-aba-2-custos-diárias--orçamento-fase-3)
-4. [Painel de KPIs & Contagem Decrescente](#4-painel-de-kpis--contagem-decrescente)
-5. [Filtros, Pesquisa e Exportação CSV](#5-filtros-pesquisa-e-exportação-csv)
-6. [Boas Práticas de Operação](#6-boas-práticas-de-operação)
+   - [3.4. Aba 3: Telas & Players da Loja (Fase 4)](#34-aba-3-telas--players-da-loja-fase-4)
+4. [Modal: Hub Central de Digital Signage & Playlists (Fase 4)](#4-modal-hub-central-de-digital-signage--playlists-fase-4)
+   - [4.1. Como Aceder](#41-como-aceder)
+   - [4.2. Aba A: Catálogo de Playlists & Versões](#42-aba-a-catálogo-de-playlists--versões)
+   - [4.3. Aba B: Parque Global de Displays](#43-aba-b-parque-global-de-displays)
+5. [Painel de KPIs & Contagem Decrescente](#5-painel-de-kpis--contagem-decrescente)
+6. [Filtros, Pesquisa e Exportação CSV](#6-filtros-pesquisa-e-exportação-csv)
+7. [Boas Práticas de Operação](#7-boas-práticas-de-operação)
 
 ---
 
@@ -57,12 +62,13 @@ No canto superior direito do Dashboard, clica no botão dourado **"+ Nova Abertu
 
 ---
 
-## 3. Modal / Gaveta: Gestão da Loja (Abas: Marcos Técnicos & Custos)
+## 3. Modal / Gaveta: Gestão da Loja (Abas: Marcos Técnicos, Custos e Telas)
 
 ### 3.1. Como Aceder
-Na tabela **"Aberturas em Curso"**, clica no botão **"Gerir"** situado na coluna de ações de qualquer loja. O modal expandido (*large*) abrir-se-á com um sistema de navegação por abas:
+Na tabela **"Aberturas em Curso"**, clica no botão **"Gerir"** situado na coluna de ações de qualquer loja. O modal expandido (*large*) abrir-se-á com um sistema de 3 abas operacionais:
 * **Aba 1: Marcos Técnicos & Signage**
 * **Aba 2: Custos, Diárias & Orçamento**
+* **Aba 3: Telas & Players da Loja (Fase 4)**
 
 ---
 
@@ -134,18 +140,65 @@ Lista discriminada de todos os custos imputados à abertura:
 * **Remoção de Registo**: Ícone de caixote do lixo para eliminar lançamentos incorretos com recálculo automático instantâneo dos KPIs.
 
 #### D. Lançar Novo Custo ou Diária Técnica
-Para imputar um novo custo ao projeto:
 1. Clica no botão **"+ Registar Custo / Diária"** no cabeçalho do histórico para abrir o formulário desdobrável.
-2. Preenche os campos:
-   * **Data da Despesa***: Data de ocorrência da fatura ou da intervenção no local (pré-selecionada com o dia atual).
-   * **Categoria de Custo***: Escolha entre *Diária Técnica Externa*, *Hardware & Displays Multimédia*, *Licenciamento & Streaming de Telas*, *Cablagem & Redes IT* ou *Outro*.
-   * **Valor (€)***: Montante em euros (ex: `485.50`).
-   * **Descrição do Custo***: Justificação clara (ex: *"Calibração de som e alinhamento de displays de montra"*).
-3. Clica em **"Gravar Custo"**: O sistema envia os dados via `POST /api/v1/projects/:id/costs`, armazena o lançamento na base de dados SQLite, atualiza a lista de histórico e recalcula todos os saldos e indicadores no modal e no Dashboard principal.
+2. Preenche os campos: Data, Categoria de Custo, Valor em euros e Justificação.
+3. Clica em **"Gravar Custo"**: O sistema envia os dados via `POST /api/v1/projects/:id/costs`, atualiza o histórico e recalcula todos os saldos e indicadores no modal e no Dashboard principal.
 
 ---
 
-## 4. Painel de KPIs & Contagem Decrescente
+### 3.4. Aba 3: Telas & Players da Loja (Fase 4)
+
+Esta aba permite gerir o inventário de ecrãs, totens e media players instalados na loja, associar pacotes de playlists e testar conetividade em tempo real.
+
+#### A. Lista de Ecrãs Instalados
+Cada display é apresentado com:
+* **Identificação & Localização**: Designação do ponto de exibição (ex: *Video Wall Entrada 4x4*), zona na loja (*Montra*, *Linha de Caixas*, *Auditório*) e modelo de hardware (*BrightSign XT1144 4K*, *Samsung SSP Tizen 6.5*, *LG webOS Signage*).
+* **Resolução**: Badge indicativo (`4K UHD`, `1920x1080 (FHD)` ou `Video Wall LED`).
+* **Endereço de Rede**: IP configurado na VLAN técnica da loja e MAC Address.
+* **Seletor Rápido de Playlist**: Menu dropdown direto para associar uma campanha do catálogo a este ecrã específico, com atualização instantânea na base de dados.
+* **Badge de Estado**:
+  * `Online` (Verde pulsante): Equipamento ativo e a responder à rede.
+  * `Syncing` (Azul): A descarregar novo pacote de conteúdos ou playlist.
+  * `Testing` (Âmbar): Em calibração de cor, brilho ou áudio.
+  * `Offline` (Vermelho): Sem comunicação ou desligado da rede.
+* **Botão "Ping"**: Envia um pedido de teste imediato via API `POST /api/v1/signage/players/:id/ping`, atualizando a data de último contacto (*last_ping*) e confirmando que o dispositivo está operacional.
+* **Eliminar Ecrã**: Remove o equipamento do parque da loja após confirmação.
+
+#### B. Associar Novo Ecrã / Player
+1. Clica no botão **"+ Associar Novo Ecrã / Player"** no cabeçalho da lista.
+2. Preenche: Nome do ecrã, Zona na loja, Modelo de hardware, Resolução de saída, Endereço IP e Playlist inicial.
+3. Clica em **"Gravar Ecrã"**: O registo é gravado via `POST /api/v1/projects/:id/players` e integrado no cálculo de prontidão de Digital Signage.
+
+---
+
+## 4. Modal: Hub Central de Digital Signage & Playlists (Fase 4)
+
+### 4.1. Como Aceder
+No menu lateral esquerdo (Sidebar), clica em qualquer uma destas opções:
+* **"Digital Signage / Telas"** (abre diretamente na aba de monitorização do parque global).
+* **"Playlists & Conteúdos"** (abre diretamente na aba do catálogo de versões).
+
+O modal extra-largo (*extra-large*) sobrepõe-se ao Dashboard, disponibilizando a visão central do Gabinete Multimédia.
+
+### 4.2. Aba A: Catálogo de Playlists & Versões
+Apresenta todas as campanhas audiovisuais disponíveis para transmissão no ecossistema Fnac / Darty:
+* **Cartões de Playlist**:
+  * Nome oficial e código de referência (ex: `PL-FNAC-CAS-4K`).
+  * Insígnia alvo com identidade de marca (Fnac, Darty ou Todas).
+  * Resolução, duração do loop contínuo (em minutos e segundos) e contagem de ficheiros de vídeo/spot.
+  * Seletor de Estado de Publicação: `Publicada`, `Em Validação`, `Rascunho` ou `Arquivada` (atualizado instantaneamente via `PATCH`).
+  * Indicador de ecrãs vinculados: Exibe quantas telas em todo o país estão a reproduzir esta playlist.
+* **Botão "+ Nova Versão de Playlist"**:
+  * Abre o formulário para registar um novo pacote de conteúdos, definindo a insígnia, versão semântica, duração do ciclo e notas técnicas.
+
+### 4.3. Aba B: Parque Global de Displays
+Permite auditar a totalidade dos media players e ecrãs instalados em todas as lojas piloto:
+* Tabela completa com Loja, Ponto de Exibição, Modelo de Hardware, IP, Playlist em reprodução e Estado de Conectividade.
+* Ação de **Ping Individual** para diagnosticar rapidamente qualquer falha de transmissão em qualquer loja remota sem necessidade de aceder localmente.
+
+---
+
+## 5. Painel de KPIs & Contagem Decrescente
 
 O painel superior do Dashboard atualiza-se em tempo real com as seguintes métricas:
 
@@ -153,7 +206,8 @@ O painel superior do Dashboard atualiza-se em tempo real com as seguintes métri
    * Deteta automaticamente a loja com data de go-live mais iminente.
    * Apresenta um relógio com contagem decrescente ativa ao segundo: `[Dias : Horas : Minutos : Segundos]`.
 2. **Playlists & Signage**:
-   * Barra de prontidão percentual indicando o volume de telas e conteúdos validados no piloto.
+   * Barra de prontidão percentual calculada a partir do rácio de ecrãs `Online` face ao total do parque.
+   * Sub-contadores dinâmicos: `Players Ativos`, `Em Teste` e `Falhas` alimentados diretamente pela base de dados.
 3. **Custo Diário Médio**:
    * Média aritmética do custo/dia de todas as lojas ativas, com o volume financeiro acumulado no mês corrente.
 4. **Budget Global Alocado**:
@@ -161,28 +215,30 @@ O painel superior do Dashboard atualiza-se em tempo real com as seguintes métri
 
 ---
 
-## 5. Filtros, Pesquisa e Exportação CSV
+## 6. Filtros, Pesquisa e Exportação CSV
 
-### 5.1. Filtragem Rápida por Insígnia
+### 6.1. Filtragem Rápida por Insígnia
 Por cima da tabela, clica nos botões:
 * **Todas**: Apresenta todas as lojas do portfólio.
 * **Fnac**: Filtra apenas lojas com marca Fnac (fundo dourado).
 * **Darty**: Filtra apenas lojas com marca Darty (fundo vermelho).
 
-### 5.2. Pesquisa Instantânea (`⌘K`)
+### 6.2. Pesquisa Instantânea (`⌘K`)
 * Escreve no campo de pesquisa do cabeçalho qualquer termo (ex: *"Cascais"*, *"Darty"*, *"Shopping"*).
 * A tabela filtra as linhas em tempo real à medida que digitas.
 
-### 5.3. Exportação para CSV
+### 6.3. Exportação para CSV
 * Clica no botão **"Exportar CSV"** no canto direito da secção de aberturas.
 * O sistema compila os dados atuais e descarrega automaticamente um ficheiro formatado: `RetailLaunchOS_Aberturas_AAAA-MM-DD.csv`, pronto para abrir no Excel ou Google Sheets.
 
 ---
 
-## 6. Boas Práticas de Operação
+## 7. Boas Práticas de Operação
 
 1. **Nomenclatura**: Utiliza sempre a convenção `[Insígnia] [Nome do Centro ou Cidade]` (ex: `Fnac Forum Coimbra`, `Darty Sintra`).
 2. **Datas de Entrega**: Define sempre a *Entrega Técnica Multimédia* pelo menos 5 dias antes do *Go-Live*, permitindo testes de stress de reprodução contínua 24/7 nas telas antes da inauguração.
 3. **Playlists**: Mantém o padrão de numeração semântica nas playlists (ex: `v1.0-abertura`, `v1.1-ajustes`, `v2.0-campanha`).
 4. **Registo Imediato de Diárias**: Imputar as diárias e custos de deslocação no próprio dia da intervenção para manter o saldo orçamental permanentemente fidedigno.
+5. **Verificação de Rede de Displays**: Realizar testes de *Ping* a todos os players após a entrega técnica para garantir que nenhuma tela se encontra no estado `Offline` no dia da abertura.
+
 

@@ -122,3 +122,69 @@ INSERT OR IGNORE INTO project_costs (id, project_id, entry_date, cost_type, amou
 (2, 1, DATE('now', '-2 days'), 'tecnico_externo', 620.00, 'Diária de calibração acústica e vídeo', 1),
 (3, 1, DATE('now', '-1 days'), 'licenciamento_telas', 485.50, 'Taxa diária de sincronização e streaming central', 2),
 (4, 2, DATE('now', '-1 days'), 'licenciamento_telas', 390.00, 'Alocação inicial de infraestrutura cloud e players', 2);
+
+-- ==============================================================================
+-- FASE 4: DIGITAL SIGNAGE & CATÁLOGO DE PLAYLISTS
+-- ==============================================================================
+
+-- 6. TABELA: PLAYLISTS (Catálogo Central e Versionamento de Conteúdos)
+CREATE TABLE IF NOT EXISTS playlists (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    code VARCHAR(50) NOT NULL UNIQUE,          -- Ex: PL-FNAC-GOLD-4K, PL-DARTY-PROMO
+    name VARCHAR(150) NOT NULL,                 -- Ex: 'Fnac Flagship 4K - Campanha Inauguração'
+    brand VARCHAR(50) NOT NULL,                 -- 'Fnac', 'Darty', 'Todas'
+    version VARCHAR(50) NOT NULL,               -- Ex: 'v2.5-gold-cascais', 'v1.1-darty-pt'
+    resolution VARCHAR(50) DEFAULT '3840x2160 (4K)', -- '3840x2160 (4K)', '1920x1080 (FHD)', 'Video Wall LED'
+    duration_seconds INTEGER DEFAULT 180,       -- Duração do ciclo de loop em segundos
+    status VARCHAR(50) DEFAULT 'publicada',     -- 'draft', 'em_validacao', 'publicada', 'arquivada'
+    file_size_mb DECIMAL(8, 2) DEFAULT 0.0,
+    media_count INTEGER DEFAULT 12,
+    notes TEXT,
+    created_by INTEGER,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE SET NULL
+);
+
+-- 7. TABELA: SIGNAGE_PLAYERS (Displays, Ecrãs e Media Players por Loja)
+CREATE TABLE IF NOT EXISTS signage_players (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    project_id INTEGER NOT NULL,
+    name VARCHAR(150) NOT NULL,                 -- Ex: 'Video Wall Entrada 4x4', 'Display Montra Lateral'
+    device_model VARCHAR(100) DEFAULT 'BrightSign XT1144 4K', -- 'BrightSign XT1144', 'Samsung SSP Tizen', 'LG webOS Signage'
+    zone_location VARCHAR(100) NOT NULL,        -- 'Entrada Principal', 'Montra', 'Linha de Caixas', 'Auditório Fnac'
+    resolution VARCHAR(50) DEFAULT '4K UHD',
+    ip_address VARCHAR(45),                     -- Ex: '192.168.142.10'
+    mac_address VARCHAR(20),                    -- Ex: '00:10:18:A4:21:01'
+    status VARCHAR(30) DEFAULT 'online',        -- 'online', 'offline', 'testing', 'syncing'
+    playlist_id INTEGER,
+    current_firmware VARCHAR(50) DEFAULT 'v9.0.145',
+    last_ping TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (project_id) REFERENCES projects(id) ON DELETE CASCADE,
+    FOREIGN KEY (playlist_id) REFERENCES playlists(id) ON DELETE SET NULL
+);
+
+-- Índices Fase 4
+CREATE INDEX IF NOT EXISTS idx_playlists_brand ON playlists(brand);
+CREATE INDEX IF NOT EXISTS idx_playlists_status ON playlists(status);
+CREATE INDEX IF NOT EXISTS idx_signage_project ON signage_players(project_id);
+CREATE INDEX IF NOT EXISTS idx_signage_status ON signage_players(status);
+
+-- Sementes Fase 4: Playlists
+INSERT OR IGNORE INTO playlists (id, code, name, brand, version, resolution, duration_seconds, status, file_size_mb, media_count, notes, created_by) VALUES
+(1, 'PL-FNAC-CAS-4K', 'Fnac Flagship 4K - Campanha Inauguração', 'Fnac', 'v2.5-gold-cascais', '3840x2160 (4K)', 240, 'publicada', 1450.50, 18, 'Campanha oficial de abertura com spots institucionais Fnac, Clube Fnac e parceiros 4K.', 1),
+(2, 'PL-DARTY-PROMO-1080', 'Darty Electro & Tech - Promoções Abertura', 'Darty', 'v1.1-darty-pt', '1920x1080 (FHD)', 180, 'publicada', 820.00, 12, 'Linha de produtos grande e pequeno eletrodoméstico com selo Confiança Darty.', 1),
+(3, 'PL-FNAC-INSTITUCIONAL', 'Fnac Brand Universe & Bilheteira', 'Fnac', 'v3.0-standard', '3840x2160 (4K)', 300, 'em_validacao', 1850.00, 24, 'Pacote de conteúdos universais para auditórios e áreas culturais.', 1),
+(4, 'PL-DARTY-SERVICE', 'Darty Contratos de Assistência & Entrega', 'Darty', 'v1.0-draft', '1920x1080 (FHD)', 120, 'draft', 450.00, 8, 'Em validação com o departamento de serviços e pós-venda.', 2);
+
+-- Sementes Fase 4: Players e Telas Instaladas
+INSERT OR IGNORE INTO signage_players (id, project_id, name, device_model, zone_location, resolution, ip_address, mac_address, status, playlist_id, current_firmware, last_ping) VALUES
+(1, 1, 'Video Wall Entrada 4x4 (LED Wall)', 'BrightSign XT1144 4K', 'Entrada Principal', '3840x2160 (4K)', '192.168.142.10', '00:10:18:A4:21:01', 'online', 1, 'v9.0.145', CURRENT_TIMESTAMP),
+(2, 1, 'Display Duplo Montra Shopping', 'Samsung SSP (Tizen 6.5)', 'Montra Lateral', '1920x1080 (FHD)', '192.168.142.12', '00:10:18:B2:14:88', 'online', 1, 'v6.5.210', CURRENT_TIMESTAMP),
+(3, 1, 'Totem Interativo Bilheteira & Cultura', 'BrightSign HD224', 'Fórum Cultural', '1920x1080 (FHD)', '192.168.142.15', '00:10:18:C9:83:02', 'syncing', 3, 'v9.0.145', CURRENT_TIMESTAMP),
+(4, 1, 'Telas Menu Linha de Caixas (3 Displays)', 'Samsung SSP (Tizen 6.5)', 'Linha de Caixas', '1920x1080 (FHD)', '192.168.142.18', '00:10:18:D1:45:90', 'testing', 1, 'v6.5.210', CURRENT_TIMESTAMP),
+(5, 2, 'Painel LED Montra Exterior', 'BrightSign XT1144 4K', 'Fachada Principal', 'Video Wall LED', '192.168.150.10', '00:10:18:E7:22:19', 'online', 2, 'v9.0.145', CURRENT_TIMESTAMP),
+(6, 2, 'Display Balcão Apoio ao Cliente', 'LG webOS Signage 6.0', 'Balcão de Serviços', '1920x1080 (FHD)', '192.168.150.14', '00:10:18:F3:11:44', 'offline', 2, 'v6.0.102', CURRENT_TIMESTAMP);
+

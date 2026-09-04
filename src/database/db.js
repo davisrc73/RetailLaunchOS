@@ -29,14 +29,17 @@ try {
 // Auto-bootstrap: Se a tabela projects não existir, executa o schema.sql inicial
 function initSchema() {
   try {
-    const tableCheck = db.prepare("SELECT name FROM sqlite_master WHERE type='table' AND name='projects';").get();
-    if (!tableCheck) {
-      console.log('🔄 [DB] A inicializar tabelas e dados piloto a partir de database/schema.sql...');
+    const projectsTable = db.prepare("SELECT name FROM sqlite_master WHERE type='table' AND name='projects';").get();
+    const playlistsTable = db.prepare("SELECT name FROM sqlite_master WHERE type='table' AND name='playlists';").get();
+    const signageTable = db.prepare("SELECT name FROM sqlite_master WHERE type='table' AND name='signage_players';").get();
+
+    if (!projectsTable || !playlistsTable || !signageTable) {
+      console.log('🔄 [DB] A sincronizar estrutura de tabelas a partir de database/schema.sql...');
       const schemaPath = path.join(dbDir, 'schema.sql');
       if (fs.existsSync(schemaPath)) {
         const schemaSql = fs.readFileSync(schemaPath, 'utf8');
         db.exec(schemaSql);
-        console.log('✅ [DB] Tabelas e sementes iniciais criadas com sucesso!');
+        console.log('✅ [DB] Estrutura e sementes da base de dados sincronizadas com sucesso!');
       } else {
         console.error('❌ [DB] Ficheiro schema.sql não encontrado em:', schemaPath);
       }
