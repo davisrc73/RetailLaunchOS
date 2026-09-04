@@ -11,6 +11,7 @@ const config = require('./config/app');
 const projectController = require('./src/controllers/projectController');
 
 const taskController = require('./src/controllers/taskController');
+const costController = require('./src/controllers/costController');
 
 // Helper para responder JSON em servidor HTTP nativo
 function sendJson(res, statusCode, data) {
@@ -96,7 +97,32 @@ const server = http.createServer(async (req, res) => {
       return;
     }
 
-    // 6. PATCH ou PUT /api/v1/projects/:id/signage (atualizar signage e playlist)
+    // 6. GET /api/v1/projects/:id/costs
+    const costsMatch = pathname.match(/^\/api\/v1\/projects\/([^\/]+)\/costs$/);
+    if (costsMatch && method === 'GET') {
+      req.params = { projectId: costsMatch[1] };
+      const mockRes = { status: (code) => ({ json: (data) => sendJson(res, code, data) }) };
+      return costController.getByProject(req, mockRes);
+    }
+
+    // 7. POST /api/v1/projects/:id/costs (lançar despesa ou diária)
+    if (costsMatch && method === 'POST') {
+      req.params = { projectId: costsMatch[1] };
+      let body = '';
+      req.on('data', chunk => { body += chunk.toString(); });
+      req.on('end', async () => {
+        try {
+          req.body = body ? JSON.parse(body) : {};
+          const mockRes = { status: (code) => ({ json: (data) => sendJson(res, code, data) }) };
+          await costController.create(req, mockRes);
+        } catch (err) {
+          sendJson(res, 400, { success: false, message: 'JSON Inválido: ' + err.message });
+        }
+      });
+      return;
+    }
+
+    // 8. PATCH ou PUT /api/v1/projects/:id/signage (atualizar signage e playlist)
     const signageMatch = pathname.match(/^\/api\/v1\/projects\/([^\/]+)\/signage$/);
     if (signageMatch && (method === 'PATCH' || method === 'PUT')) {
       req.params = { id: signageMatch[1] };
@@ -114,7 +140,7 @@ const server = http.createServer(async (req, res) => {
       return;
     }
 
-    // 7. GET /api/v1/projects/:id
+    // 9. GET /api/v1/projects/:id
     const singleMatch = pathname.match(/^\/api\/v1\/projects\/([^\/]+)$/);
     if (singleMatch && method === 'GET') {
       req.params = { id: singleMatch[1] };
@@ -122,13 +148,31 @@ const server = http.createServer(async (req, res) => {
       return projectController.getById(req, mockRes);
     }
 
-    // 8. DELETE /api/v1/projects/:id
+    // 10. DELETE /api/v1/projects/:id
     if (singleMatch && method === 'DELETE') {
       req.params = { id: singleMatch[1] };
       const mockRes = { status: (code) => ({ json: (data) => sendJson(res, code, data) }) };
       return projectController.delete(req, mockRes);
     }
   }
+
+  // --- API ROUTES: /api/v1/costs ---
+  if (pathname.startsWith('/api/v1/costs')) {
+    // 1. GET /api/v1/costs/summary
+    if (pathname === '/api/v1/costs/summary' && method === 'GET') {
+      const mockRes = { status: (code) => ({ json: (data) => sendJson(res, code, data) }) };
+      return costController.getGlobalSummary(req, mockRes);
+    }
+
+    // 2. DELETE /api/v1/costs/:id
+    const singleCostMatch = pathname.match(/^\/api\/v1\/costs\/([^\/]+)$/);
+    if (singleCostMatch && method === 'DELETE') {
+      req.params = { id: singleCostMatch[1] };
+      const mockRes = { status: (code) => ({ json: (data) => sendJson(res, code, data) }) };
+      return costController.delete(req, mockRes);
+    }
+  }
+
 
   // --- API ROUTES: /api/v1/tasks ---
   if (pathname.startsWith('/api/v1/tasks')) {

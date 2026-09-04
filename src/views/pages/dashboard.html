@@ -925,14 +925,39 @@
     const modalDetalheBody = document.getElementById('modalDetalheBody');
 
     let currentProjectIdInModal = null;
+    let currentActiveTab = 'tabTasks';
+
+    function switchModalTab(tabId, btn) {
+      currentActiveTab = tabId;
+      document.querySelectorAll('.modal-tab-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.tab-pane').forEach(pane => pane.classList.remove('active'));
+      
+      if (btn) btn.classList.add('active');
+      const activePane = document.getElementById(tabId);
+      if (activePane) activePane.classList.add('active');
+    }
 
     async function openProjectDetails(id) {
       currentProjectIdInModal = id;
       try {
-        const res = await fetch(`/api/v1/projects/${id}`);
-        const json = await res.json();
-        if (json.success && json.data) {
-          const p = json.data;
+        const [resProj, resCosts] = await Promise.all([
+          fetch(`/api/v1/projects/${id}`),
+          fetch(`/api/v1/projects/${id}/costs`)
+        ]);
+        
+        const jsonProj = await resProj.json();
+        const jsonCosts = await resCosts.json();
+
+        if (jsonProj.success && jsonProj.data) {
+          const p = jsonProj.data;
+          const fin = (jsonCosts.success && jsonCosts.data) ? jsonCosts.data : {
+            totalBudget: p.total_budget || 0,
+            totalSpent: 0,
+            remainingBudget: p.total_budget || 0,
+            budgetExecutionPercent: 0,
+            costs: []
+          };
+
           const brandClass = p.brand?.toLowerCase().includes('darty') ? 'darty' : 'fnac';
           
           modalDetalheTitle.innerHTML = `
@@ -992,126 +1017,290 @@
             `;
           }
 
-          modalDetalheBody.innerHTML = `
-            <!-- Progresso Geral da Loja -->
-            <div style="margin-bottom: 20px;">
-              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                <span style="font-size: 13px; font-weight: 700; color: var(--text-white);">Progresso Global de Abertura</span>
-                <span style="font-size: 13px; font-family: 'JetBrains Mono', monospace; font-weight: 700; color: var(--fnac-gold);">${progressPercent}% (${completedTasks} de ${totalTasks} concluídos)</span>
-              </div>
-              <div class="progress-track" style="height: 9px;">
-                <div class="progress-fill-bar ${brandClass === 'darty' ? 'progress-fill-red' : 'progress-fill-gold'}" style="width: ${progressPercent}%;"></div>
-              </div>
-            </div>
+          // Renderizar lista de custos
+          let costsListHtml = '';
+          const costs = fin.costs || [];
+          if (costs.length > 0) {
+            costsListHtml = costs.map(c => {
+              let typeClass = 'tag-outro';
+              let typeLabel = c.cost_type;
+              if (c.cost_type === 'hardware_multimedia') { typeClass = 'tag-hardware'; typeLabel = 'Hardware'; }
+              else if (c.cost_type === 'licenciamento_telas') { typeClass = 'tag-licenciamento'; typeLabel = 'Licenciamento'; }
+              else if (c.cost_type === 'tecnico_externo') { typeClass = 'tag-tecnico'; typeLabel = 'Diária Técnica'; }
+              else if (c.cost_type === 'infraestrutura_rede') { typeClass = 'tag-rede'; typeLabel = 'Redes & IT'; }
 
-            <!-- Resumo de Prazos e Custos -->
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px;">
-              <div style="padding: 14px; background: var(--bg-base); border-radius: 8px; border: 1px solid var(--border-subtle);">
-                <div style="font-size: 11px; text-transform: uppercase; color: var(--text-dim); font-weight: 700;">Inauguração Oficial</div>
-                <div style="font-size: 16px; font-weight: 700; color: var(--text-white); margin-top: 4px;">${formatDate(p.go_live_date)}</div>
-                <div style="font-size: 12px; color: var(--text-muted); margin-top: 2px;">${getDaysRemaining(p.go_live_date)} dias restantes • ${p.location}</div>
-              </div>
-              <div style="padding: 14px; background: var(--bg-base); border-radius: 8px; border: 1px solid var(--border-subtle);">
-                <div style="font-size: 11px; text-transform: uppercase; color: var(--text-dim); font-weight: 700;">Custo Diário & Orçamento</div>
-                <div style="font-size: 16px; font-weight: 700; color: var(--fnac-gold); margin-top: 4px;">${formatCurrency(p.daily_cost)} <span style="font-size: 12px; color: var(--text-dim);">/ dia</span></div>
-                <div style="font-size: 12px; color: var(--text-muted); margin-top: 2px;">Budget Alocado: ${formatCurrency(p.total_budget)}</div>
-              </div>
-            </div>
-
-            <!-- Secção 1: Configuração Digital Signage & Playlist -->
-            <div class="modal-section-card" style="margin-bottom: 20px;">
-              <div class="modal-section-title">
-                <span>Configuração de Digital Signage & Broadcast</span>
-                <span class="status-badge ${p.signage_status === 'pronto' ? 'badge-signage-ok' : 'badge-signage-testing'}">${p.signage_status}</span>
-              </div>
-              <form id="formUpdateSignage" onsubmit="handleUpdateSignage(event, ${p.id})" style="display: grid; grid-template-columns: 1fr 1fr auto; gap: 12px; align-items: flex-end;">
-                <div class="form-group" style="margin-bottom: 0;">
-                  <label class="form-label">Estado de Signage</label>
-                  <select id="editSignageStatus" class="form-select">
-                    <option value="pendente" ${p.signage_status === 'pendente' ? 'selected' : ''}>Pendente de Instalação</option>
-                    <option value="configuracao" ${p.signage_status === 'configuracao' ? 'selected' : ''}>Em Configuração de IPs</option>
-                    <option value="validacao" ${p.signage_status === 'validacao' ? 'selected' : ''}>Em Validação de Telas</option>
-                    <option value="pronto" ${p.signage_status === 'pronto' ? 'selected' : ''}>Pronto para Broadcast</option>
-                  </select>
-                </div>
-                <div class="form-group" style="margin-bottom: 0;">
-                  <label class="form-label">Versão da Playlist</label>
-                  <input type="text" id="editPlaylistVersion" class="form-input" value="${p.playlist_version || 'v1.0'}" required>
-                </div>
-                <button type="submit" class="btn-primary" style="height: 42px; padding: 0 16px;">
-                  <svg width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-                  </svg>
-                  <span>Atualizar</span>
-                </button>
-              </form>
-            </div>
-
-            <!-- Secção 2: Checklist de Marcos Multimédia -->
-            <div class="modal-section-card">
-              <div class="modal-section-title">
-                <span>Checklist de Marcos Técnicos (${completedTasks}/${totalTasks} concluídos)</span>
-                <button type="button" class="add-task-toggle" onclick="toggleAddTaskForm()">
-                  <svg width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4.5v15m7.5-7.5h-15"></path>
-                  </svg>
-                  <span>Novo Marco Técnico</span>
-                </button>
-              </div>
-
-              <!-- Formulário Desdobrável para Novo Marco -->
-              <div class="add-task-card" id="addTaskCard" style="display: none;">
-                <form id="formCreateTask" onsubmit="handleCreateTask(event, ${p.id})">
-                  <div class="form-grid-2">
-                    <div class="form-group">
-                      <label class="form-label">Título do Marco Técnico *</label>
-                      <input type="text" id="newTaskTitle" class="form-input" placeholder="Ex: Calibração de Áudio Bose / JBL" required>
-                    </div>
-                    <div class="form-group">
-                      <label class="form-label">Departamento</label>
-                      <select id="newTaskDept" class="form-select">
-                        <option value="Multimédia & Telas" selected>Multimédia & Telas</option>
-                        <option value="Redes & IT">Redes & IT</option>
-                        <option value="Som & Iluminação">Som & Iluminação</option>
-                        <option value="Operações & Obras">Operações & Obras</option>
-                      </select>
+              return `
+                <div class="cost-entry-item" id="cost-entry-${c.id}">
+                  <div style="display: flex; align-items: center; gap: 12px; flex: 1;">
+                    <span class="cost-type-badge ${typeClass}">${typeLabel}</span>
+                    <div>
+                      <div style="font-size: 13px; font-weight: 600; color: var(--text-white);">${c.description || 'Despesa sem descrição'}</div>
+                      <div style="font-size: 11px; color: var(--text-dim); margin-top: 2px;">
+                        Data: <strong>${formatDate(c.entry_date)}</strong> • Lançado por: ${c.logged_by_name || 'Admin'}
+                      </div>
                     </div>
                   </div>
-
-                  <div class="form-grid-2" style="margin-top: 10px;">
-                    <div class="form-group">
-                      <label class="form-label">Prioridade</label>
-                      <select id="newTaskPriority" class="form-select">
-                        <option value="critical">Crítica</option>
-                        <option value="high" selected>Alta</option>
-                        <option value="medium">Média</option>
-                        <option value="low">Baixa</option>
-                      </select>
-                    </div>
-                    <div class="form-group">
-                      <label class="form-label">Prazo de Entrega</label>
-                      <input type="date" id="newTaskDueDate" class="form-input" value="${p.target_completion_date || p.go_live_date}">
-                    </div>
-                  </div>
-
-                  <div class="form-group" style="margin-top: 10px;">
-                    <label class="form-label">Descrição / Observações Técnicas</label>
-                    <input type="text" id="newTaskDesc" class="form-input" placeholder="Ex: Garantir teste de volume nas zonas de Caixas e Livraria">
-                  </div>
-
-                  <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 14px;">
-                    <button type="button" class="btn-secondary" onclick="toggleAddTaskForm()">Cancelar</button>
-                    <button type="submit" class="btn-primary">
-                      <span>Guardar Marco</span>
+                  <div style="display: flex; align-items: center; gap: 14px;">
+                    <strong style="font-family: 'JetBrains Mono', monospace; font-size: 14px; color: var(--text-white);">${formatCurrency(c.amount)}</strong>
+                    <button class="task-del-btn" onclick="deleteCost(${c.id}, ${p.id})" title="Remover despesa">
+                      <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                      </svg>
                     </button>
                   </div>
+                </div>
+              `;
+            }).join('');
+          } else {
+            costsListHtml = `
+              <div style="text-align: center; padding: 24px; color: var(--text-dim); font-size: 13px;">
+                Sem despesas registadas para esta loja. Clica em "+ Registar Custo / Diária" para lançar!
+              </div>
+            `;
+          }
+
+          let budgetColor = 'var(--status-success)';
+          if (fin.budgetExecutionPercent > 85) budgetColor = 'var(--darty-red)';
+          else if (fin.budgetExecutionPercent > 65) budgetColor = 'var(--fnac-gold)';
+
+          modalDetalheBody.innerHTML = `
+            <!-- Abas de Navegação do Modal -->
+            <div class="modal-nav-tabs">
+              <button type="button" class="modal-tab-btn ${currentActiveTab === 'tabTasks' ? 'active' : ''}" onclick="switchModalTab('tabTasks', this)">
+                <svg width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                <span>Marcos Técnicos & Signage</span>
+              </button>
+              <button type="button" class="modal-tab-btn ${currentActiveTab === 'tabCosts' ? 'active' : ''}" onclick="switchModalTab('tabCosts', this)">
+                <svg width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v12m-3-2.818l.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                <span>Custos, Diárias & Orçamento</span>
+              </button>
+            </div>
+
+            <!-- =================================================================
+                 ABA 1: MARCOS TÉCNICOS & DIGITAL SIGNAGE
+                 ================================================================= -->
+            <div class="tab-pane ${currentActiveTab === 'tabTasks' ? 'active' : ''}" id="tabTasks">
+              
+              <!-- Progresso Geral da Loja -->
+              <div style="margin-bottom: 20px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                  <span style="font-size: 13px; font-weight: 700; color: var(--text-white);">Progresso Global de Abertura</span>
+                  <span style="font-size: 13px; font-family: 'JetBrains Mono', monospace; font-weight: 700; color: var(--fnac-gold);">${progressPercent}% (${completedTasks} de ${totalTasks} concluídos)</span>
+                </div>
+                <div class="progress-track" style="height: 9px;">
+                  <div class="progress-fill-bar ${brandClass === 'darty' ? 'progress-fill-red' : 'progress-fill-gold'}" style="width: ${progressPercent}%;"></div>
+                </div>
+              </div>
+
+              <!-- Resumo de Prazos e Custos -->
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px;">
+                <div style="padding: 14px; background: var(--bg-base); border-radius: 8px; border: 1px solid var(--border-subtle);">
+                  <div style="font-size: 11px; text-transform: uppercase; color: var(--text-dim); font-weight: 700;">Inauguração Oficial</div>
+                  <div style="font-size: 16px; font-weight: 700; color: var(--text-white); margin-top: 4px;">${formatDate(p.go_live_date)}</div>
+                  <div style="font-size: 12px; color: var(--text-muted); margin-top: 2px;">${getDaysRemaining(p.go_live_date)} dias restantes • ${p.location}</div>
+                </div>
+                <div style="padding: 14px; background: var(--bg-base); border-radius: 8px; border: 1px solid var(--border-subtle);">
+                  <div style="font-size: 11px; text-transform: uppercase; color: var(--text-dim); font-weight: 700;">Custo Diário & Orçamento</div>
+                  <div style="font-size: 16px; font-weight: 700; color: var(--fnac-gold); margin-top: 4px;">${formatCurrency(p.daily_cost)} <span style="font-size: 12px; color: var(--text-dim);">/ dia</span></div>
+                  <div style="font-size: 12px; color: var(--text-muted); margin-top: 2px;">Budget Alocado: ${formatCurrency(p.total_budget)}</div>
+                </div>
+              </div>
+
+              <!-- Secção: Configuração Digital Signage & Playlist -->
+              <div class="modal-section-card" style="margin-bottom: 20px;">
+                <div class="modal-section-title">
+                  <span>Configuração de Digital Signage & Broadcast</span>
+                  <span class="status-badge ${p.signage_status === 'pronto' ? 'badge-signage-ok' : 'badge-signage-testing'}">${p.signage_status}</span>
+                </div>
+                <form id="formUpdateSignage" onsubmit="handleUpdateSignage(event, ${p.id})" style="display: grid; grid-template-columns: 1fr 1fr auto; gap: 12px; align-items: flex-end;">
+                  <div class="form-group" style="margin-bottom: 0;">
+                    <label class="form-label">Estado de Signage</label>
+                    <select id="editSignageStatus" class="form-select">
+                      <option value="pendente" ${p.signage_status === 'pendente' ? 'selected' : ''}>Pendente de Instalação</option>
+                      <option value="configuracao" ${p.signage_status === 'configuracao' ? 'selected' : ''}>Em Configuração de IPs</option>
+                      <option value="validacao" ${p.signage_status === 'validacao' ? 'selected' : ''}>Em Validação de Telas</option>
+                      <option value="pronto" ${p.signage_status === 'pronto' ? 'selected' : ''}>Pronto para Broadcast</option>
+                    </select>
+                  </div>
+                  <div class="form-group" style="margin-bottom: 0;">
+                    <label class="form-label">Versão da Playlist</label>
+                    <input type="text" id="editPlaylistVersion" class="form-input" value="${p.playlist_version || 'v1.0'}" required>
+                  </div>
+                  <button type="submit" class="btn-primary" style="height: 42px; padding: 0 16px;">
+                    <svg width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                    </svg>
+                    <span>Atualizar</span>
+                  </button>
                 </form>
               </div>
 
-              <!-- Lista de Tarefas -->
-              <div class="task-list" id="modalTaskList" style="margin-top: 12px;">
-                ${tasksListHtml}
+              <!-- Secção: Checklist de Marcos Multimédia -->
+              <div class="modal-section-card">
+                <div class="modal-section-title">
+                  <span>Checklist de Marcos Técnicos (${completedTasks}/${totalTasks} concluídos)</span>
+                  <button type="button" class="add-task-toggle" onclick="toggleAddTaskForm()">
+                    <svg width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4.5v15m7.5-7.5h-15"></path>
+                    </svg>
+                    <span>Novo Marco Técnico</span>
+                  </button>
+                </div>
+
+                <!-- Formulário Desdobrável para Novo Marco -->
+                <div class="add-task-card" id="addTaskCard" style="display: none;">
+                  <form id="formCreateTask" onsubmit="handleCreateTask(event, ${p.id})">
+                    <div class="form-grid-2">
+                      <div class="form-group">
+                        <label class="form-label">Título do Marco Técnico *</label>
+                        <input type="text" id="newTaskTitle" class="form-input" placeholder="Ex: Calibração de Áudio Bose / JBL" required>
+                      </div>
+                      <div class="form-group">
+                        <label class="form-label">Departamento</label>
+                        <select id="newTaskDept" class="form-select">
+                          <option value="Multimédia & Telas" selected>Multimédia & Telas</option>
+                          <option value="Redes & IT">Redes & IT</option>
+                          <option value="Som & Iluminação">Som & Iluminação</option>
+                          <option value="Operações & Obras">Operações & Obras</option>
+                        </select>
+                      </div>
+                    </div>
+
+                    <div class="form-grid-2" style="margin-top: 10px;">
+                      <div class="form-group">
+                        <label class="form-label">Prioridade</label>
+                        <select id="newTaskPriority" class="form-select">
+                          <option value="critical">Crítica</option>
+                          <option value="high" selected>Alta</option>
+                          <option value="medium">Média</option>
+                          <option value="low">Baixa</option>
+                        </select>
+                      </div>
+                      <div class="form-group">
+                        <label class="form-label">Prazo de Entrega</label>
+                        <input type="date" id="newTaskDueDate" class="form-input" value="${p.target_completion_date || p.go_live_date}">
+                      </div>
+                    </div>
+
+                    <div class="form-group" style="margin-top: 10px;">
+                      <label class="form-label">Descrição / Observações Técnicas</label>
+                      <input type="text" id="newTaskDesc" class="form-input" placeholder="Ex: Garantir teste de volume nas zonas de Caixas e Livraria">
+                    </div>
+
+                    <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 14px;">
+                      <button type="button" class="btn-secondary" onclick="toggleAddTaskForm()">Cancelar</button>
+                      <button type="submit" class="btn-primary">
+                        <span>Guardar Marco</span>
+                      </button>
+                    </div>
+                  </form>
+                </div>
+
+                <!-- Lista de Tarefas -->
+                <div class="task-list" id="modalTaskList" style="margin-top: 12px;">
+                  ${tasksListHtml}
+                </div>
               </div>
+            </div>
+
+            <!-- =================================================================
+                 ABA 2: CUSTOS, DIÁRIAS & ORÇAMENTO
+                 ================================================================= -->
+            <div class="tab-pane ${currentActiveTab === 'tabCosts' ? 'active' : ''}" id="tabCosts">
+              
+              <!-- Cartões de KPIs Financeiros -->
+              <div class="financial-kpi-grid">
+                <div class="fin-card">
+                  <div class="fin-label">Orçamento Total</div>
+                  <div class="fin-value">${formatCurrency(fin.totalBudget)}</div>
+                </div>
+                <div class="fin-card">
+                  <div class="fin-label">Total Executado</div>
+                  <div class="fin-value spent">${formatCurrency(fin.totalSpent)}</div>
+                </div>
+                <div class="fin-card">
+                  <div class="fin-label">Saldo Restante</div>
+                  <div class="fin-value ${fin.remainingBudget < 0 ? 'danger' : 'remaining'}">${formatCurrency(fin.remainingBudget)}</div>
+                </div>
+                <div class="fin-card">
+                  <div class="fin-label">Consumo Budget</div>
+                  <div class="fin-value" style="color: ${budgetColor};">${fin.budgetExecutionPercent}%</div>
+                </div>
+              </div>
+
+              <!-- Barra de Consumo Orçamental -->
+              <div style="margin-bottom: 20px;">
+                <div style="display: flex; justify-content: space-between; font-size: 12px; color: var(--text-dim); margin-bottom: 6px;">
+                  <span>Taxa de Execução Financeira</span>
+                  <span style="color: ${budgetColor}; font-weight: 700;">${fin.budgetExecutionPercent}% consumido</span>
+                </div>
+                <div class="progress-track" style="height: 8px;">
+                  <div class="progress-fill-bar" style="width: ${Math.min(fin.budgetExecutionPercent, 100)}%; background: ${budgetColor};"></div>
+                </div>
+              </div>
+
+              <!-- Histórico de Custos & Botão de Novo Lançamento -->
+              <div class="modal-section-card">
+                <div class="modal-section-title">
+                  <span>Histórico de Despesas & Diárias (${fin.entriesCount || 0} registos)</span>
+                  <button type="button" class="add-task-toggle" onclick="toggleAddCostForm()">
+                    <svg width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4.5v15m7.5-7.5h-15"></path>
+                    </svg>
+                    <span>Registar Custo / Diária</span>
+                  </button>
+                </div>
+
+                <!-- Formulário Desdobrável para Novo Custo -->
+                <div class="add-task-card" id="addCostCard" style="display: none; margin-bottom: 14px;">
+                  <form id="formCreateCost" onsubmit="handleCreateCost(event, ${p.id})">
+                    <div class="form-grid-2">
+                      <div class="form-group">
+                        <label class="form-label">Data da Despesa *</label>
+                        <input type="date" id="newCostDate" class="form-input" value="${new Date().toISOString().split('T')[0]}" required>
+                      </div>
+                      <div class="form-group">
+                        <label class="form-label">Categoria de Custo *</label>
+                        <select id="newCostType" class="form-select">
+                          <option value="tecnico_externo" selected>Diária Técnica Externa</option>
+                          <option value="hardware_multimedia">Hardware & Displays Multimédia</option>
+                          <option value="licenciamento_telas">Licenciamento & Streaming de Telas</option>
+                          <option value="infraestrutura_rede">Cablagem & Redes IT</option>
+                          <option value="outro">Outro / Despesas Diversas</option>
+                        </select>
+                      </div>
+                    </div>
+
+                    <div class="form-grid-2" style="margin-top: 10px;">
+                      <div class="form-group">
+                        <label class="form-label">Valor (€) *</label>
+                        <input type="number" step="0.50" id="newCostAmount" class="form-input" placeholder="Ex: 485.50" required>
+                      </div>
+                      <div class="form-group">
+                        <label class="form-label">Descrição do Custo</label>
+                        <input type="text" id="newCostDesc" class="form-input" placeholder="Ex: Calibração de som e alinhamento de displays" required>
+                      </div>
+                    </div>
+
+                    <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 14px;">
+                      <button type="button" class="btn-secondary" onclick="toggleAddCostForm()">Cancelar</button>
+                      <button type="submit" class="btn-primary">
+                        <span>Gravar Custo</span>
+                      </button>
+                    </div>
+                  </form>
+                </div>
+
+                <!-- Lista de Despesas -->
+                <div class="task-list" id="modalCostList">
+                  ${costsListHtml}
+                </div>
+              </div>
+
             </div>
           `;
 
@@ -1133,6 +1322,17 @@
       }
     }
 
+    // Toggle Formulário de Novo Custo
+    function toggleAddCostForm() {
+      const card = document.getElementById('addCostCard');
+      if (card) {
+        card.style.display = card.style.display === 'none' ? 'block' : 'none';
+        if (card.style.display === 'block') {
+          document.getElementById('newCostAmount')?.focus();
+        }
+      }
+    }
+
     // Ação: Alternar Estado da Tarefa (Checkbox)
     async function toggleTask(taskId, projectId) {
       try {
@@ -1140,7 +1340,6 @@
         const json = await res.json();
         if (json.success) {
           showToast(json.message, 'success');
-          // Atualizar modal de detalhes e tabela principal
           await openProjectDetails(projectId);
           await loadProjects();
         } else {
@@ -1198,6 +1397,54 @@
       }
     }
 
+    // Ação: Criar Novo Custo para a Loja
+    async function handleCreateCost(e, projectId) {
+      e.preventDefault();
+      const entry_date = document.getElementById('newCostDate').value;
+      const cost_type = document.getElementById('newCostType').value;
+      const amount = parseFloat(document.getElementById('newCostAmount').value);
+      const description = document.getElementById('newCostDesc').value;
+
+      try {
+        const res = await fetch(`/api/v1/projects/${projectId}/costs`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ entry_date, cost_type, amount, description })
+        });
+
+        const json = await res.json();
+        if (json.success) {
+          showToast('Custo registado com sucesso!', 'success');
+          await openProjectDetails(projectId);
+          await loadProjects();
+          await loadKpis();
+        } else {
+          showToast(json.message || 'Erro ao registar custo', 'error');
+        }
+      } catch (err) {
+        showToast('Erro de comunicação: ' + err.message, 'error');
+      }
+    }
+
+    // Ação: Eliminar Custo
+    async function deleteCost(costId, projectId) {
+      if (!confirm('Tens a certeza que desejas remover este registo de custo?')) return;
+      try {
+        const res = await fetch(`/api/v1/costs/${costId}`, { method: 'DELETE' });
+        const json = await res.json();
+        if (json.success) {
+          showToast(json.message, 'success');
+          await openProjectDetails(projectId);
+          await loadProjects();
+          await loadKpis();
+        } else {
+          showToast(json.message || 'Erro ao remover custo', 'error');
+        }
+      } catch (err) {
+        showToast('Erro de comunicação: ' + err.message, 'error');
+      }
+    }
+
     // Ação: Atualizar Signage & Playlist
     async function handleUpdateSignage(e, projectId) {
       e.preventDefault();
@@ -1227,6 +1474,7 @@
 
     if (btnCloseDetalhe) btnCloseDetalhe.addEventListener('click', () => modalDetalhe.classList.remove('active'));
     if (btnFecharDetalhe) btnFecharDetalhe.addEventListener('click', () => modalDetalhe.classList.remove('active'));
+
 
 
     // Filtros de Tabela

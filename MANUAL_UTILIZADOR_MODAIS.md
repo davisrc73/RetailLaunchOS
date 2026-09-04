@@ -8,7 +8,9 @@ Este manual destina-se aos utilizadores e operadores do **Gabinete Multimédia**
 ## Índice
 1. [Visão Geral do Dashboard](#1-visão-geral-do-dashboard)
 2. [Modal: Registar Nova Abertura de Loja](#2-modal-registar-nova-abertura-de-loja)
-3. [Modal / Gaveta: Detalhes da Abertura & Marcos Técnicos](#3-modal--gaveta-detalhes-da-abertura--marcos-técnicos)
+3. [Modal / Gaveta: Gestão da Loja (Abas: Marcos Técnicos & Custos)](#3-modal--gaveta-gestão-da-loja-abas-marcos-técnicos--custos)
+   - [3.2. Aba 1: Marcos Técnicos & Digital Signage](#32-aba-1-marcos-técnicos--digital-signage)
+   - [3.3. Aba 2: Custos, Diárias & Orçamento (Fase 3)](#33-aba-2-custos-diárias--orçamento-fase-3)
 4. [Painel de KPIs & Contagem Decrescente](#4-painel-de-kpis--contagem-decrescente)
 5. [Filtros, Pesquisa e Exportação CSV](#5-filtros-pesquisa-e-exportação-csv)
 6. [Boas Práticas de Operação](#6-boas-práticas-de-operação)
@@ -55,15 +57,19 @@ No canto superior direito do Dashboard, clica no botão dourado **"+ Nova Abertu
 
 ---
 
-## 3. Modal de Gestão Técnica da Loja & Checklist Multimédia
+## 3. Modal / Gaveta: Gestão da Loja (Abas: Marcos Técnicos & Custos)
 
 ### 3.1. Como Aceder
-Na tabela **"Aberturas em Curso"**, clica no botão **"Gerir"** situado na coluna de ações de qualquer loja. O modal expandido (*large*) abrir-se-á com todas as ferramentas técnicas de controlo.
+Na tabela **"Aberturas em Curso"**, clica no botão **"Gerir"** situado na coluna de ações de qualquer loja. O modal expandido (*large*) abrir-se-á com um sistema de navegação por abas:
+* **Aba 1: Marcos Técnicos & Signage**
+* **Aba 2: Custos, Diárias & Orçamento**
 
-### 3.2. Estrutura e Funcionalidades do Modal
+---
+
+### 3.2. Aba 1: Marcos Técnicos & Digital Signage
 
 #### A. Barra de Progresso Global em Tempo Real
-No topo do modal, é exibida a barra de progresso da abertura e o rácio de cumprimento:
+No topo da aba, é exibida a barra de progresso da abertura e o rácio de cumprimento:
 * **Exemplo**: `75% (3 de 4 concluídos)`.
 * O cálculo é feito instantaneamente na base de dados: `Progresso = (Tarefas Concluídas / Total de Tarefas) * 100`.
 
@@ -96,6 +102,46 @@ Para acrescentar uma nova tarefa à checklist da loja:
    * **Descrição / Observações Técnicas** (opcional, ex: *"Verificar níveis de SPL junto à Linha de Caixas"*).
 3. Clica em **"Guardar Marco"**: a tarefa é inserida na base de dados SQLite via `POST /api/v1/projects/:id/tasks` e surge imediatamente na lista com o progresso recalculado.
 
+---
+
+### 3.3. Aba 2: Custos, Diárias & Orçamento (Fase 3)
+
+Esta aba disponibiliza o acompanhamento financeiro detalhado de cada abertura, permitindo controlar o consumo do orçamento alocado e auditar as diárias técnicas efetuadas no local.
+
+#### A. Cartões de Indicadores Financeiros (KPIs)
+No topo da aba surgem 4 métricas calculadas em tempo real:
+1. **Orçamento Total**: Montante global aprovado para a loja (`total_budget`).
+2. **Total Executado**: Somatório de todas as despesas e diárias lançadas até ao momento (`totalSpent`).
+3. **Saldo Restante**: Diferença entre o orçamento e os custos registados (`remainingBudget`). Fica automaticamente assinalado a vermelho caso ocorra derrapagem orçamental.
+4. **Consumo Budget (%)**: Percentagem de execução com código visual de alerta:
+   * **Verde (< 65%)**: Consumo controlado e dentro dos limites.
+   * **Âmbar (65% a 85%)**: Consumo intermédio; requer atenção para custos adicionais.
+   * **Vermelho (> 85%)**: Alerta crítico de aproximação ao limite do budget.
+
+#### B. Barra de Consumo Orçamental
+Barra visual proporcional que espelha graficamente a percentagem consumida face ao limite global.
+
+#### C. Histórico de Despesas & Diárias (`project_costs`)
+Lista discriminada de todos os custos imputados à abertura:
+* **Badge de Categoria**:
+  * `Diária Técnica`: Deslocações, horas de técnicos externos e calibradores.
+  * `Hardware`: Aquisição de displays, media players, suportes ou cablagem.
+  * `Licenciamento`: Assinaturas de software CMS de Digital Signage e licenças de streaming.
+  * `Redes & IT`: Switches, bastidores, routers ou conetividade.
+  * `Outro`: Despesas e consumíveis diversos.
+* **Descrição & Auditoria**: Detalha o motivo da despesa, a data em que ocorreu e o utilizador que realizou o lançamento (`logged_by_name`).
+* **Valor**: Formatação em Euros (`€`) em tipografia tabular *JetBrains Mono*.
+* **Remoção de Registo**: Ícone de caixote do lixo para eliminar lançamentos incorretos com recálculo automático instantâneo dos KPIs.
+
+#### D. Lançar Novo Custo ou Diária Técnica
+Para imputar um novo custo ao projeto:
+1. Clica no botão **"+ Registar Custo / Diária"** no cabeçalho do histórico para abrir o formulário desdobrável.
+2. Preenche os campos:
+   * **Data da Despesa***: Data de ocorrência da fatura ou da intervenção no local (pré-selecionada com o dia atual).
+   * **Categoria de Custo***: Escolha entre *Diária Técnica Externa*, *Hardware & Displays Multimédia*, *Licenciamento & Streaming de Telas*, *Cablagem & Redes IT* ou *Outro*.
+   * **Valor (€)***: Montante em euros (ex: `485.50`).
+   * **Descrição do Custo***: Justificação clara (ex: *"Calibração de som e alinhamento de displays de montra"*).
+3. Clica em **"Gravar Custo"**: O sistema envia os dados via `POST /api/v1/projects/:id/costs`, armazena o lançamento na base de dados SQLite, atualiza a lista de histórico e recalcula todos os saldos e indicadores no modal e no Dashboard principal.
 
 ---
 
@@ -138,3 +184,5 @@ Por cima da tabela, clica nos botões:
 1. **Nomenclatura**: Utiliza sempre a convenção `[Insígnia] [Nome do Centro ou Cidade]` (ex: `Fnac Forum Coimbra`, `Darty Sintra`).
 2. **Datas de Entrega**: Define sempre a *Entrega Técnica Multimédia* pelo menos 5 dias antes do *Go-Live*, permitindo testes de stress de reprodução contínua 24/7 nas telas antes da inauguração.
 3. **Playlists**: Mantém o padrão de numeração semântica nas playlists (ex: `v1.0-abertura`, `v1.1-ajustes`, `v2.0-campanha`).
+4. **Registo Imediato de Diárias**: Imputar as diárias e custos de deslocação no próprio dia da intervenção para manter o saldo orçamental permanentemente fidedigno.
+

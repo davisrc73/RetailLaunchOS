@@ -23,13 +23,17 @@ RetailLaunchOS/
 │   └── js/                          # Scripts auxiliares e bibliotecas cliente
 ├── src/                             # Código-fonte principal da aplicação
 │   ├── controllers/                 # Controladores REST e lógica de endpoints
-│   │   └── projectController.js     # Gestão de aberturas de lojas e métricas
+│   │   ├── projectController.js     # Gestão de aberturas de lojas e métricas
+│   │   ├── taskController.js        # Checklist de marcos técnicos e progresso
+│   │   └── costController.js        # Registo de custos, diárias e sumários orçamentais
 │   ├── database/                    # Abstração de ligação e auto-bootstrap da BD
 │   │   └── db.js                    # Conexão nativa via node:sqlite com WAL e PRAGMAs
 │   ├── middleware/                  # Intercetores de pedidos
 │   │   └── authMiddleware.js        # Autenticação e controlo de permissões RBAC
 │   ├── models/                      # Camada de acesso aos dados (Data Access Objects)
-│   │   └── Project.js               # Consultas parametrizadas, criação e KPIs
+│   │   ├── Project.js               # Consultas parametrizadas, criação e KPIs
+│   │   ├── Task.js                  # Marcos técnicos e toggle de estado
+│   │   └── Cost.js                  # Custos diários, agregações e sumário financeiro
 │   ├── routes/                      # Definição e mapeamento de rotas
 │   │   ├── api/                     # Rotas de dados JSON (/api/v1/...)
 │   │   │   └── projects.js          # Endpoints REST de projetos
@@ -167,9 +171,23 @@ Os modelos encapsulam a lógica de negócio e queries SQL parametrizadas (evitan
 * **`Task.getStats(projectId)`**:
   * Retorna contagens agregadas `{ total, completed, inProgress, pending, progress }` para recálculo imediato na interface.
 
+### 3.3. Modelo `Cost.js` (Fase 3)
+* **`Cost.findByProject(projectId)`**:
+  * Lista todos os lançamentos financeiros vinculados ao projeto, com ordenação por data decrescente e `LEFT JOIN` com a tabela `users` para identificar o autor do registo.
+* **`Cost.findById(id)`**:
+  * Procura um registo de custo individual pelo seu ID primário.
+* **`Cost.create(data)`**:
+  * Insere uma nova despesa ou diária na tabela `project_costs` (`project_id`, `entry_date`, `cost_type`, `amount`, `description`, `logged_by`).
+* **`Cost.delete(id)`**:
+  * Remove um registo de despesa e devolve confirmação booleana.
+* **`Cost.getProjectFinancialSummary(projectId)`**:
+  * Calcula em tempo real o sumário financeiro da loja: `totalBudget`, `totalSpent`, `remainingBudget`, `budgetExecutionPercent`, `costsByType` (agrupamento por categoria de custo) e a lista completa de despesas.
+* **`Cost.getGlobalSummary()`**:
+  * Agrega os totais financeiros de todo o ecossistema: total gasto, despesa acumulada no mês corrente e distribuição de gastos por tipo de custo.
+
 ---
 
-## 4. Controladores e API REST (`projectController.js` e `taskController.js`)
+## 4. Controladores e API REST (`projectController.js`, `taskController.js` e `costController.js`)
 
 A API segue os padrões RESTful com payloads JSON e códigos de resposta HTTP semânticos:
 
@@ -192,6 +210,14 @@ A API segue os padrões RESTful com payloads JSON e códigos de resposta HTTP se
 | **PATCH**| `/api/v1/tasks/:id/toggle` | `:id` (Task ID) | Alterna estado de conclusão (pendente/concluído) com 1 clique |
 | **PUT** | `/api/v1/tasks/:id` | Body JSON com alterações | Atualiza detalhes de uma tarefa específica |
 | **DELETE**| `/api/v1/tasks/:id` | `:id` (Task ID) | Elimina um marco técnico da base de dados |
+
+### 4.3. Endpoints de Custos, Diárias e Orçamento (`/api/v1/projects/:id/costs` & `/api/v1/costs`) (Fase 3)
+| Método | Endpoint | Parâmetros | Descrição |
+| :--- | :--- | :--- | :--- |
+| **GET** | `/api/v1/projects/:id/costs` | `:id` (Project ID) | Retorna o sumário financeiro detalhado, saldo restante, percentagem de consumo e histórico |
+| **POST** | `/api/v1/projects/:id/costs` | Body JSON com dados da despesa | Regista uma nova diária ou custo de hardware/licença |
+| **GET** | `/api/v1/costs/summary` | — | Sumário financeiro global consolidado e distribuição por categoria |
+| **DELETE**| `/api/v1/costs/:id` | `:id` (Cost ID) | Elimina um registo de despesa e devolve o sumário recalculado |
 
 
 ---
