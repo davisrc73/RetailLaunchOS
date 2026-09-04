@@ -5,6 +5,23 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>RetailLaunchOS • Painel de Aberturas de Lojas | Fnac Darty</title>
   <meta name="description" content="Sistema de gestão de aberturas de lojas Fnac e Darty para o Gabinete Multimédia. Acompanhamento de infraestrutura, digital signage e custos diários.">
+  <meta name="color-scheme" content="light dark">
+  <!-- Anti-FOUC Theme Script (Sincronização imediata antes da renderização) -->
+  <script>
+    (function() {
+      try {
+        var saved = localStorage.getItem('retaillaunch_theme') || 'auto';
+        var effective = saved;
+        if (saved === 'auto') {
+          effective = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        }
+        document.documentElement.setAttribute('data-theme', effective);
+        document.documentElement.setAttribute('data-theme-setting', saved);
+        var meta = document.querySelector('meta[name="color-scheme"]');
+        if (meta) meta.content = effective;
+      } catch (e) {}
+    })();
+  </script>
   <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -162,6 +179,31 @@
           </svg>
           <input type="text" id="projectSearch" placeholder="Pesquisar loja, insígnia...">
           <span class="kbd-shortcut">⌘K</span>
+        </div>
+
+        <!-- Seletor Tri-Estado de Tema (Dia / Noite / Auto) -->
+        <div class="theme-switcher-group" id="themeSwitcherGroup" role="radiogroup" aria-label="Modo de Visualização">
+          <button type="button" class="theme-switch-btn" data-theme-mode="light" id="themeBtnLight" title="Modo Claro (Day)" aria-label="Modo Claro (Day)">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="4"></circle>
+              <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"></path>
+            </svg>
+            <span class="theme-switch-label">Dia</span>
+          </button>
+          <button type="button" class="theme-switch-btn" data-theme-mode="dark" id="themeBtnDark" title="Modo Escuro (Night)" aria-label="Modo Escuro (Night)">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"></path>
+            </svg>
+            <span class="theme-switch-label">Noite</span>
+          </button>
+          <button type="button" class="theme-switch-btn" data-theme-mode="auto" id="themeBtnAuto" title="Automático (Segue o Sistema Operativo)" aria-label="Automático (Segue o Sistema Operativo)">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="2" y="3" width="20" height="14" rx="2"></rect>
+              <line x1="8" y1="21" x2="16" y2="21"></line>
+              <line x1="12" y1="17" x2="12" y2="21"></line>
+            </svg>
+            <span class="theme-switch-label">Auto</span>
+          </button>
         </div>
 
         <!-- Botão de Notificações -->
@@ -903,6 +945,65 @@
         toast.style.transition = 'all 0.3s ease';
         setTimeout(() => toast.remove(), 300);
       }, 3500);
+    }
+
+    // =========================================================================
+    // MOTOR MULTI-TEMA (CLARO / ESCURO / AUTOMÁTICO) - FASE 6
+    // =========================================================================
+    function getSystemTheme() {
+      return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    }
+
+    function applyThemeMode(mode, save = true) {
+      if (save) {
+        localStorage.setItem('retaillaunch_theme', mode);
+      }
+      const effectiveTheme = mode === 'auto' ? getSystemTheme() : mode;
+      document.documentElement.setAttribute('data-theme', effectiveTheme);
+      document.documentElement.setAttribute('data-theme-setting', mode);
+
+      const meta = document.querySelector('meta[name="color-scheme"]');
+      if (meta) meta.content = effectiveTheme;
+
+      // Sincronizar estado visual dos botões no seletor
+      document.querySelectorAll('.theme-switch-btn').forEach(btn => {
+        const btnMode = btn.getAttribute('data-theme-mode');
+        if (btnMode === mode) {
+          btn.classList.add('active');
+          btn.setAttribute('aria-checked', 'true');
+        } else {
+          btn.classList.remove('active');
+          btn.setAttribute('aria-checked', 'false');
+        }
+      });
+    }
+
+    function initThemeEngine() {
+      const saved = localStorage.getItem('retaillaunch_theme') || 'auto';
+      applyThemeMode(saved, false);
+
+      // Ouvir alterações dinâmicas do sistema se estiver em modo 'auto'
+      const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+      mediaQuery.addEventListener('change', () => {
+        const currentSetting = localStorage.getItem('retaillaunch_theme') || 'auto';
+        if (currentSetting === 'auto') {
+          applyThemeMode('auto', false);
+        }
+      });
+
+      // Registar cliques nos botões do seletor
+      document.querySelectorAll('.theme-switch-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const mode = btn.getAttribute('data-theme-mode');
+          applyThemeMode(mode, true);
+          const modeLabels = {
+            light: 'Modo Claro (Dia)',
+            dark: 'Modo Escuro (Noite)',
+            auto: 'Modo Automático (Sistema)'
+          };
+          showToast(`Tema alterado para: ${modeLabels[mode] || mode}`, 'success');
+        });
+      });
     }
 
     // Formatação de Valores Monetários
@@ -2643,6 +2744,9 @@
 
     // Arranque Inicial
     document.addEventListener('DOMContentLoaded', async () => {
+      // 0. Inicializar Motor Multi-Tema
+      initThemeEngine();
+
       // 1. Inicializar Sessão Auth
       const storedToken = localStorage.getItem('retaillaunch_token');
       if (storedToken) {

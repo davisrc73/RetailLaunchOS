@@ -363,21 +363,85 @@ A camada de segurança foi construída segundo o princípio de **Zero Dependênc
 
 ---
 
-## 6. Front-End & Design System (`public/css/dashboard.css`)
+## 7. Design System Oficial & Motor Multi-Tema (Fase 6)
 
-* **Estética**: Dark mode elegante com fundo obsidian (`#090d16`), cartões com efeito de vidro (*Glassmorphism* com `backdrop-filter: blur(16px)`), e sombras suaves.
-* **Identidade de Marca**:
-  * **Fnac**: Dourado/Âmbar (`#F59E0B`), com badges translúcidos e barras de progresso com gradiente de ouro.
-  * **Darty**: Vermelho vivo (`#EF4444`), com badges em tons de fogo e destaques vibrantes.
-* **Tipografia**: *Plus Jakarta Sans* para títulos e interface geral; *JetBrains Mono* com números tabulares para relógios, valores em euros e contagens.
+A interface do **RetailLaunchOS** foi totalmente reformulada com um motor multi-tema tri-estado nativo e conformidade rigorosa com a identidade visual e cromática do Gabinete Multimédia Fnac / Darty.
+
+### 7.1. Paleta Oficial Fnac & Darty e Cores Secundárias
+As cores corporativas foram normalizadas no arquivo [`public/css/dashboard.css`](file:///Users/daviscorreia/Antigravity%20/RetailLaunchOS/public/css/dashboard.css) através de tokens CSS em `:root`:
+
+```css
+:root {
+  /* Marca Fnac Oficial */
+  --fnac-gold: #F5B027;
+  --fnac-black: #000000;
+  --fnac-white: #FFFFFF;
+  --fnac-gold-hover: #e09d1b;
+  --fnac-gold-glow: rgba(245, 176, 39, 0.28);
+
+  /* Marca Darty Oficial */
+  --darty-red: #E21212;
+  --darty-black: #000000;
+  --darty-white: #FFFFFF;
+  --darty-red-hover: #c70d0d;
+  --darty-red-glow: rgba(226, 18, 18, 0.28);
+
+  /* Cores Secundárias (Ambas as Insígnias) */
+  --sec-blue: #006EFA;
+  --sec-green: #39D66A;
+  --sec-yellow: #FFDB00;
+  --sec-purple: #9147FF;
+  --sec-teal: #28E4AB;
+  --sec-pink: #FF7BF9;
+}
+```
+
+### 7.2. Arquitetura de Tokens CSS Dinâmicos
+A aplicação utiliza uma estratégia de variáveis CSS por escopo para garantir alternância instantânea de tema sem recarregar a página e sem duplicação de regras:
+
+* **Modo Escuro (`:root, [data-theme="dark"]`)**:
+  * `--bg-base: #090D16` (Obsidian profundo de alto contraste).
+  * `--bg-surface: #101626` / `--bg-card: rgba(16, 22, 38, 0.85)` com *Glassmorphism* (`backdrop-filter: blur(16px)`).
+  * `--text-main: #FFFFFF` / `--text-muted: #94A3B8`.
+  * `--border-color: rgba(255, 255, 255, 0.08)`.
+* **Modo Claro (`[data-theme="light"]`)**:
+  * `--bg-base: #F8FAFC` (Slate neutro e confortável).
+  * `--bg-surface: #FFFFFF` / `--bg-card: #FFFFFF` com sombras estruturais (`--shadow-card: 0 4px 20px rgba(0, 0, 0, 0.06)`).
+  * `--text-main: #0F172A` (Preto ardósia de alto contraste para máxima legibilidade).
+  * `--text-muted: #64748B`.
+  * `--border-color: #E2E8F0`.
+
+### 7.3. Motor Multi-Tema Tri-Estado e Prevenção de FOUC
+O controle de temas no cliente web [`src/views/pages/dashboard.html`](file:///Users/daviscorreia/Antigravity%20/RetailLaunchOS/src/views/pages/dashboard.html) implementa três modos:
+1. **`light` (Dia)**: Força a interface em modo claro.
+2. **`dark` (Noite)**: Força a interface em modo escuro.
+3. **`auto` (Sistema)**: Sincroniza dinamicamente com a preferência do sistema operativo do utilizador (`prefers-color-scheme`).
+
+```mermaid
+flowchart TD
+    A[Arranque HTML Head] --> B{Ler localStorage: retaillaunch_theme}
+    B -- light --> C[data-theme=light]
+    B -- dark --> D[data-theme=dark]
+    B -- auto ou nulo --> E{prefers-color-scheme: dark?}
+    E -- Sim --> D
+    E -- Não --> C
+    C --> F[Renderizar DOM sem FOUC]
+    D --> F
+    F --> G[Listener Dinâmico prefers-color-scheme]
+    G -- Alteração no SO --> H[Atualizar data-theme instantaneamente]
+```
+
+* **Eliminação de FOUC (*Flash of Unstyled Content*)**: Um script síncrono inline posicionado estrategicamente no `<head>`, antes de qualquer elemento visual ou folha de estilos secundária, determina o tema inicial e define `data-theme` na tag `<html>` em menos de 1 milissegundo.
+* **Persistência**: A escolha é gravada na chave `retaillaunch_theme` do `localStorage`.
+* **Controlo de UI**: Seletor segmentado com micro-animações no cabeçalho (`.theme-switcher-group`), exibindo o estado ativo com preenchimento em Fnac Gold (`#F5B027`) e tipografia em `#000000`.
 
 ---
 
-## 7. Infraestrutura, Docker & Synology NAS
+## 8. Infraestrutura, Docker & Synology NAS
 
 * **Contentorização (`Dockerfile`)**:
   * Imagem de base: `node:22-alpine` (menos de 60 MB).
-  * Inclui o motor nativo `node:sqlite`.
+  * Inclui o motor nativo `node:sqlite` sem necessidade de ferramentas de compilação C++.
 * **Persistência no NAS (`docker-compose.yml`)**:
   * Mapeia o volume `retaillaunch_data` para `/app/database`, garantindo que o ficheiro `retaillaunch.sqlite` nunca é perdido ao atualizar ou reiniciar o contentor.
 * **Sincronização (`sync_github.sh`)**:

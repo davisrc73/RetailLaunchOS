@@ -262,7 +262,51 @@ Para autenticação formal ou em postos de trabalho partilhados, a secção infe
 
 ---
 
-## 6. Painel de KPIs & Contagem Decrescente
+## 6. Motor Multi-Tema & Identidade Cromática Oficial (Fnac & Darty)
+
+O RetailLaunchOS disponibiliza um motor de visualização moderno adaptativo e diferenciador, desenhado para garantir o máximo conforto de leitura e estrita fidelidade às marcas do grupo **Fnac Darty**.
+
+### 6.1. Seletor Tri-Estado no Cabeçalho Superior
+No canto superior direito (ao lado da barra de pesquisa e do botão de notificações), encontra-se o grupo segmentado de alternância rápida de tema:
+
+* ☀️ **Dia (Modo Claro)**:
+  * Otimizado para postos em superfícies de loja com iluminação forte ou para apresentações em monitores claros.
+  * Fundo limpo `#F8FAFC`, cartões brancos com sombras suaves de alta definição e texto escuro `#0F172A` para contraste máximo (WCAG AAA).
+* 🌙 **Noite (Modo Escuro)**:
+  * Configuração padrão obsidian `#090D16` com painéis em vidro translúcido (*glassmorphism*), sombras volumétricas e iluminação periférica sutil. Ideal para bastidores técnicos, auditórios e menor cansaço visual noturno.
+* 💻 **Auto (Automático)**:
+  * Segue automaticamente as definições do Sistema Operativo (macOS, Windows, iOS, Android).
+  * O sistema deteta em tempo real a transição Dia/Noite do computador através da API `prefers-color-scheme`, comutando de imediato sem necessidade de recarregar a página.
+
+> [!TIP]
+> **Zero FOUC (Flash of Unstyled Content):**
+> A preferência de tema é gravada instantaneamente no navegador (`localStorage`). O cabeçalho da página executa um script ultraleve pré-renderização que aplica o tema antes do desenho de qualquer elemento, eliminando qualquer flash de tela branca ao navegar.
+
+### 6.2. Paleta Oficial de Cores Rigorosa
+
+| Insígnia / Categoria | Cor Primária | Código Hex | Utilização Principal |
+| :--- | :--- | :--- | :--- |
+| **Fnac** | Dourado / Amarelo Oficial | `#F5B027` | Botões de ação primária, cartões de contagem decrescente, avatares de administração e realces ativos |
+| **Fnac** | Preto Puro | `#000000` | Tipografia em botões primários Fnac para contraste perfeito e fidelidade de marca |
+| **Fnac** | Branco Puro | `#FFFFFF` | Superfícies, textos de elevado destaque e contrastes |
+| **Darty** | Vermelho Oficial | `#E21212` | Badges de marca Darty, alertas críticos, ações de desconexão e status offline |
+| **Darty** | Preto Puro | `#000000` | Fundos e contrastes de insígnia |
+| **Darty** | Branco Puro | `#FFFFFF` | Tipografia em badges Darty |
+
+### 6.3. Paleta Secundária Oficial Partilhada
+
+O sistema utiliza 6 cores secundárias normalizadas para identificação de periféricos, tipos de custos e status de telas:
+
+1. **Azul Corporativo (`#006EFA`)**: Utilizado em status de sincronismo de telas, rede LAN/Wi-Fi e displays Full HD.
+2. **Verde Sucesso (`#39D66A`)**: Indica displays 100% online, saldo orçamental positivo e tarefas concluídas.
+3. **Amarelo Destaque (`#FFDB00`)**: Identifica displays 4K Ultra HD e avisos operacionais.
+4. **Roxo Multimédia (`#9147FF`)**: Sinaliza despesas de hardware, servidores BrightSign e telas de topo.
+5. **Turquesa Conetividade (`#28E4AB`)**: Aplicado em gradientes de prontidão de rede audiovisual e testes de broadcast.
+6. **Rosa Neon (`#FF7BF9`)**: Utilizado em custos e rubricas orçamentais diversas.
+
+---
+
+## 7. Painel de KPIs & Contagem Decrescente
 
 O painel superior do Dashboard atualiza-se em tempo real com as seguintes métricas:
 
@@ -279,25 +323,25 @@ O painel superior do Dashboard atualiza-se em tempo real com as seguintes métri
 
 ---
 
-## 7. Filtros, Pesquisa e Exportação CSV
+## 8. Filtros, Pesquisa e Exportação CSV
 
-### 7.1. Filtragem Rápida por Insígnia
+### 8.1. Filtragem Rápida por Insígnia
 Por cima da tabela, clica nos botões:
 * **Todas**: Apresenta todas as lojas do portfólio.
-* **Fnac**: Filtra apenas lojas com marca Fnac (fundo dourado).
-* **Darty**: Filtra apenas lojas com marca Darty (fundo vermelho).
+* **Fnac**: Filtra apenas lojas com marca Fnac (fundo dourado `#F5B027`).
+* **Darty**: Filtra apenas lojas com marca Darty (fundo vermelho `#E21212`).
 
-### 7.2. Pesquisa Instantânea (`⌘K`)
+### 8.2. Pesquisa Instantânea (`⌘K`)
 * Escreve no campo de pesquisa do cabeçalho qualquer termo (ex: *"Cascais"*, *"Darty"*, *"Shopping"*).
 * A tabela filtra as linhas em tempo real à medida que digitas.
 
-### 7.3. Exportação para CSV
+### 8.3. Exportação para CSV
 * Clica no botão **"Exportar CSV"** no canto direito da secção de aberturas.
 * O sistema compila os dados atuais e descarrega automaticamente um ficheiro formatado: `RetailLaunchOS_Aberturas_AAAA-MM-DD.csv`, pronto para abrir no Excel ou Google Sheets.
 
 ---
 
-## 8. Boas Práticas de Operação
+## 9. Boas Práticas de Operação
 
 1. **Nomenclatura**: Utiliza sempre a convenção `[Insígnia] [Nome do Centro ou Cidade]` (ex: `Fnac Forum Coimbra`, `Darty Sintra`).
 2. **Datas de Entrega**: Define sempre a *Entrega Técnica Multimédia* pelo menos 5 dias antes do *Go-Live*, permitindo testes de stress de reprodução contínua 24/7 nas telas antes da inauguração.
@@ -305,5 +349,6 @@ Por cima da tabela, clica nos botões:
 4. **Registo Imediato de Diárias**: Imputar as diárias e custos de deslocação no próprio dia da intervenção para manter o saldo orçamental permanentemente fidedigno.
 5. **Verificação de Rede de Displays**: Realizar testes de *Ping* a todos os players após a entrega técnica para garantir que nenhuma tela se encontra no estado `Offline` no dia da abertura.
 6. **Sessões e Auditoria**: Em postos partilhados na loja ou no auditório, terminar sempre a sessão ou mudar para o perfil `viewer` para prevenir edições acidentais no planeamento técnico.
+7. **Modo de Ecrã**: Recomenda-se o uso do modo **Dia** em auditorias durante o horário de abertura de loja e o modo **Noite** durante as montagens noturnas para reduzir a luminosidade excessiva.
 
 
