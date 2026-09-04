@@ -60,7 +60,53 @@ function initSchema() {
   }
 }
 
+// Migração transparente Fase 8: Torna project_id opcional no catálogo de hardware
+function migrateSchema() {
+  try {
+    const tableCheck = db.prepare("SELECT name FROM sqlite_master WHERE type='table' AND name='signage_players';").get();
+    if (!tableCheck) return;
+
+    const tableInfo = db.prepare("PRAGMA table_info(signage_players);").all();
+    const projectIdCol = tableInfo.find(c => c.name === 'project_id');
+    if (projectIdCol && projectIdCol.notnull === 1) {
+      console.log('🔄 [DB Migration] A migrar signage_players: tornando project_id opcional (NULL) para catálogo global...');
+      db.exec('PRAGMA foreign_keys = OFF;');
+      db.exec(`
+        CREATE TABLE signage_players_fase8_tmp (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          project_id INTEGER,
+          name VARCHAR(150) NOT NULL,
+          device_model VARCHAR(100) DEFAULT 'BrightSign XT1144 4K',
+          zone_location VARCHAR(100) NOT NULL,
+          resolution VARCHAR(50) DEFAULT '4K UHD',
+          ip_address VARCHAR(45),
+          mac_address VARCHAR(20),
+          status VARCHAR(30) DEFAULT 'online',
+          playlist_id INTEGER,
+          current_firmware VARCHAR(50) DEFAULT 'v9.0.145',
+          last_ping TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+          created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+          updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+          FOREIGN KEY (project_id) REFERENCES projects(id) ON DELETE SET NULL,
+          FOREIGN KEY (playlist_id) REFERENCES playlists(id) ON DELETE SET NULL
+        );
+        INSERT INTO signage_players_fase8_tmp (id, project_id, name, device_model, zone_location, resolution, ip_address, mac_address, status, playlist_id, current_firmware, last_ping, created_at, updated_at)
+          SELECT id, project_id, name, device_model, zone_location, resolution, ip_address, mac_address, status, playlist_id, current_firmware, last_ping, created_at, updated_at FROM signage_players;
+        DROP TABLE signage_players;
+        ALTER TABLE signage_players_fase8_tmp RENAME TO signage_players;
+        CREATE INDEX IF NOT EXISTS idx_signage_project ON signage_players(project_id);
+        CREATE INDEX IF NOT EXISTS idx_signage_status ON signage_players(status);
+      `);
+      db.exec('PRAGMA foreign_keys = ON;');
+      console.log('✅ [DB Migration] Migração de signage_players concluída com sucesso!');
+    }
+  } catch (err) {
+    console.error('❌ [DB Migration Error] Erro ao migrar signage_players:', err.message);
+  }
+}
+
 initSchema();
+migrateSchema();
 
 module.exports = {
   db,

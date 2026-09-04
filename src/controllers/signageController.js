@@ -142,13 +142,10 @@ const signageController = {
     }
   },
 
-  // Regista um novo ecrã/player para uma loja
+  // Regista um novo ecrã/player (no catálogo global ou numa loja)
   createPlayer: async (req, res) => {
     try {
-      const { project_id, name, zone_location, device_model } = req.body || {};
-      if (!project_id) {
-        return res.status(400).json({ success: false, message: 'O ID da loja é obrigatório.' });
-      }
+      const { name } = req.body || {};
       if (!name || !name.trim()) {
         return res.status(400).json({ success: false, message: 'O nome do ecrã/display é obrigatório.' });
       }
@@ -156,7 +153,7 @@ const signageController = {
       const newPlayer = await SignagePlayer.create(req.body);
       return res.status(201).json({
         success: true,
-        message: 'Novo ecrã/player registado com sucesso na loja!',
+        message: 'Registo de ecrã/player gravado com sucesso no catálogo!',
         data: newPlayer
       });
     } catch (error) {

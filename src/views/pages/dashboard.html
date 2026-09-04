@@ -757,6 +757,155 @@
   </div>
 
   <!-- =========================================================================
+       MODAL: CATÁLOGO GLOBAL DE TELAS & PLAYERS (CONFIGURAÇÕES FASE 8)
+       ========================================================================= -->
+  <div class="modal-backdrop" id="modalPlayersCatalog">
+    <div class="modal-card" style="max-width: 1100px; width: 96%;">
+      <div class="modal-header">
+        <div class="modal-title">
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <svg width="22" height="22" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="color: var(--fnac-gold);">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17.25v1.007a3 3 0 01-.879 2.122L7.5 21h9l-.621-.621A3 3 0 0115 18.257V17.25m6-12V15a2.25 2.25 0 01-2.25 2.25H5.25A2.25 2.25 0 013 15V5.25m18 0A2.25 2.25 0 0018.75 3H5.25A2.25 2.25 0 003 5.25m18 0H3"></path>
+            </svg>
+            <span>Telas &amp; Players • Catálogo Global de Hardware</span>
+          </div>
+        </div>
+        <button class="modal-close-btn" id="btnClosePlayersCatalogModal" aria-label="Fechar">
+          <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+          </svg>
+        </button>
+      </div>
+
+      <div class="modal-body" style="padding: 20px 24px;">
+        <!-- Painel de Registo/Edição de Hardware (oculto por defeito) -->
+        <div id="catalogPlayerFormPanel" class="player-form-panel" style="display: none;">
+          <div class="player-form-panel-header">
+            <div class="player-form-panel-title" id="catalogPlayerFormTitle">➕ Registar Novo Ecrã / Player</div>
+            <button type="button" class="btn-secondary" onclick="cancelCatalogPlayerForm()" style="font-size: 12px; padding: 5px 12px;">✕ Cancelar</button>
+          </div>
+          <form id="formCatalogPlayerCrud" onsubmit="saveCatalogPlayerForm(event)">
+            <input type="hidden" id="editCatalogPlayerId" value="">
+            <div class="player-form-grid">
+              <div class="form-group">
+                <label class="form-label" for="playerCatalogName">Nome do Ecrã / Display *</label>
+                <input type="text" id="playerCatalogName" class="form-input" placeholder="ex: Video Wall Entrada 4x4" required>
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="playerCatalogModel">Modelo de Hardware</label>
+                <select id="playerCatalogModel" class="form-input">
+                  <option value="BrightSign XT1144 4K">BrightSign XT1144 4K</option>
+                  <option value="Samsung SSP Tizen">Samsung SSP Tizen</option>
+                  <option value="LG webOS Signage">LG webOS Signage</option>
+                  <option value="Display Android Genérico">Display Android Genérico</option>
+                  <option value="Mini PC Windows / Linux">Mini PC Windows / Linux</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="playerCatalogZone">Zona / Localização *</label>
+                <input type="text" id="playerCatalogZone" class="form-input" placeholder="ex: Entrada Principal, Montra, Caixas" required>
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="playerCatalogResolution">Resolução / Formato</label>
+                <select id="playerCatalogResolution" class="form-input">
+                  <option value="4K UHD">4K UHD (3840x2160)</option>
+                  <option value="FHD 1080p">FHD 1080p (1920x1080)</option>
+                  <option value="HD 720p">HD 720p (1280x720)</option>
+                  <option value="Video Wall LED">Video Wall LED</option>
+                  <option value="Formato Vertical 9:16">Formato Vertical 9:16</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="playerCatalogIp">Endereço IP</label>
+                <input type="text" id="playerCatalogIp" class="form-input" placeholder="ex: 192.168.142.10">
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="playerCatalogMac">Endereço MAC</label>
+                <input type="text" id="playerCatalogMac" class="form-input" placeholder="ex: 00:10:18:A4:21:01">
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="playerCatalogStatus">Estado Operacional</label>
+                <select id="playerCatalogStatus" class="form-input">
+                  <option value="online">● Online (Ativo)</option>
+                  <option value="testing">● Em Testes</option>
+                  <option value="syncing">● A Sincronizar</option>
+                  <option value="offline">● Offline (Inativo)</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="playerCatalogFirmware">Versão de Firmware</label>
+                <input type="text" id="playerCatalogFirmware" class="form-input" placeholder="ex: v9.0.145" value="v9.0.145">
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="playerCatalogProject">Loja / Projeto Associado</label>
+                <select id="playerCatalogProject" class="form-input">
+                  <option value="">— Em Stock / Não Associado a Projeto —</option>
+                  <!-- preenchido dinamicamente via JS -->
+                </select>
+              </div>
+              <div class="form-group" style="grid-column: 1 / -1;">
+                <label class="form-label" for="playerCatalogPlaylist">Playlist de Conteúdos Vinculada</label>
+                <select id="playerCatalogPlaylist" class="form-input">
+                  <option value="">— Nenhuma Playlist Vinculada —</option>
+                  <!-- preenchido dinamicamente via JS -->
+                </select>
+              </div>
+            </div>
+            <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 16px;">
+              <button type="button" class="btn-secondary" onclick="cancelCatalogPlayerForm()">Cancelar</button>
+              <button type="submit" class="btn-primary" id="btnSaveCatalogPlayer">💾 Guardar Hardware</button>
+            </div>
+          </form>
+        </div>
+
+        <!-- Toolbar: filtros + pesquisa + botão novo -->
+        <div class="players-toolbar">
+          <div style="font-size: 13px; color: var(--text-muted);" id="playersCatalogCountLabel">A carregar catálogo...</div>
+          <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+            <select id="playersCatalogStoreFilter" class="form-input" style="font-size: 12px; padding: 6px 10px; width: auto;" onchange="filterPlayersCatalog()">
+              <option value="all">Todas as Associações</option>
+              <option value="unassigned">📦 Em Stock / Sem Loja</option>
+              <option value="Fnac">🟡 Fnac</option>
+              <option value="Darty">🔴 Darty</option>
+            </select>
+            <select id="playersCatalogStatusFilter" class="form-input" style="font-size: 12px; padding: 6px 10px; width: auto;" onchange="filterPlayersCatalog()">
+              <option value="all">Todos os Estados</option>
+              <option value="online">● Online</option>
+              <option value="syncing">● Syncing</option>
+              <option value="testing">● Testing</option>
+              <option value="offline">● Offline</option>
+            </select>
+            <input type="search" id="playersCatalogSearchInput" class="players-search-input" placeholder="Pesquisar por nome, zona, IP..." oninput="filterPlayersCatalog()">
+            <button type="button" class="btn-primary" id="btnNewCatalogPlayer" onclick="openCreateCatalogPlayerForm()" style="font-size: 13px; padding: 8px 16px; white-space: nowrap;">
+              ＋ Novo Ecrã / Player
+            </button>
+          </div>
+        </div>
+
+        <!-- Tabela do Catálogo -->
+        <div style="overflow-x: auto; border-radius: var(--radius-md); border: 1px solid var(--border-color);">
+          <table class="players-catalog-table">
+            <thead>
+              <tr>
+                <th>Ecrã / Display</th>
+                <th>Zona / Localização</th>
+                <th>Loja Associada</th>
+                <th>Rede (IP / MAC)</th>
+                <th>Estado</th>
+                <th>Playlist</th>
+                <th style="text-align: right;">Ações</th>
+              </tr>
+            </thead>
+            <tbody id="playersCatalogTableBody">
+              <tr><td colspan="7" class="users-empty-state"><div class="empty-icon">⏳</div>A carregar catálogo de hardware...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================================================
        MODAL: AUTENTICAÇÃO, ACESSOS & TROCA DE PERFIL (RBAC FASE 5)
        ========================================================================= -->
   <div class="modal-backdrop" id="modalAuthLogin">
@@ -1180,6 +1329,348 @@
     }
 
     // ==============================================================================
+    // FASE 8: CATÁLOGO GLOBAL DE TELAS & PLAYERS (CONFIGURAÇÕES)
+    // ==============================================================================
+    let _allCatalogPlayers = [];
+    let _allCatalogProjects = [];
+    let _allCatalogPlaylists = [];
+
+    async function openPlayersCatalog() {
+      const modal = document.getElementById('modalPlayersCatalog');
+      if (!modal) return;
+      modal.classList.add('active');
+
+      cancelCatalogPlayerForm();
+
+      const btnNew = document.getElementById('btnNewCatalogPlayer');
+      if (btnNew) {
+        if (currentPermissions?.canManageSignagePlayers) {
+          btnNew.classList.remove('perm-hidden');
+        } else {
+          btnNew.classList.add('perm-hidden');
+        }
+      }
+
+      const searchInput = document.getElementById('playersCatalogSearchInput');
+      if (searchInput) searchInput.value = '';
+      const storeFilter = document.getElementById('playersCatalogStoreFilter');
+      if (storeFilter) storeFilter.value = 'all';
+      const statusFilter = document.getElementById('playersCatalogStatusFilter');
+      if (statusFilter) statusFilter.value = 'all';
+
+      await loadPlayersCatalogData();
+    }
+
+    function closePlayersCatalog() {
+      const modal = document.getElementById('modalPlayersCatalog');
+      if (modal) modal.classList.remove('active');
+      cancelCatalogPlayerForm();
+    }
+
+    async function loadPlayersCatalogData() {
+      const tbody = document.getElementById('playersCatalogTableBody');
+      const countLabel = document.getElementById('playersCatalogCountLabel');
+      if (tbody) {
+        tbody.innerHTML = `<tr><td colspan="7" class="users-empty-state"><div class="empty-icon">⏳</div>A carregar catálogo de hardware...</td></tr>`;
+      }
+
+      try {
+        const [resPlayers, resProjects, resPlaylists] = await Promise.all([
+          fetch('/api/v1/signage/players'),
+          fetch('/api/v1/projects'),
+          fetch('/api/v1/signage/playlists')
+        ]);
+
+        const jsonPlayers = await resPlayers.json();
+        const jsonProjects = await resProjects.json();
+        const jsonPlaylists = await resPlaylists.json();
+
+        _allCatalogPlayers = jsonPlayers.data || [];
+        _allCatalogProjects = jsonProjects.data || [];
+        _allCatalogPlaylists = jsonPlaylists.data || [];
+
+        populatePlayerDropdowns();
+        renderPlayersCatalogTable(_allCatalogPlayers);
+      } catch (err) {
+        if (tbody) {
+          tbody.innerHTML = `<tr><td colspan="7" class="users-empty-state"><div class="empty-icon">❌</div>Erro ao carregar catálogo: ${err.message}</td></tr>`;
+        }
+      }
+    }
+
+    function populatePlayerDropdowns() {
+      const selectProj = document.getElementById('playerCatalogProject');
+      const selectPl = document.getElementById('playerCatalogPlaylist');
+
+      if (selectProj) {
+        let opts = `<option value="">— Em Stock / Não Associado a Projeto —</option>`;
+        _allCatalogProjects.forEach(p => {
+          const brandIcon = p.brand === 'Fnac' ? '🟡' : '🔴';
+          opts += `<option value="${p.id}">${brandIcon} ${p.name} (${p.brand}${p.location ? ' • ' + p.location : ''})</option>`;
+        });
+        selectProj.innerHTML = opts;
+      }
+
+      if (selectPl) {
+        let opts = `<option value="">— Nenhuma Playlist Vinculada —</option>`;
+        _allCatalogPlaylists.forEach(pl => {
+          opts += `<option value="${pl.id}">${pl.brand === 'Fnac' ? '🟡' : '🔴'} ${pl.name} [${pl.version || 'v1.0'}]</option>`;
+        });
+        selectPl.innerHTML = opts;
+      }
+    }
+
+    function renderPlayersCatalogTable(players) {
+      const tbody = document.getElementById('playersCatalogTableBody');
+      const countLabel = document.getElementById('playersCatalogCountLabel');
+      if (!tbody) return;
+
+      if (countLabel) {
+        countLabel.textContent = `${players.length} dispositivo${players.length !== 1 ? 's' : ''} no catálogo`;
+      }
+
+      if (!players || players.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="7" class="users-empty-state"><div class="empty-icon">🖥️</div>Nenhum ecrã ou player encontrado no catálogo.</td></tr>`;
+        return;
+      }
+
+      const canManage = currentPermissions?.canManageSignagePlayers;
+
+      tbody.innerHTML = players.map(p => {
+        const hasProject = !!p.project_id && !!p.store_name;
+        const brandCls = hasProject ? (p.store_brand === 'Fnac' ? 'fnac' : 'darty') : 'unassigned';
+        const brandBadge = hasProject
+          ? `<span class="player-store-badge ${brandCls}">${p.store_brand === 'Fnac' ? '🟡' : '🔴'} ${p.store_name}</span>`
+          : `<span class="player-store-badge unassigned">📦 Em Stock / Sem Loja</span>`;
+
+        const statusCls = p.status || 'online';
+        const statusLabels = {
+          online: '● Online',
+          syncing: '● Syncing',
+          testing: '● Em Teste',
+          offline: '● Offline'
+        };
+        const statusLabel = statusLabels[statusCls] || p.status;
+
+        const actionBtns = canManage
+          ? `<div style="display: flex; align-items: center; justify-content: flex-end; gap: 6px;">
+               <button type="button" class="player-action-btn ping" onclick="pingCatalogPlayerAction(${p.id}, '${p.name.replace(/'/g, "\\'")}')" title="Testar Conectividade / Ping">
+                 📡 Ping
+               </button>
+               <button type="button" class="player-action-btn" onclick="openEditCatalogPlayerForm(${p.id})" title="Editar Hardware">
+                 ✏️ Editar
+               </button>
+               <button type="button" class="player-action-btn delete" onclick="deleteCatalogPlayerAction(${p.id}, '${p.name.replace(/'/g, "\\'")}')" title="Eliminar do Catálogo">
+                 🗑️
+               </button>
+             </div>`
+          : `<span style="color: var(--text-muted); font-size: 11px;">Leitura</span>`;
+
+        return `<tr>
+          <td>
+            <div class="player-item-name">
+              <span style="font-size: 18px;">🖥️</span>
+              <div>
+                <div>${p.name}</div>
+                <div class="player-item-meta">
+                  <span class="player-model-chip">${p.device_model || 'Player'}</span>
+                  <span class="player-res-chip">${p.resolution || '4K UHD'}</span>
+                </div>
+              </div>
+            </div>
+          </td>
+          <td>
+            <div style="font-weight: 500;">${p.zone_location || '—'}</div>
+            <div style="font-size: 11px; color: var(--text-muted);">Firmware: ${p.current_firmware || '—'}</div>
+          </td>
+          <td>${brandBadge}</td>
+          <td>
+            <div class="player-net-info">
+              <div class="player-net-ip">IP: ${p.ip_address || '—'}</div>
+              <div>MAC: ${p.mac_address || '—'}</div>
+            </div>
+          </td>
+          <td>
+            <span class="player-status-badge ${statusCls}">${statusLabel}</span>
+          </td>
+          <td>
+            ${p.playlist_name
+              ? `<div style="font-size: 12px; font-weight: 500;">${p.playlist_name}</div>
+                 <div style="font-size: 10px; color: var(--text-muted);">${p.playlist_version_code || ''}</div>`
+              : `<span style="font-size: 12px; color: var(--text-muted);">— Nenhuma —</span>`}
+          </td>
+          <td style="text-align: right;">${actionBtns}</td>
+        </tr>`;
+      }).join('');
+    }
+
+    function filterPlayersCatalog() {
+      const q = (document.getElementById('playersCatalogSearchInput')?.value || '').toLowerCase().trim();
+      const storeFilter = document.getElementById('playersCatalogStoreFilter')?.value || 'all';
+      const statusFilter = document.getElementById('playersCatalogStatusFilter')?.value || 'all';
+
+      let filtered = _allCatalogPlayers;
+
+      if (storeFilter === 'unassigned') {
+        filtered = filtered.filter(p => !p.project_id);
+      } else if (storeFilter === 'Fnac' || storeFilter === 'Darty') {
+        filtered = filtered.filter(p => p.store_brand === storeFilter);
+      }
+
+      if (statusFilter !== 'all') {
+        filtered = filtered.filter(p => p.status === statusFilter);
+      }
+
+      if (q) {
+        filtered = filtered.filter(p =>
+          (p.name && p.name.toLowerCase().includes(q)) ||
+          (p.device_model && p.device_model.toLowerCase().includes(q)) ||
+          (p.zone_location && p.zone_location.toLowerCase().includes(q)) ||
+          (p.ip_address && p.ip_address.toLowerCase().includes(q)) ||
+          (p.mac_address && p.mac_address.toLowerCase().includes(q)) ||
+          (p.store_name && p.store_name.toLowerCase().includes(q))
+        );
+      }
+
+      renderPlayersCatalogTable(filtered);
+    }
+
+    function openCreateCatalogPlayerForm() {
+      const panel = document.getElementById('catalogPlayerFormPanel');
+      const title = document.getElementById('catalogPlayerFormTitle');
+      const editId = document.getElementById('editCatalogPlayerId');
+      if (!panel) return;
+
+      document.getElementById('formCatalogPlayerCrud').reset();
+      if (editId) editId.value = '';
+      if (title) title.textContent = '➕ Registar Novo Ecrã / Player';
+      panel.style.display = '';
+      panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+
+    function openEditCatalogPlayerForm(playerId) {
+      const p = _allCatalogPlayers.find(item => item.id === playerId);
+      if (!p) return showToast('Dispositivo não encontrado.', 'error');
+
+      const panel = document.getElementById('catalogPlayerFormPanel');
+      const title = document.getElementById('catalogPlayerFormTitle');
+      const editId = document.getElementById('editCatalogPlayerId');
+      if (!panel) return;
+
+      if (editId) editId.value = p.id;
+      if (title) title.textContent = `✏️ Editar Hardware: ${p.name}`;
+
+      document.getElementById('playerCatalogName').value = p.name || '';
+      document.getElementById('playerCatalogModel').value = p.device_model || 'BrightSign XT1144 4K';
+      document.getElementById('playerCatalogZone').value = p.zone_location || '';
+      document.getElementById('playerCatalogResolution').value = p.resolution || '4K UHD';
+      document.getElementById('playerCatalogIp').value = p.ip_address || '';
+      document.getElementById('playerCatalogMac').value = p.mac_address || '';
+      document.getElementById('playerCatalogStatus').value = p.status || 'online';
+      document.getElementById('playerCatalogFirmware').value = p.current_firmware || 'v9.0.145';
+      document.getElementById('playerCatalogProject').value = p.project_id || '';
+      document.getElementById('playerCatalogPlaylist').value = p.playlist_id || '';
+
+      panel.style.display = '';
+      panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+
+    function cancelCatalogPlayerForm() {
+      const panel = document.getElementById('catalogPlayerFormPanel');
+      if (panel) panel.style.display = 'none';
+      const form = document.getElementById('formCatalogPlayerCrud');
+      if (form) form.reset();
+      const editId = document.getElementById('editCatalogPlayerId');
+      if (editId) editId.value = '';
+    }
+
+    async function saveCatalogPlayerForm(e) {
+      e.preventDefault();
+      const editId = document.getElementById('editCatalogPlayerId')?.value;
+      const isEdit = !!editId;
+
+      const projVal = document.getElementById('playerCatalogProject')?.value;
+      const plVal = document.getElementById('playerCatalogPlaylist')?.value;
+
+      const payload = {
+        name: document.getElementById('playerCatalogName')?.value?.trim(),
+        device_model: document.getElementById('playerCatalogModel')?.value,
+        zone_location: document.getElementById('playerCatalogZone')?.value?.trim(),
+        resolution: document.getElementById('playerCatalogResolution')?.value,
+        ip_address: document.getElementById('playerCatalogIp')?.value?.trim(),
+        mac_address: document.getElementById('playerCatalogMac')?.value?.trim(),
+        status: document.getElementById('playerCatalogStatus')?.value,
+        current_firmware: document.getElementById('playerCatalogFirmware')?.value?.trim(),
+        project_id: (projVal !== '' && projVal !== 'none') ? parseInt(projVal, 10) : null,
+        playlist_id: (plVal !== '' && plVal !== 'none') ? parseInt(plVal, 10) : null
+      };
+
+      const btn = document.getElementById('btnSaveCatalogPlayer');
+      if (btn) { btn.disabled = true; btn.textContent = 'A guardar...'; }
+
+      try {
+        const url = isEdit ? `/api/v1/signage/players/${editId}` : '/api/v1/signage/players';
+        const method = isEdit ? 'PATCH' : 'POST';
+        const res = await fetch(url, {
+          method,
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        const json = await res.json();
+
+        if (json.success) {
+          showToast(json.message, 'success');
+          cancelCatalogPlayerForm();
+          await loadPlayersCatalogData();
+          if (typeof loadKpis === 'function') loadKpis();
+        } else {
+          showToast(json.message || 'Erro ao guardar hardware.', 'error');
+        }
+      } catch (err) {
+        showToast('Erro de ligação: ' + err.message, 'error');
+      } finally {
+        if (btn) { btn.disabled = false; btn.textContent = '💾 Guardar Hardware'; }
+      }
+    }
+
+    async function pingCatalogPlayerAction(playerId, playerName) {
+      try {
+        const res = await fetch(`/api/v1/signage/players/${playerId}/ping`, {
+          method: 'POST'
+        });
+        const json = await res.json();
+        if (json.success) {
+          showToast(`Comunicação confirmada com ${playerName}! Status atualizado.`, 'success');
+          await loadPlayersCatalogData();
+        } else {
+          showToast(json.message || 'Falha no teste de ping.', 'error');
+        }
+      } catch (err) {
+        showToast('Erro ao contactar player: ' + err.message, 'error');
+      }
+    }
+
+    async function deleteCatalogPlayerAction(playerId, playerName) {
+      if (!confirm(`Tem a certeza que deseja eliminar o ecrã/player "${playerName}" do catálogo de hardware?\n\nEsta operação é irreversível.`)) return;
+
+      try {
+        const res = await fetch(`/api/v1/signage/players/${playerId}`, {
+          method: 'DELETE'
+        });
+        const json = await res.json();
+        if (json.success) {
+          showToast('Dispositivo removido do catálogo com sucesso!', 'success');
+          await loadPlayersCatalogData();
+          if (typeof loadKpis === 'function') loadKpis();
+        } else {
+          showToast(json.message || 'Erro ao eliminar dispositivo.', 'error');
+        }
+      } catch (err) {
+        showToast('Erro de ligação: ' + err.message, 'error');
+      }
+    }
+
+    // ==============================================================================
     // FUNÇÕES DE GESTÃO DE AUTENTICAÇÃO & RBAC
     // ==============================================================================
     // Funções de Gestão de Autenticação & RBAC
@@ -1302,6 +1793,26 @@
           btnNewProject.classList.remove('perm-hidden');
         } else {
           btnNewProject.classList.add('perm-hidden');
+        }
+      }
+
+      // 2. Botão "+ Novo Utilizador" (apenas Admin)
+      const btnNewUser = document.getElementById('btnNewUser');
+      if (btnNewUser) {
+        if (currentPermissions?.canManageUsers) {
+          btnNewUser.classList.remove('perm-hidden');
+        } else {
+          btnNewUser.classList.add('perm-hidden');
+        }
+      }
+
+      // 3. Botão "+ Novo Ecrã / Player" no Catálogo (Admin e Técnico Multimédia)
+      const btnNewCatalogPlayer = document.getElementById('btnNewCatalogPlayer');
+      if (btnNewCatalogPlayer) {
+        if (currentPermissions?.canManageSignagePlayers) {
+          btnNewCatalogPlayer.classList.remove('perm-hidden');
+        } else {
+          btnNewCatalogPlayer.classList.add('perm-hidden');
         }
       }
 
@@ -3108,7 +3619,7 @@
     if (navRoles) navRoles.addEventListener('click', (e) => { e.preventDefault(); openAuthModal(); });
     if (navUsers) navUsers.addEventListener('click', (e) => { e.preventDefault(); openUsersManagement(); });
     const navConfigPlayers = document.getElementById('nav-config-players');
-    if (navConfigPlayers) navConfigPlayers.addEventListener('click', (e) => { e.preventDefault(); openSignageHub('hubPlayers'); });
+    if (navConfigPlayers) navConfigPlayers.addEventListener('click', (e) => { e.preventDefault(); openPlayersCatalog(); });
     if (modalAuth) {
       modalAuth.addEventListener('click', (e) => {
         if (e.target === modalAuth) closeAuthModal();
@@ -3125,11 +3636,22 @@
       });
     }
 
+    // Modal Catálogo de Telas & Players — fechar
+    const btnClosePlayersCatalogModal = document.getElementById('btnClosePlayersCatalogModal');
+    const modalPlayersCatalogEl = document.getElementById('modalPlayersCatalog');
+    if (btnClosePlayersCatalogModal) btnClosePlayersCatalogModal.addEventListener('click', closePlayersCatalog);
+    if (modalPlayersCatalogEl) {
+      modalPlayersCatalogEl.addEventListener('click', (e) => {
+        if (e.target === modalPlayersCatalogEl) closePlayersCatalog();
+      });
+    }
+
     // Fechar modais com tecla ESC
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Escape') {
         closeAuthModal();
         closeUsersManagement();
+        closePlayersCatalog();
         if (modalDetalhe) modalDetalhe.classList.remove('active');
         if (modalHubSignage) modalHubSignage.classList.remove('active');
         const modalNova = document.getElementById('modalNovaAbertura');

@@ -307,18 +307,22 @@ A API segue os padrões RESTful com payloads JSON e códigos de resposta HTTP se
 | **GET** | `/api/v1/costs/summary` | — | Todos | Sumário financeiro global consolidado |
 | **DELETE**| `/api/v1/costs/:id` | `:id` (Cost ID) | `admin`, `multimedia_user` | Elimina um registo de despesa e recalcula saldo |
 
-### 4.4. Endpoints de Digital Signage & Playlists (`/api/v1/signage` & `/api/v1/projects/:id/players`) (Fase 4)
+### 4.4. Endpoints de Digital Signage & Playlists (`/api/v1/signage` & `/api/v1/projects/:id/players`) (Fases 4 & 8)
 | Método | Endpoint | Parâmetros | Permissões | Descrição |
 | :--- | :--- | :--- | :---: | :--- |
 | **GET** | `/api/v1/signage/stats` | — | Todos | Métricas globais de Digital Signage |
 | **GET** | `/api/v1/signage/playlists`| `?brand=Fnac&status=aprovado` | Todos | Catálogo de playlists e contagem de telas vinculadas |
 | **POST** | `/api/v1/signage/playlists`| Body JSON com versão/resolução | `admin`, `multimedia_user` | Cria uma nova versão de playlist no catálogo central |
 | **PATCH**| `/api/v1/signage/playlists/:id/status` | `{ status }` | `admin`, `multimedia_user` | Altera estado da playlist |
-| **GET** | `/api/v1/signage/players` | `?status=online&projectId=1` | Todos | Inventário global de ecrãs/players de todas as lojas |
+| **GET** | `/api/v1/signage/players` | `?status=online&projectId=1` | Todos | Inventário global de ecrãs/players do catálogo e das lojas |
+| **POST** | `/api/v1/signage/players` | Body JSON com dados da tela (`project_id` opcional) | `admin`, `multimedia_user` | Regista novo ecrã/player no catálogo global (em stock ou para loja) |
+| **PATCH**| `/api/v1/signage/players/:id` | `:id` + Body JSON (`project_id`, `name`, `status`, etc.) | `admin`, `multimedia_user` | Atualiza hardware ou reatribui/desassocia projeto |
 | **GET** | `/api/v1/projects/:id/players` | `:id` (Project ID) | Todos | Lista os ecrãs e players instalados na loja |
 | **POST** | `/api/v1/projects/:id/players` | Body JSON com dados da tela | `admin`, `multimedia_user` | Associa um novo ecrã/player à loja especificada |
 | **POST** | `/api/v1/signage/players/:id/ping` | `:id` (Player ID) | `admin`, `multimedia_user`, `store_manager` | Executa teste de conectividade (ping) |
-| **DELETE**| `/api/v1/signage/players/:id` | `:id` (Player ID) | `admin`, `multimedia_user` | Remove uma tela/player do parque |
+| **DELETE**| `/api/v1/signage/players/:id` | `:id` (Player ID) | `admin`, `multimedia_user` | Remove permanentemente uma tela/player do catálogo |
+
+
 
 ### 4.5. Endpoints de Autenticação e Perfis (`/api/v1/auth`, `/api/v1/users`, `/api/v1/roles`) (Fases 5 & 7)
 | Método | Endpoint | Parâmetros | Permissões | Descrição |

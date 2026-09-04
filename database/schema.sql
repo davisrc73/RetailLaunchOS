@@ -148,10 +148,10 @@ CREATE TABLE IF NOT EXISTS playlists (
     FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE SET NULL
 );
 
--- 7. TABELA: SIGNAGE_PLAYERS (Displays, Ecrãs e Media Players por Loja)
+-- 7. TABELA: SIGNAGE_PLAYERS (Displays, Ecrãs e Media Players - Catálogo Global & Por Loja)
 CREATE TABLE IF NOT EXISTS signage_players (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    project_id INTEGER NOT NULL,
+    project_id INTEGER,                         -- Opcional: NULL quando o hardware está em catálogo/stock sem loja associada
     name VARCHAR(150) NOT NULL,                 -- Ex: 'Video Wall Entrada 4x4', 'Display Montra Lateral'
     device_model VARCHAR(100) DEFAULT 'BrightSign XT1144 4K', -- 'BrightSign XT1144', 'Samsung SSP Tizen', 'LG webOS Signage'
     zone_location VARCHAR(100) NOT NULL,        -- 'Entrada Principal', 'Montra', 'Linha de Caixas', 'Auditório Fnac'
@@ -164,7 +164,7 @@ CREATE TABLE IF NOT EXISTS signage_players (
     last_ping TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (project_id) REFERENCES projects(id) ON DELETE CASCADE,
+    FOREIGN KEY (project_id) REFERENCES projects(id) ON DELETE SET NULL,
     FOREIGN KEY (playlist_id) REFERENCES playlists(id) ON DELETE SET NULL
 );
 

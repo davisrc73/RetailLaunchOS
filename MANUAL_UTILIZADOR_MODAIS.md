@@ -25,6 +25,9 @@ Este manual destina-se aos utilizadores e operadores do **Gabinete Multimédia**
 6. [Painel de KPIs & Contagem Decrescente](#6-painel-de-kpis--contagem-decrescente)
 7. [Filtros, Pesquisa e Exportação CSV](#7-filtros-pesquisa-e-exportação-csv)
 8. [Boas Práticas de Operação](#8-boas-práticas-de-operação)
+9. [Motor Multi-Tema & Paleta Oficial (Fase 6)](#9-motor-multi-tema-claro-escuro-e-automático-fase-6)
+10. [Módulo: Gestão de Utilizadores (Fase 7)](#10-módulo-gestão-de-utilizadores-utilizadores-gabinete-fase-7)
+11. [Modal: Telas & Players • Catálogo Global de Hardware (Fase 8)](#11-modal-telas--players--catálogo-global-de-hardware-fase-8)
 
 ---
 
@@ -400,6 +403,53 @@ Por cima da tabela, clica nos botões:
 2. Após confirmação, o acesso ao sistema é restaurado.
 
 ### 10.7. Secção "Configurações" na Barra Lateral
-Uma nova secção **"Configurações"** foi adicionada na parte inferior da barra lateral, com acesso direto a:
-* **"Telas & Players"**: Abre o hub de Digital Signage diretamente na aba de gestão de ecrãs e players, para configuração do parque de displays das lojas.
+A secção **"Configurações"** na barra lateral do dashboard centraliza as ferramentas estruturais de inventário e parametrização do sistema:
+* **"Telas & Players"**: Abre diretamente o **Catálogo Global de Hardware**, permitindo criar, inventariar, editar e eliminar ecrãs e players de Digital Signage para todo o ecossistema Fnac / Darty (com ou sem loja associada).
+
+---
+
+## 11. Modal: Telas & Players • Catálogo Global de Hardware (Fase 8)
+
+### 11.1. Como Aceder
+Na barra lateral de navegação, na secção **"Configurações"**, clica em **"Telas & Players"**. O modal **"Telas & Players • Catálogo Global de Hardware"** abre-se centralmente no ecrã.
+
+### 11.2. Estrutura do Catálogo Global vs Associações por Loja
+* **Catálogo Global em "Configurações" (Fase 8)**: Gere o **inventário físico de hardware** (dispositivos BrightSign, Samsung Tizen, LG webOS, Mini PCs). Permite registar displays mesmo antes de serem atribuídos a uma obra/loja (ficando identificados como `📦 Em Stock / Sem Loja`), editar especificações técnicas (IP, MAC, resolução, firmware) e desassociar/reassociar entre projetos.
+* **Aba "Telas & Players" no Detalhe da Loja (Fase 4)**: Permite visualizar e controlar apenas os displays instalados naquela obra específica.
+
+### 11.3. Registar Novo Ecrã / Player
+1. No topo do modal do catálogo, clica no botão **"＋ Novo Ecrã / Player"** (disponível para perfis *Admin* e *Técnico Multimédia*).
+2. O painel superior expande-se com o formulário de hardware:
+   * **Nome do Ecrã / Display \***: Nome descritivo (ex: `Video Wall Entrada 4x4`, `Totem Interativo Montra`).
+   * **Modelo de Hardware**: Selecionar na lista (`BrightSign XT1144 4K`, `Samsung SSP Tizen`, `LG webOS Signage`, `Display Android Genérico`, `Mini PC Windows / Linux`).
+   * **Zona / Localização \***: Zona física na loja ou armazém (ex: `Entrada Principal`, `Montra`, `Linha de Caixas`, `Stock Central`).
+   * **Resolução / Formato**: Resolução nativa (`4K UHD`, `FHD 1080p`, `HD 720p`, `Video Wall LED`, `Formato Vertical 9:16`).
+   * **Endereço IP**: Endereço IPv4 atribuído na rede da loja ou laboratório (ex: `192.168.142.10`).
+   * **Endereço MAC**: Identificador físico de rede (ex: `00:10:18:A4:21:01`).
+   * **Estado Operacional**: `Online`, `Testing`, `Syncing` ou `Offline`.
+   * **Versão de Firmware**: Versão instalada no media player (ex: `v9.0.145`).
+   * **Loja / Projeto Associado**: Selecionar a loja correspondente (`Fnac Cascais`, `Darty Alfragide`, etc.) ou deixar em **"— Em Stock / Não Associado a Projeto —"** para ecrãs de reserva ou catálogo.
+   * **Playlist Vinculada**: Selecionar opcionalmente a versão de playlist do catálogo para sincronização de conteúdos.
+3. Clica em **"💾 Guardar Hardware"**. O dispositivo é imediatamente registado e exibido na tabela.
+
+### 11.4. Editar Hardware e Reatribuição de Loja
+1. Na linha correspondente ao ecrã/player, clica no botão **"✏️ Editar"**.
+2. Os dados atuais são carregados para o painel de formulário.
+3. Altera qualquer parâmetro, incluindo a **reatribuição de loja** (ex: transferir um display de *Stock* para uma loja ou de uma loja para outra).
+4. Clica em **"💾 Guardar Hardware"**. As alterações são refletidas de imediato.
+
+### 11.5. Teste de Conectividade (Ping em Tempo Real)
+* Na coluna de ações de cada linha, clica no botão **"📡 Ping"**.
+* O sistema envia um sinal de handshake e atualiza o estado operacional e o timestamp `last_ping` do player.
+
+### 11.6. Eliminar Ecrã / Player do Catálogo
+1. Clica no botão com o ícone de caixote do lixo **"🗑️"** na linha do dispositivo.
+2. É solicitada a confirmação explícita de eliminação irreversível.
+3. Após confirmação, o dispositivo é removido permanentemente do catálogo e da base de dados.
+
+### 11.7. Filtros Rápidos e Pesquisa Dinâmica
+* **Filtro de Associação**: Permite filtrar entre *Todas as Associações*, *📦 Em Stock / Sem Loja*, *🟡 Fnac* ou *🔴 Darty*.
+* **Filtro de Estado**: Permite filtrar por *Online*, *Syncing*, *Testing* ou *Offline*.
+* **Campo de Pesquisa**: Filtra instantaneamente conforme o operador digita nome, modelo, IP, MAC, zona ou loja.
+
 

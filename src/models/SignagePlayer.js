@@ -59,7 +59,7 @@ class SignagePlayer {
       sql += ` WHERE ` + conditions.join(' AND ');
     }
 
-    sql += ` ORDER BY p.name ASC, sp.id ASC`;
+    sql += ` ORDER BY CASE WHEN p.name IS NULL THEN 1 ELSE 0 END, p.name ASC, sp.id ASC`;
 
     return db.query(sql, params);
   }
@@ -81,9 +81,11 @@ class SignagePlayer {
     return db.get(sql, [id]);
   }
 
-  // Regista um novo display/player numa loja
+  // Regista um novo display/player (em catálogo global ou associado a uma loja)
   static async create(data) {
-    const projectId = parseInt(data.project_id, 10);
+    const projectId = (data.project_id !== undefined && data.project_id !== null && data.project_id !== '' && data.project_id !== 'none')
+      ? parseInt(data.project_id, 10)
+      : null;
     const name = data.name ? data.name.trim() : 'Novo Display';
     const device_model = data.device_model || 'BrightSign XT1144 4K';
     const zone_location = data.zone_location ? data.zone_location.trim() : 'Entrada Principal';
@@ -91,7 +93,9 @@ class SignagePlayer {
     const ip_address = data.ip_address ? data.ip_address.trim() : '192.168.1.100';
     const mac_address = data.mac_address ? data.mac_address.trim() : '00:10:18:00:00:00';
     const status = data.status || 'online';
-    const playlist_id = data.playlist_id ? parseInt(data.playlist_id, 10) : null;
+    const playlist_id = (data.playlist_id !== undefined && data.playlist_id !== null && data.playlist_id !== '' && data.playlist_id !== 'none')
+      ? parseInt(data.playlist_id, 10)
+      : null;
     const current_firmware = data.current_firmware || 'v9.0.145';
 
     const sql = `
@@ -109,16 +113,20 @@ class SignagePlayer {
     return this.findById(result.lastInsertRowid);
   }
 
-  // Atualiza dados de um player (ex: IP, zona, playlist vinculada, status)
+  // Atualiza dados de um player (ex: loja, IP, zona, playlist vinculada, status)
   static async update(id, data) {
-    const allowed = ['name', 'device_model', 'zone_location', 'resolution', 'ip_address', 'mac_address', 'status', 'playlist_id', 'current_firmware'];
+    const allowed = ['project_id', 'name', 'device_model', 'zone_location', 'resolution', 'ip_address', 'mac_address', 'status', 'playlist_id', 'current_firmware'];
     const updates = [];
     const params = [];
 
     for (const key of allowed) {
       if (data[key] !== undefined) {
         updates.push(`${key} = ?`);
-        params.push(data[key]);
+        let val = data[key];
+        if (key === 'project_id' || key === 'playlist_id') {
+          val = (val !== null && val !== '' && val !== 'none' && !isNaN(val)) ? parseInt(val, 10) : null;
+        }
+        params.push(val);
       }
     }
 
