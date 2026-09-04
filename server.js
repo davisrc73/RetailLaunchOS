@@ -6,101 +6,136 @@
 const http = require('http');
 const fs = require('fs');
 const path = require('path');
+const url = require('url');
 const config = require('./config/app');
+const projectController = require('./src/controllers/projectController');
 
-// Tentativa de utilizar Express caso esteja instalado, caso contrário usa HTTP nativo
-let useExpress = false;
-let app;
-
-try {
-  const express = require('express');
-  app = express();
-  useExpress = true;
-} catch (e) {
-  useExpress = false;
+// Helper para responder JSON em servidor HTTP nativo
+function sendJson(res, statusCode, data) {
+  res.writeHead(statusCode, {
+    'Content-Type': 'application/json; charset=utf-8',
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+    'Access-Control-Allow-Headers': 'Content-Type, Authorization'
+  });
+  res.end(JSON.stringify(data));
 }
 
-if (useExpress) {
-  const express = require('express');
-  app.use(express.json());
-  app.use(express.urlencoded({ extended: true }));
+// Servidor de Aplicação
+const server = http.createServer(async (req, res) => {
+  const parsedUrl = url.parse(req.url, true);
+  const pathname = parsedUrl.pathname;
+  const method = req.method;
 
-  // Ficheiros estáticos
-  app.use(express.static(path.join(__dirname, 'public')));
-  app.use('/css', express.static(path.join(__dirname, 'public/css')));
-  app.use('/js', express.static(path.join(__dirname, 'public/js')));
+  // CORS Preflight
+  if (method === 'OPTIONS') {
+    res.writeHead(204, {
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+      'Access-Control-Allow-Headers': 'Content-Type, Authorization'
+    });
+    res.end();
+    return;
+  }
 
-  // Rotas da Aplicação
-  const webRoutes = require('./src/routes/web/dashboard');
-  const apiProjectRoutes = require('./src/routes/api/projects');
+  // --- API ROUTES: /api/v1/projects ---
+  if (pathname.startsWith('/api/v1/projects')) {
+    // 1. GET /api/v1/projects/kpis
+    if (pathname === '/api/v1/projects/kpis' && method === 'GET') {
+      const mockRes = {
+        status: (code) => ({ json: (data) => sendJson(res, code, data) })
+      };
+      return projectController.getDashboardMetrics(req, mockRes);
+    }
 
-  app.use('/', webRoutes);
-  app.use('/api/v1/projects', apiProjectRoutes);
+    // 2. GET /api/v1/projects (listagem com query params)
+    if ((pathname === '/api/v1/projects' || pathname === '/api/v1/projects/') && method === 'GET') {
+      req.query = parsedUrl.query;
+      const mockRes = {
+        status: (code) => ({ json: (data) => sendJson(res, code, data) })
+      };
+      return projectController.getAll(req, mockRes);
+    }
 
-  app.listen(config.port, () => {
-    console.log(`\n======================================================`);
-    console.log(`🚀 RetailLaunchOS em execução (Express)`);
-    console.log(`🏢 Gabinete Multimédia • Fnac & Darty`);
-    console.log(`🌐 Dashboard: http://localhost:${config.port}`);
-    console.log(`📡 API Endpoints: http://localhost:${config.port}/api/v1/projects`);
-    console.log(`======================================================\n`);
-  });
-
-} else {
-  // Servidor Nativo HTTP Zero-Dependency para arranque imediato
-  const server = http.createServer((req, res) => {
-    const url = req.url.split('?')[0];
-
-    // API Mock Endpoint
-    if (url === '/api/v1/projects' || url === '/api/v1/projects/') {
-      const Project = require('./src/models/Project');
-      Project.findAll().then(data => {
-        res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8' });
-        res.end(JSON.stringify({ success: true, count: data.length, data }));
+    // 3. POST /api/v1/projects (criação de nova loja)
+    if ((pathname === '/api/v1/projects' || pathname === '/api/v1/projects/') && method === 'POST') {
+      let body = '';
+      req.on('data', chunk => { body += chunk.toString(); });
+      req.on('end', async () => {
+        try {
+          req.body = body ? JSON.parse(body) : {};
+          const mockRes = {
+            status: (code) => ({ json: (data) => sendJson(res, code, data) })
+          };
+          await projectController.create(req, mockRes);
+        } catch (err) {
+          sendJson(res, 400, { success: false, message: 'JSON Inválido: ' + err.message });
+        }
       });
       return;
     }
 
-    if (url === '/api/v1/projects/kpis') {
-      const Project = require('./src/models/Project');
-      Project.getKpis().then(data => {
-        res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8' });
-        res.end(JSON.stringify({ success: true, data }));
-      });
+    // 4. GET /api/v1/projects/:id
+    const singleMatch = pathname.match(/^\/api\/v1\/projects\/([^\/]+)$/);
+    if (singleMatch && method === 'GET') {
+      req.params = { id: singleMatch[1] };
+      const mockRes = {
+        status: (code) => ({ json: (data) => sendJson(res, code, data) })
+      };
+      return projectController.getById(req, mockRes);
+    }
+
+    // 5. DELETE /api/v1/projects/:id
+    if (singleMatch && method === 'DELETE') {
+      req.params = { id: singleMatch[1] };
+      const mockRes = {
+        status: (code) => ({ json: (data) => sendJson(res, code, data) })
+      };
+      return projectController.delete(req, mockRes);
+    }
+  }
+
+  // --- STATIC ASSETS ---
+  if (pathname.startsWith('/css/') || pathname.startsWith('/public/css/')) {
+    const filename = path.basename(pathname);
+    const cssPath = path.join(__dirname, 'public/css', filename);
+    if (fs.existsSync(cssPath)) {
+      res.writeHead(200, { 'Content-Type': 'text/css; charset=utf-8' });
+      fs.createReadStream(cssPath).pipe(res);
       return;
     }
+  }
 
-    // Servir CSS
-    if (url.startsWith('/css/') || url.startsWith('/public/css/')) {
-      const cssPath = path.join(__dirname, 'public/css', path.basename(url));
-      if (fs.existsSync(cssPath)) {
-        res.writeHead(200, { 'Content-Type': 'text/css; charset=utf-8' });
-        fs.createReadStream(cssPath).pipe(res);
-        return;
-      }
+  if (pathname.startsWith('/js/') || pathname.startsWith('/public/js/')) {
+    const filename = path.basename(pathname);
+    const jsPath = path.join(__dirname, 'public/js', filename);
+    if (fs.existsSync(jsPath)) {
+      res.writeHead(200, { 'Content-Type': 'application/javascript; charset=utf-8' });
+      fs.createReadStream(jsPath).pipe(res);
+      return;
     }
+  }
 
-    // Servir Dashboard HTML
-    if (url === '/' || url === '/dashboard' || url.endsWith('.html')) {
-      const htmlPath = path.join(__dirname, 'src/views/pages/dashboard.html');
-      if (fs.existsSync(htmlPath)) {
-        res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
-        fs.createReadStream(htmlPath).pipe(res);
-        return;
-      }
+  // --- WEB VIEWS ---
+  if (pathname === '/' || pathname === '/dashboard' || pathname.endsWith('.html')) {
+    const htmlPath = path.join(__dirname, 'src/views/pages/dashboard.html');
+    if (fs.existsSync(htmlPath)) {
+      res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
+      fs.createReadStream(htmlPath).pipe(res);
+      return;
     }
+  }
 
-    // Fallback 404
-    res.writeHead(404, { 'Content-Type': 'text/plain; charset=utf-8' });
-    res.end('Página ou recurso não encontrado.');
-  });
+  // 404
+  res.writeHead(404, { 'Content-Type': 'text/plain; charset=utf-8' });
+  res.end('Recurso não encontrado.');
+});
 
-  server.listen(config.port, () => {
-    console.log(`\n======================================================`);
-    console.log(`🚀 RetailLaunchOS em execução (Servidor Nativo HTTP)`);
-    console.log(`🏢 Gabinete Multimédia • Fnac & Darty`);
-    console.log(`🌐 Dashboard: http://localhost:${config.port}`);
-    console.log(`📡 API Endpoints: http://localhost:${config.port}/api/v1/projects`);
-    console.log(`======================================================\n`);
-  });
-}
+server.listen(config.port, () => {
+  console.log(`\n======================================================`);
+  console.log(`🚀 RetailLaunchOS Ativo e Conectado à Base de Dados SQLite`);
+  console.log(`🏢 Gabinete Multimédia • Fnac & Darty`);
+  console.log(`🌐 Dashboard: http://localhost:${config.port}`);
+  console.log(`📡 API Endpoints: http://localhost:${config.port}/api/v1/projects`);
+  console.log(`======================================================\n`);
+});

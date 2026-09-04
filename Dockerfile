@@ -1,7 +1,7 @@
 # Dockerfile para RetailLaunchOS (Fnac/Darty - Gabinete Multimédia)
-FROM node:20-alpine
+# Node.js 22 LTS Alpine com suporte nativo ao node:sqlite
+FROM node:22-alpine
 
-# Definir diretório de trabalho
 WORKDIR /app
 
 # Instalar dependências se package.json existir

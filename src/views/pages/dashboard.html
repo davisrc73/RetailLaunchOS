@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
-  <!-- Stylesheets (suporta carregamento local direto e servido por backend) -->
+  <!-- Stylesheets -->
   <link rel="stylesheet" href="../../../public/css/dashboard.css">
   <link rel="stylesheet" href="/css/dashboard.css">
 </head>
@@ -18,6 +18,9 @@
   <!-- Efeitos de iluminação ambiente -->
   <div class="ambient-glow-1"></div>
   <div class="ambient-glow-2"></div>
+
+  <!-- Contentor para Notificações Toast -->
+  <div class="toast-container" id="toastContainer"></div>
 
   <!-- =========================================================================
        1. SIDEBAR DE NAVEGAÇÃO
@@ -56,7 +59,7 @@
               <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 21v-7.5a.75.75 0 01.75-.75h3a.75.75 0 01.75.75V21m-4.5 0H2.36m11.14 0H18m0 0h3.64m-1.39 0V9.349m-16.5 11.65V9.35m0 0a3.001 3.001 0 003.75-.614A2.993 2.993 0 009 9.35c.801 0 1.554-.316 2.12-.876a3.004 3.004 0 004.24 0c.567.56 1.32.876 2.12.876 1.042 0 2.012-.534 2.58-1.401"></path>
             </svg>
             <span>Lojas & Aberturas</span>
-            <span class="badge-count">3</span>
+            <span class="badge-count" id="sidebarBadgeCount">3</span>
           </a>
         </li>
         <li>
@@ -155,7 +158,7 @@
           </svg>
         </button>
 
-        <!-- Ação Primária -->
+        <!-- Ação Primária: Nova Abertura -->
         <button class="btn-primary" id="btnNovaAbertura">
           <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4.5v15m7.5-7.5h-15"></path>
@@ -174,14 +177,14 @@
       <section class="kpi-grid" aria-label="Indicadores Chave de Desempenho">
         
         <!-- KPI 1: Próxima Abertura com Contagem Decrescente -->
-        <div class="kpi-card hero-countdown">
+        <div class="kpi-card hero-countdown" id="kpiHeroCard">
           <div class="kpi-header">
             <span class="kpi-label">Próxima Abertura</span>
-            <span class="brand-badge fnac">Fnac Flagship</span>
+            <span class="brand-badge fnac" id="kpiHeroBadge">Fnac Flagship</span>
           </div>
           
-          <div class="store-title" style="font-size: 16px; margin-bottom: 4px;">Fnac Cascais</div>
-          <div class="kpi-subtitle">CascaiShopping • Inauguração Oficial</div>
+          <div class="store-title" id="kpiHeroStoreName" style="font-size: 16px; margin-bottom: 4px;">Fnac Cascais</div>
+          <div class="kpi-subtitle" id="kpiHeroLocation">CascaiShopping • Inauguração Oficial</div>
 
           <!-- Relógio de Contagem Decrescente Live -->
           <div class="countdown-box" id="countdownTimer">
@@ -204,8 +207,8 @@
           </div>
 
           <div class="target-store-meta">
-            <span>Entrega Técnica: <strong>14 Dias</strong></span>
-            <span class="status-badge badge-signage-testing">Validação Final</span>
+            <span>Inauguração: <strong id="kpiHeroTargetDate">22 Set 2026</strong></span>
+            <span class="status-badge badge-signage-testing" id="kpiHeroStatus">Validação Final</span>
           </div>
         </div>
 
@@ -220,19 +223,18 @@
             </div>
           </div>
           
-          <div class="kpi-val">87%</div>
+          <div class="kpi-val" id="kpiSignageReadiness">87%</div>
           <div class="kpi-subtitle">Conteúdos e Telas Prontas para Broadcast</div>
 
-          <!-- Barra de Progresso do Signage -->
           <div class="signage-meter-wrap">
             <div class="signage-progress-bar">
-              <div class="signage-progress-fill" style="width: 87%;"></div>
+              <div class="signage-progress-fill" id="kpiSignageFill" style="width: 87%;"></div>
             </div>
           </div>
 
           <div class="signage-sub-stats">
-            <span><strong>24</strong> Players Sincronizados</span>
-            <span><strong>2</strong> Em Teste Técnico</span>
+            <span><strong>24</strong> Players Ativos</span>
+            <span><strong>2</strong> Em Teste</span>
             <span style="color: #10B981;"><strong>0</strong> Falhas</span>
           </div>
         </div>
@@ -248,15 +250,15 @@
             </div>
           </div>
 
-          <div class="kpi-val">€ 378,50</div>
+          <div class="kpi-val" id="kpiAvgDailyCost">€ 378,50</div>
           <div class="kpi-trend positive">
             <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4.5 19.5l15-15m0 0H8.25m11.25 0v11.25"></path>
             </svg>
-            <span>Alocado a 3 lojas ativas</span>
+            <span id="kpiActiveStoresCount">Alocado a 3 lojas ativas</span>
           </div>
           <div class="kpi-subtitle" style="margin-top: 8px;">
-            Total faturado no mês: <strong style="color: var(--text-white);">€ 11.355,00</strong>
+            Total mensal registado: <strong id="kpiMonthlyCost" style="color: var(--text-white);">€ 11.355,00</strong>
           </div>
         </div>
 
@@ -271,7 +273,7 @@
             </div>
           </div>
 
-          <div class="kpi-val">€ 98.500,00</div>
+          <div class="kpi-val" id="kpiTotalBudget">€ 98.500,00</div>
           <div class="kpi-trend" style="color: var(--text-muted);">
             <span>Executado: <strong style="color: var(--fnac-gold);">54.2%</strong> (€ 53.387)</span>
           </div>
@@ -295,9 +297,9 @@
           <!-- Filtros Rápidos -->
           <div class="table-filter-bar">
             <div class="filter-chip-group">
-              <button class="filter-chip active" data-filter="all">Todas (3)</button>
-              <button class="filter-chip" data-filter="Fnac">Fnac (2)</button>
-              <button class="filter-chip" data-filter="Darty">Darty (1)</button>
+              <button class="filter-chip active" data-filter="all" id="filterAll">Todas</button>
+              <button class="filter-chip" data-filter="Fnac" id="filterFnac">Fnac</button>
+              <button class="filter-chip" data-filter="Darty" id="filterDarty">Darty</button>
             </div>
             <button class="btn-secondary" id="btnExport">
               <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="vertical-align: -2px; margin-right: 4px;">
@@ -322,169 +324,8 @@
                 <th>Ações</th>
               </tr>
             </thead>
-            <tbody>
-              
-              <!-- Linha 1: Fnac Cascais -->
-              <tr data-brand="Fnac" data-status="em_curso">
-                <td>
-                  <div class="store-cell">
-                    <div class="store-brand-pill fnac">FNAC</div>
-                    <div>
-                      <div class="store-title">Fnac Cascais</div>
-                      <div class="store-sub">CascaiShopping • Piso 1, Loja 142</div>
-                    </div>
-                  </div>
-                </td>
-                <td>
-                  <span class="brand-badge fnac">Flagship</span>
-                </td>
-                <td>
-                  <div class="date-pill">
-                    <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5"></path>
-                    </svg>
-                    <span>22 Set 2026</span>
-                    <span class="date-countdown-tag tag-urgent">18 dias</span>
-                  </div>
-                </td>
-                <td>
-                  <div class="cost-day-cell">€ 485,50 <span class="cost-period">/ dia</span></div>
-                  <div class="cost-period">Budget: € 45.000</div>
-                </td>
-                <td>
-                  <span class="status-badge badge-signage-testing">
-                    <span class="pulse-dot" style="width: 5px; height: 5px; background: var(--fnac-gold); box-shadow: none;"></span>
-                    Validação Telas
-                  </span>
-                  <div style="font-size: 11px; color: var(--text-dim); margin-top: 4px;">Playlist v2.4</div>
-                </td>
-                <td>
-                  <div class="progress-bar-container">
-                    <div class="progress-track">
-                      <div class="progress-fill-bar progress-fill-gold" style="width: 82%;"></div>
-                    </div>
-                    <span class="progress-percent-label">82%</span>
-                  </div>
-                </td>
-                <td>
-                  <div class="action-btn-group">
-                    <button class="btn-secondary" title="Gerir Telas e Marcos">Gerir</button>
-                    <button class="btn-icon" style="width: 28px; height: 28px;" title="Mais opções">
-                      <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.75a.75.75 0 110-1.5.75.75 0 010 1.5zM12 12.75a.75.75 0 110-1.5.75.75 0 010 1.5zM12 18.75a.75.75 0 110-1.5.75.75 0 010 1.5z"></path>
-                      </svg>
-                    </button>
-                  </div>
-                </td>
-              </tr>
-
-              <!-- Linha 2: Darty Parque das Nações -->
-              <tr data-brand="Darty" data-status="planeamento">
-                <td>
-                  <div class="store-cell">
-                    <div class="store-brand-pill darty">DARTY</div>
-                    <div>
-                      <div class="store-title">Darty Parque das Nações</div>
-                      <div class="store-sub">Av. D. João II, Lisboa</div>
-                    </div>
-                  </div>
-                </td>
-                <td>
-                  <span class="brand-badge darty">Standard</span>
-                </td>
-                <td>
-                  <div class="date-pill">
-                    <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5"></path>
-                    </svg>
-                    <span>16 Out 2026</span>
-                    <span class="date-countdown-tag tag-normal">42 dias</span>
-                  </div>
-                </td>
-                <td>
-                  <div class="cost-day-cell">€ 390,00 <span class="cost-period">/ dia</span></div>
-                  <div class="cost-period">Budget: € 32.000</div>
-                </td>
-                <td>
-                  <span class="status-badge badge-signage-testing">
-                    <span class="pulse-dot" style="width: 5px; height: 5px; background: #3B82F6; box-shadow: none;"></span>
-                    Configuração IP
-                  </span>
-                  <div style="font-size: 11px; color: var(--text-dim); margin-top: 4px;">Playlist v1.1</div>
-                </td>
-                <td>
-                  <div class="progress-bar-container">
-                    <div class="progress-track">
-                      <div class="progress-fill-bar progress-fill-red" style="width: 48%;"></div>
-                    </div>
-                    <span class="progress-percent-label">48%</span>
-                  </div>
-                </td>
-                <td>
-                  <div class="action-btn-group">
-                    <button class="btn-secondary" title="Gerir Telas e Marcos">Gerir</button>
-                    <button class="btn-icon" style="width: 28px; height: 28px;" title="Mais opções">
-                      <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.75a.75.75 0 110-1.5.75.75 0 010 1.5zM12 12.75a.75.75 0 110-1.5.75.75 0 010 1.5zM12 18.75a.75.75 0 110-1.5.75.75 0 010 1.5z"></path>
-                      </svg>
-                    </button>
-                  </div>
-                </td>
-              </tr>
-
-              <!-- Linha 3: Fnac Porto Boavista -->
-              <tr data-brand="Fnac" data-status="planeamento">
-                <td>
-                  <div class="store-cell">
-                    <div class="store-brand-pill fnac">FNAC</div>
-                    <div>
-                      <div class="store-title">Fnac Porto Boavista</div>
-                      <div class="store-sub">Avenida da Boavista, Porto</div>
-                    </div>
-                  </div>
-                </td>
-                <td>
-                  <span class="brand-badge fnac">Express</span>
-                </td>
-                <td>
-                  <div class="date-pill">
-                    <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5"></path>
-                    </svg>
-                    <span>08 Nov 2026</span>
-                    <span class="date-countdown-tag tag-relaxed">65 dias</span>
-                  </div>
-                </td>
-                <td>
-                  <div class="cost-day-cell">€ 260,00 <span class="cost-period">/ dia</span></div>
-                  <div class="cost-period">Budget: € 21.500</div>
-                </td>
-                <td>
-                  <span class="status-badge badge-signage-pending">
-                    Planeamento
-                  </span>
-                  <div style="font-size: 11px; color: var(--text-dim); margin-top: 4px;">Playlist v1.0</div>
-                </td>
-                <td>
-                  <div class="progress-bar-container">
-                    <div class="progress-track">
-                      <div class="progress-fill-bar progress-fill-gold" style="width: 25%;"></div>
-                    </div>
-                    <span class="progress-percent-label">25%</span>
-                  </div>
-                </td>
-                <td>
-                  <div class="action-btn-group">
-                    <button class="btn-secondary" title="Gerir Telas e Marcos">Gerir</button>
-                    <button class="btn-icon" style="width: 28px; height: 28px;" title="Mais opções">
-                      <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.75a.75.75 0 110-1.5.75.75 0 010 1.5zM12 12.75a.75.75 0 110-1.5.75.75 0 010 1.5zM12 18.75a.75.75 0 110-1.5.75.75 0 010 1.5z"></path>
-                      </svg>
-                    </button>
-                  </div>
-                </td>
-              </tr>
-
+            <tbody id="projectsTableBody">
+              <!-- As linhas são carregadas dinamicamente via JavaScript da base de dados SQLite -->
             </tbody>
           </table>
         </div>
@@ -522,7 +363,7 @@
                 </svg>
               </div>
               <div class="feed-item-text">
-                <div>Atualização de diária de testes lançada: <strong>€ 485,50</strong> atribuídos a <strong>Fnac Cascais</strong>.</div>
+                <div>Diária técnica registada em SQLite: <strong>€ 485,50</strong> atribuídos a <strong>Fnac Cascais</strong>.</div>
                 <div class="feed-timestamp">Há 2 horas • Lançado por Admin Multimédia</div>
               </div>
             </div>
@@ -574,25 +415,218 @@
   </main>
 
   <!-- =========================================================================
-       SCRIPT DINÂMICO (CONTAGEM DECRESCENTE + FILTRAGEM DE TABELA)
+       MODAL: NOVA ABERTURA DE LOJA
+       ========================================================================= -->
+  <div class="modal-backdrop" id="modalNovaAbertura">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div class="modal-title">
+          <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4.5v15m7.5-7.5h-15"></path>
+          </svg>
+          <span>Registar Nova Abertura de Loja</span>
+        </div>
+        <button class="modal-close-btn" id="btnCloseModal" aria-label="Fechar">
+          <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+          </svg>
+        </button>
+      </div>
+
+      <form id="formNovaAbertura">
+        <div class="modal-body">
+          <!-- Insígnia -->
+          <div class="form-group">
+            <label class="form-label">Insígnia da Loja</label>
+            <div class="brand-toggle-group">
+              <button type="button" class="brand-toggle-btn active fnac" data-brand="Fnac" id="btnBrandFnac">
+                <span>Fnac</span>
+              </button>
+              <button type="button" class="brand-toggle-btn darty" data-brand="Darty" id="btnBrandDarty">
+                <span>Darty</span>
+              </button>
+            </div>
+            <input type="hidden" name="brand" id="inputBrand" value="Fnac">
+          </div>
+
+          <!-- Nome da Loja & Formato -->
+          <div class="form-grid-2">
+            <div class="form-group">
+              <label class="form-label" for="inputName">Nome da Loja *</label>
+              <input type="text" id="inputName" name="name" class="form-input" placeholder="Ex: Fnac Leiria Shopping" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="inputFormat">Formato da Loja</label>
+              <select id="inputFormat" name="store_format" class="form-select">
+                <option value="Flagship">Flagship Store</option>
+                <option value="Standard" selected>Standard Retail</option>
+                <option value="Express">Fnac Express / Travel</option>
+                <option value="Pop-up">Pop-up Store</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Localização / Morada -->
+          <div class="form-group">
+            <label class="form-label" for="inputLocation">Localização / Centro Comercial *</label>
+            <input type="text" id="inputLocation" name="location" class="form-input" placeholder="Ex: LeiriaShopping, Piso 0, Loja 45" required>
+          </div>
+
+          <!-- Datas: Go-Live e Entrega Técnica -->
+          <div class="form-grid-2">
+            <div class="form-group">
+              <label class="form-label" for="inputGoLive">Data de Inauguração (Go-Live) *</label>
+              <input type="date" id="inputGoLive" name="go_live_date" class="form-input" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="inputTargetDate">Entrega Técnica Multimédia</label>
+              <input type="date" id="inputTargetDate" name="target_completion_date" class="form-input">
+            </div>
+          </div>
+
+          <!-- Custos: Diária e Budget Global -->
+          <div class="form-grid-2">
+            <div class="form-group">
+              <label class="form-label" for="inputDailyCost">Custo Diário Estimado (€)</label>
+              <input type="number" step="0.50" id="inputDailyCost" name="daily_cost" class="form-input" placeholder="380.00" value="380.00">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="inputTotalBudget">Orçamento Total (€)</label>
+              <input type="number" step="100" id="inputTotalBudget" name="total_budget" class="form-input" placeholder="35000.00" value="35000.00">
+            </div>
+          </div>
+
+          <!-- Versão da Playlist & Status Inicial -->
+          <div class="form-grid-2">
+            <div class="form-group">
+              <label class="form-label" for="inputPlaylist">Versão da Playlist Signage</label>
+              <input type="text" id="inputPlaylist" name="playlist_version" class="form-input" placeholder="v1.0-inauguracao" value="v1.0-inauguracao">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="inputSignageStatus">Estado Inicial de Signage</label>
+              <select id="inputSignageStatus" name="signage_status" class="form-select">
+                <option value="pendente" selected>Pendente de Instalação</option>
+                <option value="configuracao">Em Configuração de IPs</option>
+                <option value="validacao">Em Validação de Telas</option>
+                <option value="pronto">Pronto para Broadcast</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn-secondary" id="btnCancelModal">Cancelar</button>
+          <button type="submit" class="btn-primary" id="btnSubmitModal">
+            <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+            </svg>
+            <span>Gravar Abertura</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- =========================================================================
+       MODAL: DETALHE DE PROJETO / MARCOS
+       ========================================================================= -->
+  <div class="modal-backdrop" id="modalDetalheProjeto">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div class="modal-title" id="modalDetalheTitle">
+          <span>Detalhes da Abertura</span>
+        </div>
+        <button class="modal-close-btn" id="btnCloseDetalheModal" aria-label="Fechar">
+          <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+          </svg>
+        </button>
+      </div>
+      <div class="modal-body" id="modalDetalheBody">
+        <!-- Preenchido dinamicamente via JS -->
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn-secondary" id="btnFecharDetalhe">Fechar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================================================
+       SCRIPT DINÂMICO COMPLETO (INTEGRAÇÃO API REST + BASE DE DADOS SQLITE)
        ========================================================================= -->
   <script>
-    // 1. Contador em Tempo Real para a Próxima Abertura (Fnac Cascais - 18 dias a partir de agora)
-    (function initCountdown() {
-      // Define data alvo: 18 dias, 6 horas, 42 minutos à frente
-      const targetDate = new Date();
-      targetDate.setDate(targetDate.getDate() + 18);
-      targetDate.setHours(targetDate.getHours() + 6);
-      targetDate.setMinutes(targetDate.getMinutes() + 42);
+    // Estado da aplicação no cliente
+    let allProjects = [];
+    let currentFilter = 'all';
+    let countdownInterval = null;
+
+    // Toast Feedback
+    function showToast(message, type = 'success') {
+      const container = document.getElementById('toastContainer');
+      const toast = document.createElement('div');
+      toast.className = `toast ${type}`;
+      toast.innerHTML = `
+        <span style="font-size: 16px;">${type === 'success' ? '✅' : '⚠️'}</span>
+        <span>${message}</span>
+      `;
+      container.appendChild(toast);
+      setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateY(10px)';
+        toast.style.transition = 'all 0.3s ease';
+        setTimeout(() => toast.remove(), 300);
+      }, 3500);
+    }
+
+    // Formatação de Valores Monetários
+    function formatCurrency(val) {
+      return new Intl.NumberFormat('pt-PT', { style: 'currency', currency: 'EUR' }).format(val || 0);
+    }
+
+    // Formatação de Datas
+    function formatDate(dateStr) {
+      if (!dateStr) return 'A definir';
+      const d = new Date(dateStr);
+      return d.toLocaleDateString('pt-PT', { day: '2-digit', month: 'short', year: 'numeric' });
+    }
+
+    // Cálculo de Dias Restantes
+    function getDaysRemaining(dateStr) {
+      if (!dateStr) return 0;
+      const target = new Date(dateStr);
+      const now = new Date();
+      now.setHours(0, 0, 0, 0);
+      const diff = target - now;
+      return Math.ceil(diff / (1000 * 60 * 60 * 24));
+    }
+
+    // Inicialização da Contagem Decrescente Dinâmica
+    function setupCountdown(targetDateStr, storeName, location, brand) {
+      if (countdownInterval) clearInterval(countdownInterval);
 
       const daysEl = document.getElementById('daysCount');
       const hoursEl = document.getElementById('hoursCount');
       const minEl = document.getElementById('minCount');
       const secEl = document.getElementById('secCount');
 
-      function updateClock() {
+      const nameEl = document.getElementById('kpiHeroStoreName');
+      const locEl = document.getElementById('kpiHeroLocation');
+      const badgeEl = document.getElementById('kpiHeroBadge');
+      const targetDateEl = document.getElementById('kpiHeroTargetDate');
+
+      if (nameEl) nameEl.innerText = storeName || 'Fnac Cascais';
+      if (locEl) locEl.innerText = location || 'CascaiShopping';
+      if (badgeEl) {
+        badgeEl.className = `brand-badge ${brand?.toLowerCase() || 'fnac'}`;
+        badgeEl.innerText = brand || 'Fnac';
+      }
+      if (targetDateEl) targetDateEl.innerText = formatDate(targetDateStr);
+
+      const target = new Date(targetDateStr).getTime();
+
+      function update() {
         const now = new Date().getTime();
-        const diff = targetDate.getTime() - now;
+        const diff = target - now;
 
         if (diff <= 0) {
           if (daysEl) daysEl.innerText = '00';
@@ -613,50 +647,398 @@
         if (secEl) secEl.innerText = String(secs).padStart(2, '0');
       }
 
-      updateClock();
-      setInterval(updateClock, 1000);
-    })();
+      update();
+      countdownInterval = setInterval(update, 1000);
+    }
 
-    // 2. Filtragem de Tabela por Insígnia (Todas, Fnac, Darty)
-    const filterButtons = document.querySelectorAll('.filter-chip');
-    const tableRows = document.querySelectorAll('#projectsTable tbody tr');
+    // Renderizar Tabela de Projetos
+    function renderProjectsTable(projects) {
+      const tbody = document.getElementById('projectsTableBody');
+      if (!tbody) return;
 
-    filterButtons.forEach(button => {
-      button.addEventListener('click', () => {
-        filterButtons.forEach(btn => btn.classList.remove('active'));
-        button.classList.add('active');
+      tbody.innerHTML = '';
 
-        const filterValue = button.getAttribute('data-filter');
-        tableRows.forEach(row => {
-          const brand = row.getAttribute('data-brand');
-          if (filterValue === 'all' || brand === filterValue) {
-            row.style.display = '';
-          } else {
-            row.style.display = 'none';
-          }
+      if (!projects || projects.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="7" style="text-align: center; padding: 32px; color: var(--text-dim);">
+              Nenhum projeto encontrado com os filtros selecionados.
+            </td>
+          </tr>
+        `;
+        return;
+      }
+
+      projects.forEach(p => {
+        const brandClass = p.brand?.toLowerCase().includes('darty') ? 'darty' : 'fnac';
+        const daysLeft = getDaysRemaining(p.go_live_date);
+        
+        let tagClass = 'tag-relaxed';
+        if (daysLeft <= 20) tagClass = 'tag-urgent';
+        else if (daysLeft <= 45) tagClass = 'tag-normal';
+
+        let signageBadgeClass = 'badge-signage-testing';
+        let signageLabel = 'Validação Telas';
+        if (p.signage_status === 'pronto') {
+          signageBadgeClass = 'badge-signage-ok';
+          signageLabel = 'Pronto Broadcast';
+        } else if (p.signage_status === 'pendente') {
+          signageBadgeClass = 'badge-signage-pending';
+          signageLabel = 'Pendente';
+        } else if (p.signage_status === 'configuracao') {
+          signageLabel = 'Configuração IP';
+        }
+
+        const tr = document.createElement('tr');
+        tr.setAttribute('data-brand', p.brand);
+        tr.setAttribute('data-status', p.status);
+        tr.innerHTML = `
+          <td>
+            <div class="store-cell">
+              <div class="store-brand-pill ${brandClass}">${p.brand ? p.brand.toUpperCase() : 'LOJA'}</div>
+              <div>
+                <div class="store-title">${p.name}</div>
+                <div class="store-sub">${p.location || 'Localização a definir'}</div>
+              </div>
+            </div>
+          </td>
+          <td>
+            <span class="brand-badge ${brandClass}">${p.store_format || 'Standard'}</span>
+          </td>
+          <td>
+            <div class="date-pill">
+              <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5"></path>
+              </svg>
+              <span>${formatDate(p.go_live_date)}</span>
+              <span class="date-countdown-tag ${tagClass}">${daysLeft} dias</span>
+            </div>
+          </td>
+          <td>
+            <div class="cost-day-cell">${formatCurrency(p.daily_cost)} <span class="cost-period">/ dia</span></div>
+            <div class="cost-period">Budget: ${formatCurrency(p.total_budget)}</div>
+          </td>
+          <td>
+            <span class="status-badge ${signageBadgeClass}">
+              <span class="pulse-dot" style="width: 5px; height: 5px; background: currentColor; box-shadow: none;"></span>
+              ${signageLabel}
+            </span>
+            <div style="font-size: 11px; color: var(--text-dim); margin-top: 4px;">Playlist ${p.playlist_version || 'v1.0'}</div>
+          </td>
+          <td>
+            <div class="progress-bar-container">
+              <div class="progress-track">
+                <div class="progress-fill-bar ${brandClass === 'darty' ? 'progress-fill-red' : 'progress-fill-gold'}" style="width: ${p.progress || 25}%;"></div>
+              </div>
+              <span class="progress-percent-label">${p.progress || 25}%</span>
+            </div>
+          </td>
+          <td>
+            <div class="action-btn-group">
+              <button class="btn-secondary btn-manage" data-id="${p.id}" title="Gerir Abertura">Gerir</button>
+            </div>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+
+      // Ligar botões "Gerir"
+      document.querySelectorAll('.btn-manage').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const id = btn.getAttribute('data-id');
+          openProjectDetails(id);
         });
+      });
+    }
+
+    // Carregar Projetos da API REST
+    async function loadProjects() {
+      try {
+        const res = await fetch('/api/v1/projects');
+        const json = await res.json();
+        if (json.success && Array.isArray(json.data)) {
+          allProjects = json.data;
+          
+          // Atualizar contadores
+          const badgeCount = document.getElementById('sidebarBadgeCount');
+          if (badgeCount) badgeCount.innerText = allProjects.length;
+
+          applyFilter(currentFilter);
+          loadKpis();
+        }
+      } catch (err) {
+        console.error('Erro ao carregar projetos:', err);
+      }
+    }
+
+    // Carregar KPIs da API REST
+    async function loadKpis() {
+      try {
+        const res = await fetch('/api/v1/projects/kpis');
+        const json = await res.json();
+        if (json.success && json.data) {
+          const kpis = json.data;
+
+          // Atualizar Hero Countdown
+          if (kpis.nextOpening) {
+            setupCountdown(
+              kpis.nextOpening.go_live_date,
+              kpis.nextOpening.name,
+              kpis.nextOpening.location,
+              kpis.nextOpening.brand
+            );
+          }
+
+          // Atualizar Custo Médio
+          const avgCostEl = document.getElementById('kpiAvgDailyCost');
+          if (avgCostEl) avgCostEl.innerText = formatCurrency(kpis.avgDailyCost);
+
+          const countStoresEl = document.getElementById('kpiActiveStoresCount');
+          if (countStoresEl) countStoresEl.innerText = `Alocado a ${kpis.activeProjectsCount} lojas ativas`;
+
+          // Atualizar Total Budget
+          const budgetEl = document.getElementById('kpiTotalBudget');
+          if (budgetEl) budgetEl.innerText = formatCurrency(kpis.totalBudget);
+
+          // Atualizar Signage Readiness
+          const signageVal = document.getElementById('kpiSignageReadiness');
+          const signageFill = document.getElementById('kpiSignageFill');
+          if (signageVal) signageVal.innerText = `${kpis.signageReadiness || 87}%`;
+          if (signageFill) signageFill.style.width = `${kpis.signageReadiness || 87}%`;
+
+          // Custo Mensal
+          const monthlyEl = document.getElementById('kpiMonthlyCost');
+          if (monthlyEl && kpis.monthlyCostsAccumulated) {
+            monthlyEl.innerText = formatCurrency(kpis.monthlyCostsAccumulated);
+          }
+        }
+      } catch (err) {
+        console.error('Erro ao carregar KPIs:', err);
+      }
+    }
+
+    // Aplicar Filtro
+    function applyFilter(filter) {
+      currentFilter = filter;
+      let filtered = allProjects;
+      if (filter !== 'all') {
+        filtered = allProjects.filter(p => p.brand?.toLowerCase() === filter.toLowerCase());
+      }
+      renderProjectsTable(filtered);
+    }
+
+    // Modal de Nova Abertura: Abertura e Fecho
+    const modalNovaAbertura = document.getElementById('modalNovaAbertura');
+    const btnNovaAbertura = document.getElementById('btnNovaAbertura');
+    const btnCloseModal = document.getElementById('btnCloseModal');
+    const btnCancelModal = document.getElementById('btnCancelModal');
+    const formNovaAbertura = document.getElementById('formNovaAbertura');
+
+    if (btnNovaAbertura) {
+      btnNovaAbertura.addEventListener('click', () => {
+        // Pré-definir data de hoje + 30 dias para conveniência
+        const d = new Date();
+        d.setDate(d.getDate() + 30);
+        document.getElementById('inputGoLive').value = d.toISOString().split('T')[0];
+        
+        const dTarget = new Date();
+        dTarget.setDate(dTarget.getDate() + 24);
+        document.getElementById('inputTargetDate').value = dTarget.toISOString().split('T')[0];
+
+        modalNovaAbertura.classList.add('active');
+      });
+    }
+
+    function closeModal() {
+      if (modalNovaAbertura) modalNovaAbertura.classList.remove('active');
+    }
+
+    if (btnCloseModal) btnCloseModal.addEventListener('click', closeModal);
+    if (btnCancelModal) btnCancelModal.addEventListener('click', closeModal);
+
+    // Toggle de Marca no Modal (Fnac / Darty)
+    const btnBrandFnac = document.getElementById('btnBrandFnac');
+    const btnBrandDarty = document.getElementById('btnBrandDarty');
+    const inputBrand = document.getElementById('inputBrand');
+
+    if (btnBrandFnac && btnBrandDarty) {
+      btnBrandFnac.addEventListener('click', () => {
+        btnBrandFnac.classList.add('active');
+        btnBrandDarty.classList.remove('active');
+        inputBrand.value = 'Fnac';
+      });
+      btnBrandDarty.addEventListener('click', () => {
+        btnBrandDarty.classList.add('active');
+        btnBrandFnac.classList.remove('active');
+        inputBrand.value = 'Darty';
+      });
+    }
+
+    // Submissão do Formulário de Nova Abertura (POST /api/v1/projects)
+    if (formNovaAbertura) {
+      formNovaAbertura.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const submitBtn = document.getElementById('btnSubmitModal');
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = 'A gravar em SQLite...';
+
+        const formData = new FormData(formNovaAbertura);
+        const payload = Object.fromEntries(formData.entries());
+
+        try {
+          const res = await fetch('/api/v1/projects', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+          });
+
+          const json = await res.json();
+          if (json.success) {
+            showToast(`Loja ${payload.name} criada e gravada com sucesso!`, 'success');
+            formNovaAbertura.reset();
+            closeModal();
+            // Recarregar tabela e KPIs da base de dados real
+            await loadProjects();
+          } else {
+            showToast(`Erro ao criar: ${json.message}`, 'error');
+          }
+        } catch (err) {
+          showToast(`Erro na requisição: ${err.message}`, 'error');
+        } finally {
+          submitBtn.disabled = false;
+          submitBtn.innerHTML = `
+            <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+            </svg>
+            <span>Gravar Abertura</span>
+          `;
+        }
+      });
+    }
+
+    // Modal de Detalhe / Gerir Projeto
+    const modalDetalhe = document.getElementById('modalDetalheProjeto');
+    const btnCloseDetalhe = document.getElementById('btnCloseDetalheModal');
+    const btnFecharDetalhe = document.getElementById('btnFecharDetalhe');
+    const modalDetalheTitle = document.getElementById('modalDetalheTitle');
+    const modalDetalheBody = document.getElementById('modalDetalheBody');
+
+    async function openProjectDetails(id) {
+      try {
+        const res = await fetch(`/api/v1/projects/${id}`);
+        const json = await res.json();
+        if (json.success && json.data) {
+          const p = json.data;
+          modalDetalheTitle.innerHTML = `
+            <span>${p.name}</span>
+            <span class="brand-badge ${p.brand?.toLowerCase()}">${p.code}</span>
+          `;
+
+          let tasksHtml = '';
+          if (p.tasks && p.tasks.length > 0) {
+            tasksHtml = p.tasks.map(t => `
+              <div style="padding: 10px 14px; background: var(--bg-base); border: 1px solid var(--border-subtle); border-radius: 6px; margin-bottom: 8px;">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                  <strong style="color: var(--text-white); font-size: 13px;">${t.title}</strong>
+                  <span class="status-badge ${t.status === 'concluido' ? 'badge-signage-ok' : 'badge-signage-testing'}">${t.status}</span>
+                </div>
+                <div style="font-size: 11.5px; color: var(--text-muted); margin-top: 4px;">${t.description || ''}</div>
+                <div style="font-size: 11px; color: var(--text-dim); margin-top: 6px;">Departamento: ${t.department} • Prazo: ${formatDate(t.due_date)}</div>
+              </div>
+            `).join('');
+          } else {
+            tasksHtml = `<div style="font-size: 12px; color: var(--text-dim);">Sem marcos registados para esta loja.</div>`;
+          }
+
+          modalDetalheBody.innerHTML = `
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px;">
+              <div style="padding: 14px; background: var(--bg-base); border-radius: 8px; border: 1px solid var(--border-subtle);">
+                <div style="font-size: 11px; text-transform: uppercase; color: var(--text-dim); font-weight: 700;">Inauguração Oficial</div>
+                <div style="font-size: 16px; font-weight: 700; color: var(--text-white); margin-top: 4px;">${formatDate(p.go_live_date)}</div>
+                <div style="font-size: 12px; color: var(--text-muted); margin-top: 2px;">${getDaysRemaining(p.go_live_date)} dias restantes</div>
+              </div>
+              <div style="padding: 14px; background: var(--bg-base); border-radius: 8px; border: 1px solid var(--border-subtle);">
+                <div style="font-size: 11px; text-transform: uppercase; color: var(--text-dim); font-weight: 700;">Custo Diário Alocado</div>
+                <div style="font-size: 16px; font-weight: 700; color: var(--fnac-gold); margin-top: 4px;">${formatCurrency(p.daily_cost)} / dia</div>
+                <div style="font-size: 12px; color: var(--text-muted); margin-top: 2px;">Orçamento Total: ${formatCurrency(p.total_budget)}</div>
+              </div>
+            </div>
+
+            <div style="margin-bottom: 20px;">
+              <h4 style="font-size: 13px; text-transform: uppercase; color: var(--text-dim); margin-bottom: 10px;">Localização & Configuração Signage</h4>
+              <div style="padding: 12px 14px; background: var(--bg-base); border-radius: 8px; border: 1px solid var(--border-subtle); font-size: 13px;">
+                <div>📍 <strong>Morada:</strong> ${p.location}</div>
+                <div style="margin-top: 6px;">📺 <strong>Playlist:</strong> ${p.playlist_version} (${p.signage_status})</div>
+              </div>
+            </div>
+
+            <div>
+              <h4 style="font-size: 13px; text-transform: uppercase; color: var(--text-dim); margin-bottom: 10px;">Marcos Técnicos Multimédia (${p.tasks ? p.tasks.length : 0})</h4>
+              ${tasksHtml}
+            </div>
+          `;
+
+          modalDetalhe.classList.add('active');
+        }
+      } catch (err) {
+        showToast('Erro ao carregar detalhes: ' + err.message, 'error');
+      }
+    }
+
+    if (btnCloseDetalhe) btnCloseDetalhe.addEventListener('click', () => modalDetalhe.classList.remove('active'));
+    if (btnFecharDetalhe) btnFecharDetalhe.addEventListener('click', () => modalDetalhe.classList.remove('active'));
+
+    // Filtros de Tabela
+    document.querySelectorAll('.filter-chip').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.filter-chip').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        applyFilter(btn.getAttribute('data-filter'));
       });
     });
 
-    // 3. Pesquisa Rápida na Tabela
+    // Pesquisa Rápida na Tabela
     const searchInput = document.getElementById('projectSearch');
     if (searchInput) {
       searchInput.addEventListener('input', (e) => {
         const query = e.target.value.toLowerCase();
-        tableRows.forEach(row => {
-          const text = row.innerText.toLowerCase();
-          row.style.display = text.includes(query) ? '' : 'none';
+        const rows = document.querySelectorAll('#projectsTableBody tr');
+        rows.forEach(r => {
+          const txt = r.innerText.toLowerCase();
+          r.style.display = txt.includes(query) ? '' : 'none';
         });
       });
     }
 
-    // 4. Modal/Feedback para o botão "Nova Abertura"
-    const btnNovaAbertura = document.getElementById('btnNovaAbertura');
-    if (btnNovaAbertura) {
-      btnNovaAbertura.addEventListener('click', () => {
-        alert('Módulo de Abertura: A preparar formulário de novo projeto com suporte para controladores REST...');
+    // Exportar CSV
+    const btnExport = document.getElementById('btnExport');
+    if (btnExport) {
+      btnExport.addEventListener('click', () => {
+        if (!allProjects.length) {
+          showToast('Sem projetos para exportar.', 'error');
+          return;
+        }
+
+        let csv = 'Código,Nome,Insígnia,Formato,Localização,Data Go-Live,Custo Diário,Orçamento Total,Estado Signage\n';
+        allProjects.forEach(p => {
+          csv += `"${p.code}","${p.name}","${p.brand}","${p.store_format}","${p.location}","${p.go_live_date}",${p.daily_cost},${p.total_budget},"${p.signage_status}"\n`;
+        });
+
+        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `RetailLaunchOS_Aberturas_${new Date().toISOString().split('T')[0]}.csv`;
+        a.click();
+        URL.revokeObjectURL(url);
+        showToast('Ficheiro CSV gerado e descarregado com sucesso!', 'success');
       });
     }
+
+    // Arranque Inicial
+    document.addEventListener('DOMContentLoaded', () => {
+      loadProjects();
+    });
   </script>
 </body>
 </html>
