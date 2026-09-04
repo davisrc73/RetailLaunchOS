@@ -16,9 +16,15 @@ Este manual destina-se aos utilizadores e operadores do **Gabinete Multimédia**
    - [4.1. Como Aceder](#41-como-aceder)
    - [4.2. Aba A: Catálogo de Playlists & Versões](#42-aba-a-catálogo-de-playlists--versões)
    - [4.3. Aba B: Parque Global de Displays](#43-aba-b-parque-global-de-displays)
-5. [Painel de KPIs & Contagem Decrescente](#5-painel-de-kpis--contagem-decrescente)
-6. [Filtros, Pesquisa e Exportação CSV](#6-filtros-pesquisa-e-exportação-csv)
-7. [Boas Práticas de Operação](#7-boas-práticas-de-operação)
+5. [Modal: Controlo de Acessos, Sessão de Operador & RBAC (Fase 5)](#5-modal-controlo-de-acessos-sessão-de-operador--rbac-fase-5)
+   - [5.1. Widget de Perfil no Rodapé da Sidebar](#51-widget-de-perfil-no-rodapé-da-sidebar)
+   - [5.2. Como Aceder ao Seletor de Sessão](#52-como-aceder-ao-seletor-de-sessão)
+   - [5.3. Troca Rápida de Perfil (1-Clique para Ambiente Piloto)](#53-troca-rápida-de-perfil-1-clique-para-ambiente-piloto)
+   - [5.4. Matriz de Permissões Operacionais por Perfil](#54-matriz-de-permissões-operacionais-por-perfil)
+   - [5.5. Início de Sessão Tradicional com Credenciais Corporativas](#55-início-de-sessão-tradicional-com-credenciais-corporativas)
+6. [Painel de KPIs & Contagem Decrescente](#6-painel-de-kpis--contagem-decrescente)
+7. [Filtros, Pesquisa e Exportação CSV](#7-filtros-pesquisa-e-exportação-csv)
+8. [Boas Práticas de Operação](#8-boas-práticas-de-operação)
 
 ---
 
@@ -198,7 +204,65 @@ Permite auditar a totalidade dos media players e ecrãs instalados em todas as l
 
 ---
 
-## 5. Painel de KPIs & Contagem Decrescente
+## 5. Modal: Controlo de Acessos, Sessão de Operador & RBAC (Fase 5)
+
+### 5.1. Widget de Perfil no Rodapé da Sidebar
+No canto inferior da barra lateral esquerda encontra-se o **Widget Interativo de Sessão** (`#sidebarUserWidget`), exibindo:
+* **Avatar Dinâmico**: Iniciais do operador ativo com anel de cor representativo do seu nível de permissão (Âmbar para Admin, Azul para Multimédia, Verde para Loja, Cinzento para Consulta).
+* **Nome e Departamento**: Identificação completa do operador (ex: `Admin Multimédia`, `Gabinete Multimédia (PT)`).
+* **Badge de Função (*Role*)**: Indicador textual em tempo real (`admin`, `multimedia_user`, `store_manager`, `viewer`).
+* **Botão de Alternância de Perfil (`⇄`)**: Abre de imediato o modal de gestão de sessão.
+* **Botão de Logout (`⎋`)**: Termina a sessão ativa e comuta o operador para o modo de segurança `viewer` (apenas leitura).
+
+### 5.2. Como Aceder ao Seletor de Sessão
+Existem três formas imediatas de abrir o modal de controlo de acessos:
+1. Clica no botão de alternância **`⇄`** no rodapé da sidebar.
+2. Clica nos itens **"Perfis & Permissões"** ou **"Utilizadores Ativos"** na secção *Controlo de Acessos* da sidebar.
+3. Clica diretamente sobre o avatar ou nome do utilizador no rodapé.
+
+### 5.3. Troca Rápida de Perfil (1-Clique para Ambiente Piloto)
+No topo do modal, a secção **"Troca Rápida de Perfil"** disponibiliza 4 cartões pré-configurados que permitem aos operadores e avaliadores alternar instantaneamente entre perfis sem ter de memorizar ou digitar credenciais:
+
+| Cartão / Perfil | Utilizador Semente | Departamento | Foco Operacional |
+| :--- | :--- | :--- | :--- |
+| **🛡️ Administrador** | `admin.multimedia@fnacdarty.pt` | Gabinete Multimédia (PT) | Acesso irrestrito total. Único com permissão para criar novas aberturas de loja e eliminar projetos. |
+| **🎬 Técnico Multimédia** | `signage.pilot@fnacdarty.pt` | Gabinete Multimédia (PT) | Gestão completa de playlists, telas, diárias, custos e marcos técnicos. |
+| **🏪 Gestor de Loja** | `loja.cascais@fnacdarty.pt` | Operações de Loja Cascais | Acompanhamento do progresso local, conclusão de tarefas da checklist e teste de ping de ecrãs. |
+| **👁️ Consulta / Auditoria** | `auditor.direcao@fnacdarty.pt` | Direção Geral & Auditoria | Perfil 100% de leitura para dashboards executivos e acompanhamento sem risco de alterações acidentais. |
+
+Ao clicar em qualquer um dos cartões:
+1. O backend emite instantaneamente um token JWT nativo assinado com HMAC-SHA256 (`POST /api/v1/auth/login`).
+2. O token e a matriz de permissões são gravados no `localStorage` do navegador.
+3. Uma notificação *toast* confirma a troca de operador.
+4. A interface ajusta-se dinamicamente (ocultando ou desativando botões para os quais a função não tem permissão).
+
+### 5.4. Matriz de Permissões Operacionais por Perfil
+
+| Funcionalidade / Ação | Administrador (`admin`) | Técnico Multimédia (`multimedia_user`) | Gestor de Loja (`store_manager`) | Consulta (`viewer`) |
+| :--- | :---: | :---: | :---: | :---: |
+| **Criar Nova Abertura de Loja** | ✅ Sim | ❌ Bloqueado | ❌ Bloqueado | ❌ Bloqueado |
+| **Eliminar Projeto de Loja** | ✅ Sim | ❌ Bloqueado | ❌ Bloqueado | ❌ Bloqueado |
+| **Adicionar / Concluir Marcos Técnicos** | ✅ Sim | ✅ Sim | ✅ Sim | ❌ Bloqueado |
+| **Eliminar Marcos Técnicos** | ✅ Sim | ✅ Sim | ❌ Bloqueado | ❌ Bloqueado |
+| **Registar Custos e Diárias** | ✅ Sim | ✅ Sim | ❌ Bloqueado | ❌ Bloqueado |
+| **Eliminar Custos Registados** | ✅ Sim | ✅ Sim | ❌ Bloqueado | ❌ Bloqueado |
+| **Criar / Editar Playlists e Telas** | ✅ Sim | ✅ Sim | ❌ Bloqueado | ❌ Bloqueado |
+| **Teste de Ping a Media Players** | ✅ Sim | ✅ Sim | ✅ Sim | ❌ Bloqueado |
+| **Visualização de KPIs e Dashboards** | ✅ Sim | ✅ Sim | ✅ Sim | ✅ Sim (Apenas Leitura) |
+
+> [!NOTE]
+> **Segurança em Duas Camadas:**
+> As permissões são aplicadas tanto visualmente no front-end (ocultando botões e desativando caixas de seleção) como no back-end (onde qualquer pedido sem o cabeçalho `Authorization: Bearer <token>` ou de uma função sem privilégios é rejeitado imediatamente com HTTP 401 Unauthorized ou HTTP 403 Forbidden).
+
+### 5.5. Início de Sessão Tradicional com Credenciais Corporativas
+Para autenticação formal ou em postos de trabalho partilhados, a secção inferior do modal disponibiliza o formulário clássico com validação PBKDF2:
+* **Email Corporativo**: Ex: `admin.multimedia@fnacdarty.pt`.
+* **Password**: Senha padrão para o ambiente de testes piloto: `fnac2026`.
+* Clica em **"Entrar no RetailLaunchOS"** para validar as credenciais e iniciar a sessão.
+
+---
+
+## 6. Painel de KPIs & Contagem Decrescente
 
 O painel superior do Dashboard atualiza-se em tempo real com as seguintes métricas:
 
@@ -215,30 +279,31 @@ O painel superior do Dashboard atualiza-se em tempo real com as seguintes métri
 
 ---
 
-## 6. Filtros, Pesquisa e Exportação CSV
+## 7. Filtros, Pesquisa e Exportação CSV
 
-### 6.1. Filtragem Rápida por Insígnia
+### 7.1. Filtragem Rápida por Insígnia
 Por cima da tabela, clica nos botões:
 * **Todas**: Apresenta todas as lojas do portfólio.
 * **Fnac**: Filtra apenas lojas com marca Fnac (fundo dourado).
 * **Darty**: Filtra apenas lojas com marca Darty (fundo vermelho).
 
-### 6.2. Pesquisa Instantânea (`⌘K`)
+### 7.2. Pesquisa Instantânea (`⌘K`)
 * Escreve no campo de pesquisa do cabeçalho qualquer termo (ex: *"Cascais"*, *"Darty"*, *"Shopping"*).
 * A tabela filtra as linhas em tempo real à medida que digitas.
 
-### 6.3. Exportação para CSV
+### 7.3. Exportação para CSV
 * Clica no botão **"Exportar CSV"** no canto direito da secção de aberturas.
 * O sistema compila os dados atuais e descarrega automaticamente um ficheiro formatado: `RetailLaunchOS_Aberturas_AAAA-MM-DD.csv`, pronto para abrir no Excel ou Google Sheets.
 
 ---
 
-## 7. Boas Práticas de Operação
+## 8. Boas Práticas de Operação
 
 1. **Nomenclatura**: Utiliza sempre a convenção `[Insígnia] [Nome do Centro ou Cidade]` (ex: `Fnac Forum Coimbra`, `Darty Sintra`).
 2. **Datas de Entrega**: Define sempre a *Entrega Técnica Multimédia* pelo menos 5 dias antes do *Go-Live*, permitindo testes de stress de reprodução contínua 24/7 nas telas antes da inauguração.
 3. **Playlists**: Mantém o padrão de numeração semântica nas playlists (ex: `v1.0-abertura`, `v1.1-ajustes`, `v2.0-campanha`).
 4. **Registo Imediato de Diárias**: Imputar as diárias e custos de deslocação no próprio dia da intervenção para manter o saldo orçamental permanentemente fidedigno.
 5. **Verificação de Rede de Displays**: Realizar testes de *Ping* a todos os players após a entrega técnica para garantir que nenhuma tela se encontra no estado `Offline` no dia da abertura.
+6. **Sessões e Auditoria**: Em postos partilhados na loja ou no auditório, terminar sempre a sessão ou mudar para o perfil `viewer` para prevenir edições acidentais no planeamento técnico.
 
 

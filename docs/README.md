@@ -14,7 +14,7 @@ Este diretório armazena todos os registos históricos de planeamento técnico (
 | **2** | **Marcos Técnicos & Checklist Interativa** | [FASE_2_PLANO.md](file:///Users/daviscorreia/Antigravity%20/RetailLaunchOS/docs/implementation_plans/FASE_2_PLANO.md) | [FASE_2_WALKTHROUGH.md](file:///Users/daviscorreia/Antigravity%20/RetailLaunchOS/docs/walkthroughs/FASE_2_WALKTHROUGH.md) | ✅ Concluído |
 | **3** | **Gestão de Custos & Diárias Técnicas** | [FASE_3_PLANO.md](file:///Users/daviscorreia/Antigravity%20/RetailLaunchOS/docs/implementation_plans/FASE_3_PLANO.md) | [FASE_3_WALKTHROUGH.md](file:///Users/daviscorreia/Antigravity%20/RetailLaunchOS/docs/walkthroughs/FASE_3_WALKTHROUGH.md) | ✅ Concluído |
 | **4** | **Digital Signage & Versionamento de Playlists** | [FASE_4_PLANO.md](file:///Users/daviscorreia/Antigravity%20/RetailLaunchOS/docs/implementation_plans/FASE_4_PLANO.md) | [FASE_4_WALKTHROUGH.md](file:///Users/daviscorreia/Antigravity%20/RetailLaunchOS/docs/walkthroughs/FASE_4_WALKTHROUGH.md) | ✅ Concluído |
-| **5** | **Controlo de Permissões (RBAC) & Autenticação** | *Próxima etapa* | *A realizar* | ⏳ Em Planeamento |
+| **5** | **Controlo de Permissões (RBAC) & Autenticação** | [FASE_5_PLANO.md](file:///Users/daviscorreia/Antigravity%20/RetailLaunchOS/docs/implementation_plans/FASE_5_PLANO.md) | [FASE_5_WALKTHROUGH.md](file:///Users/daviscorreia/Antigravity%20/RetailLaunchOS/docs/walkthroughs/FASE_5_WALKTHROUGH.md) | ✅ Concluído |
 
 ---
 

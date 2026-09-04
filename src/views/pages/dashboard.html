@@ -112,16 +112,29 @@
       </ul>
     </div>
 
-    <!-- Perfil do Utilizador no Rodapé -->
-    <div class="sidebar-footer">
-      <div class="user-card">
-        <div class="user-avatar">
-          <span>AM</span>
-          <span class="status-dot-online" title="Online"></span>
+    <!-- Perfil do Utilizador no Rodapé & RBAC (Fase 5) -->
+    <div class="sidebar-footer" id="sidebarFooter">
+      <div class="sidebar-user-widget" id="sidebarUserWidget">
+        <div class="user-profile-row">
+          <div class="user-avatar admin" id="userWidgetAvatar">AM</div>
+          <div class="user-info-text">
+            <div class="user-display-name" id="userWidgetName">Admin Multimédia</div>
+            <div class="user-display-dept" id="userWidgetDept">Gabinete Multimédia</div>
+            <span class="role-badge admin" id="userWidgetRoleBadge">admin</span>
+          </div>
         </div>
-        <div class="user-meta">
-          <div class="user-name">Admin Multimédia</div>
-          <div class="user-role">Gabinete Multimédia (PT)</div>
+        <div class="user-widget-actions">
+          <button class="btn-switch-role" id="btnOpenAuthModal" title="Alternar Perfil ou Iniciar Sessão">
+            <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99"></path>
+            </svg>
+            <span>Alternar Perfil</span>
+          </button>
+          <button class="btn-logout" id="btnLogout" title="Terminar Sessão">
+            <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15m3 0l3-3m0 0l-3-3m3 3H9"></path>
+            </svg>
+          </button>
         </div>
       </div>
     </div>
@@ -545,7 +558,8 @@
       <div class="modal-body" id="modalDetalheBody">
         <!-- Preenchido dinamicamente via JS -->
       </div>
-      <div class="modal-footer">
+      <div class="modal-footer" style="display: flex; justify-content: space-between; align-items: center;">
+        <div id="modalDetalheProjectActions"></div>
         <button type="button" class="btn-secondary" id="btnFecharDetalhe">Fechar</button>
       </div>
     </div>
@@ -580,6 +594,121 @@
     </div>
   </div>
 
+  <!-- =========================================================================
+       MODAL: AUTENTICAÇÃO, ACESSOS & TROCA DE PERFIL (RBAC FASE 5)
+       ========================================================================= -->
+  <div class="modal-backdrop" id="modalAuthLogin">
+    <div class="modal-card" style="max-width: 680px;">
+      <div class="modal-header">
+        <div class="modal-title">
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="color: var(--fnac-gold);">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z"></path>
+            </svg>
+            <span>Controlo de Acessos & Sessão de Operador • RetailLaunchOS</span>
+          </div>
+        </div>
+        <button class="modal-close-btn" id="btnCloseAuthModal" aria-label="Fechar">
+          <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+          </svg>
+        </button>
+      </div>
+
+      <div class="modal-body" style="padding: 24px;">
+        <div style="margin-bottom: 16px;">
+          <h3 style="font-size: 15px; font-weight: 700; color: var(--text-white); margin-bottom: 4px;">Troca Rápida de Perfil (Ambiente Piloto)</h3>
+          <p style="font-size: 12px; color: var(--text-muted);">
+            Selecione qualquer perfil abaixo para alternar a sessão instantaneamente com token JWT nativo e testar as permissões de acesso em tempo real:
+          </p>
+        </div>
+
+        <!-- Grelha de 4 Perfis de 1 Clique -->
+        <div class="auth-quick-cards">
+          <!-- Card Admin -->
+          <div class="quick-role-card" id="cardRoleAdmin" onclick="loginAsRole('admin')">
+            <div class="quick-role-header">
+              <div class="quick-role-title">
+                <span style="font-size: 16px;">🛡️</span> Administrador
+              </div>
+              <span class="role-badge admin">admin</span>
+            </div>
+            <div class="quick-role-desc">Acesso irrestrito a lojas, eliminação, orçamentos e utilizadores.</div>
+            <div class="quick-role-perm-list">
+              <span class="perm-tag-allowed">✓ Gestão Total & Eliminação de Lojas</span>
+              <span class="perm-tag-allowed">✓ Playlists, Telas, Custos e Utilizadores</span>
+            </div>
+          </div>
+
+          <!-- Card Técnico Multimédia -->
+          <div class="quick-role-card" id="cardRoleMultimedia" onclick="loginAsRole('multimedia_user')">
+            <div class="quick-role-header">
+              <div class="quick-role-title">
+                <span style="font-size: 16px;">🎬</span> Técnico Multimédia
+              </div>
+              <span class="role-badge multimedia_user">multimedia_user</span>
+            </div>
+            <div class="quick-role-desc">Operações técnicas do Gabinete Multimédia (conteúdos e telas).</div>
+            <div class="quick-role-perm-list">
+              <span class="perm-tag-allowed">✓ Playlists, Ecrãs, Ping e Marcos Técnicos</span>
+              <span class="perm-tag-denied">✕ Eliminação estrutural de Lojas</span>
+            </div>
+          </div>
+
+          <!-- Card Gestor de Loja -->
+          <div class="quick-role-card" id="cardRoleStore" onclick="loginAsRole('store_manager')">
+            <div class="quick-role-header">
+              <div class="quick-role-title">
+                <span style="font-size: 16px;">🏪</span> Gestor de Loja
+              </div>
+              <span class="role-badge store_manager">store_manager</span>
+            </div>
+            <div class="quick-role-desc">Direção / Gestão operacional da abertura em curso.</div>
+            <div class="quick-role-perm-list">
+              <span class="perm-tag-allowed">✓ Visualização local e Checklist de Tarefas</span>
+              <span class="perm-tag-denied">✕ Playlists Centrais e Orçamentos Globais</span>
+            </div>
+          </div>
+
+          <!-- Card Viewer / Auditor -->
+          <div class="quick-role-card" id="cardRoleViewer" onclick="loginAsRole('viewer')">
+            <div class="quick-role-header">
+              <div class="quick-role-title">
+                <span style="font-size: 16px;">👁️</span> Direção / Auditor
+              </div>
+              <span class="role-badge viewer">viewer</span>
+            </div>
+            <div class="quick-role-desc">Acesso restrito a consulta e acompanhamento de relatórios.</div>
+            <div class="quick-role-perm-list">
+              <span class="perm-tag-allowed">✓ Leitura integral de Dashboards & KPIs</span>
+              <span class="perm-tag-denied">✕ Bloqueadas todas as operações de escrita</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="auth-divider">ou iniciar sessão com credenciais</div>
+
+        <!-- Formulário Clássico de Login -->
+        <form id="formAuthLogin" onsubmit="handleCredentialsLogin(event)">
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
+            <div class="form-group">
+              <label class="form-label" for="loginEmail">Email Corporativo</label>
+              <input type="email" id="loginEmail" class="form-input" placeholder="ex: admin.multimedia@fnacdarty.pt" required autocomplete="username">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="loginPassword">Password</label>
+              <input type="password" id="loginPassword" class="form-input" placeholder="Senha padrão: fnac2026" required autocomplete="current-password">
+            </div>
+          </div>
+          <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 14px;">
+            <button type="button" class="btn-secondary" id="btnCancelLogin">Cancelar</button>
+            <button type="submit" class="btn-primary" id="btnSubmitLogin">Entrar no RetailLaunchOS</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
 
   <!-- =========================================================================
        SCRIPT DINÂMICO COMPLETO (INTEGRAÇÃO API REST + BASE DE DADOS SQLITE)
@@ -589,6 +718,168 @@
     let allProjects = [];
     let currentFilter = 'all';
     let countdownInterval = null;
+    let currentProjectIdInModal = null;
+
+    // Estado de Autenticação e RBAC (Fase 5)
+    let currentToken = localStorage.getItem('retaillaunch_token') || null;
+    let currentUser = JSON.parse(localStorage.getItem('retaillaunch_user') || 'null');
+    let currentPermissions = JSON.parse(localStorage.getItem('retaillaunch_perms') || 'null');
+
+    // Intercetor global para anexar Authorization: Bearer <token> e gerir 401/403
+    const _originalFetch = window.fetch;
+    window.fetch = async function(url, options = {}) {
+      options.headers = options.headers || {};
+      if (currentToken) {
+        if (options.headers instanceof Headers) {
+          options.headers.set('Authorization', `Bearer ${currentToken}`);
+        } else {
+          options.headers['Authorization'] = `Bearer ${currentToken}`;
+        }
+      }
+      const response = await _originalFetch(url, options);
+      if (response.status === 401 && !url.includes('/api/v1/auth/login')) {
+        showToast('Sessão expirada ou não autenticada. Por favor inicie sessão.', 'warning');
+        openAuthModal();
+      } else if (response.status === 403) {
+        const clone = response.clone();
+        try {
+          const err = await clone.json();
+          showToast(err.message || 'Acesso recusado: Permissões insuficientes.', 'error');
+        } catch {
+          showToast('Acesso recusado: Permissões insuficientes.', 'error');
+        }
+      }
+      return response;
+    };
+
+    // Funções de Gestão de Autenticação & RBAC
+    function openAuthModal() {
+      const modal = document.getElementById('modalAuthLogin');
+      if (modal) {
+        modal.classList.add('active');
+        highlightActiveRoleCard();
+      }
+    }
+
+    function closeAuthModal() {
+      const modal = document.getElementById('modalAuthLogin');
+      if (modal) modal.classList.remove('active');
+    }
+
+    function highlightActiveRoleCard() {
+      const role = currentUser?.role || 'admin';
+      document.querySelectorAll('.quick-role-card').forEach(card => card.classList.remove('active'));
+      const activeCard = document.getElementById(`cardRole${role === 'multimedia_user' ? 'Multimedia' : (role === 'store_manager' ? 'Store' : (role === 'viewer' ? 'Viewer' : 'Admin'))}`);
+      if (activeCard) activeCard.classList.add('active');
+    }
+
+    async function loginAsRole(role) {
+      try {
+        const res = await _originalFetch('/api/v1/auth/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ role })
+        });
+        const data = await res.json();
+        if (data.success && data.token) {
+          setSession(data.token, data.user, data.permissions);
+          showToast(`Sessão ativa como ${data.user.name} (${data.user.role.toUpperCase()})`, 'success');
+          closeAuthModal();
+        } else {
+          showToast(data.message || 'Erro ao alternar perfil', 'error');
+        }
+      } catch (err) {
+        showToast('Erro de ligação ao servidor: ' + err.message, 'error');
+      }
+    }
+
+    async function handleCredentialsLogin(e) {
+      e.preventDefault();
+      const email = document.getElementById('loginEmail')?.value;
+      const password = document.getElementById('loginPassword')?.value;
+      try {
+        const res = await _originalFetch('/api/v1/auth/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password })
+        });
+        const data = await res.json();
+        if (data.success && data.token) {
+          setSession(data.token, data.user, data.permissions);
+          showToast(`Bem-vindo, ${data.user.name}!`, 'success');
+          closeAuthModal();
+        } else {
+          showToast(data.message || 'Credenciais inválidas', 'error');
+        }
+      } catch (err) {
+        showToast('Erro de autenticação: ' + err.message, 'error');
+      }
+    }
+
+    function setSession(token, user, perms) {
+      currentToken = token;
+      currentUser = user;
+      currentPermissions = perms;
+      localStorage.setItem('retaillaunch_token', token);
+      localStorage.setItem('retaillaunch_user', JSON.stringify(user));
+      localStorage.setItem('retaillaunch_perms', JSON.stringify(perms));
+      renderUserWidget();
+      applyRolePermissions();
+    }
+
+    function logoutUser() {
+      localStorage.removeItem('retaillaunch_token');
+      localStorage.removeItem('retaillaunch_user');
+      localStorage.removeItem('retaillaunch_perms');
+      currentToken = null;
+      currentUser = null;
+      currentPermissions = null;
+      showToast('Sessão terminada. A entrar em modo de Consulta (Viewer)...', 'info');
+      loginAsRole('viewer');
+    }
+
+    function renderUserWidget() {
+      const avatarEl = document.getElementById('userWidgetAvatar');
+      const nameEl = document.getElementById('userWidgetName');
+      const deptEl = document.getElementById('userWidgetDept');
+      const badgeEl = document.getElementById('userWidgetRoleBadge');
+
+      if (!currentUser) return;
+
+      const role = currentUser.role || 'viewer';
+      const initials = currentUser.name.split(' ').map(n => n[0]).slice(0, 2).join('').toUpperCase();
+
+      if (avatarEl) {
+        avatarEl.className = `user-avatar ${role}`;
+        avatarEl.innerText = initials;
+      }
+      if (nameEl) nameEl.innerText = currentUser.name;
+      if (deptEl) deptEl.innerText = currentUser.department || 'Gabinete Multimédia';
+      if (badgeEl) {
+        badgeEl.className = `role-badge ${role}`;
+        badgeEl.innerText = role;
+      }
+    }
+
+    function applyRolePermissions() {
+      if (!currentUser) return;
+      const role = currentUser.role || 'admin';
+
+      // 1. Botão "+ Nova Abertura" (apenas Admin)
+      const btnNewProject = document.getElementById('btnNovaAberturaHeader') || document.querySelector('.btn-primary');
+      if (btnNewProject && btnNewProject.innerText.includes('Nova Abertura')) {
+        if (role === 'admin') {
+          btnNewProject.classList.remove('perm-hidden');
+        } else {
+          btnNewProject.classList.add('perm-hidden');
+        }
+      }
+
+      // Se o modal de loja estiver aberto, recarregar para atualizar os botões
+      if (currentProjectIdInModal && document.getElementById('modalDetalheProjeto')?.classList.contains('active')) {
+        openProjectDetails(currentProjectIdInModal);
+      }
+    }
 
     // Toast Feedback
     function showToast(message, type = 'success') {
@@ -1021,6 +1312,19 @@
           const completedTasks = tasks.filter(t => t.status === 'concluido').length;
           const progressPercent = totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : (p.status === 'em_curso' ? 75 : 25);
 
+          const role = currentUser?.role || 'admin';
+          const isViewer = role === 'viewer';
+          const isStoreManager = role === 'store_manager';
+          const isMultimedia = role === 'multimedia_user';
+          const isAdmin = role === 'admin';
+
+          const canDeleteTask = isAdmin || isMultimedia;
+          const canManageCosts = isAdmin || isMultimedia;
+          const canManageSignage = isAdmin || isMultimedia;
+          const canToggleTask = !isViewer;
+          const canCreateTask = !isViewer;
+          const canPing = !isViewer;
+
           // Renderizar lista de tarefas
           let tasksListHtml = '';
           if (tasks.length > 0) {
@@ -1034,18 +1338,19 @@
 
               return `
                 <div class="task-item ${isDone ? 'completed' : ''}" id="task-item-${t.id}">
-                  <input type="checkbox" class="task-checkbox" ${isDone ? 'checked' : ''} onchange="toggleTask(${t.id}, ${p.id})" title="Marcar como concluído">
+                  <input type="checkbox" class="task-checkbox" ${isDone ? 'checked' : ''} ${canToggleTask ? `onchange="toggleTask(${t.id}, ${p.id})"` : 'disabled style="cursor: not-allowed; opacity: 0.5;"'} title="${canToggleTask ? 'Marcar como concluído' : 'Permissão apenas de consulta'}">
                   <div class="task-content">
                     <div class="task-header-row">
                       <span class="task-title">${t.title}</span>
                       <div class="task-meta-tags">
                         <span class="task-tag ${priorityClass}">${priorityLabel}</span>
                         <span class="brand-badge fnac" style="font-size: 10px;">${t.department}</span>
+                        ${canDeleteTask ? `
                         <button class="task-del-btn" onclick="deleteTask(${t.id}, ${p.id})" title="Eliminar marco">
                           <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
                           </svg>
-                        </button>
+                        </button>` : ''}
                       </div>
                     </div>
                     ${t.description ? `<div class="task-desc">${t.description}</div>` : ''}
@@ -1090,11 +1395,12 @@
                   </div>
                   <div style="display: flex; align-items: center; gap: 14px;">
                     <strong style="font-family: 'JetBrains Mono', monospace; font-size: 14px; color: var(--text-white);">${formatCurrency(c.amount)}</strong>
+                    ${canManageCosts ? `
                     <button class="task-del-btn" onclick="deleteCost(${c.id}, ${p.id})" title="Remover despesa">
                       <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
                       </svg>
-                    </button>
+                    </button>` : ''}
                   </div>
                 </div>
               `;
@@ -1142,7 +1448,7 @@
                       </div>
                       <div style="display: flex; align-items: center; gap: 8px; margin-top: 6px;">
                         <span style="font-size: 11px; color: var(--text-dim);">Playlist:</span>
-                        <select class="form-select" style="padding: 2px 8px; font-size: 11px; height: 26px; width: auto;" onchange="changePlayerPlaylist(${sp.id}, this.value, ${p.id})">
+                        <select class="form-select" style="padding: 2px 8px; font-size: 11px; height: 26px; width: auto;" ${canManageSignage ? `onchange="changePlayerPlaylist(${sp.id}, this.value, ${p.id})"` : 'disabled style="opacity: 0.65; cursor: not-allowed;"'}>
                           <option value="">-- Nenhuma Playlist --</option>
                           ${playlistOptions}
                         </select>
@@ -1154,17 +1460,19 @@
                       <span class="status-dot-ping"></span>
                       <span>${sp.status}</span>
                     </div>
+                    ${canPing ? `
                     <button class="btn-ping" onclick="pingPlayer(${sp.id}, ${p.id})" title="Enviar sinal de teste / ping">
                       <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
                       </svg>
                       <span>Ping</span>
-                    </button>
+                    </button>` : ''}
+                    ${canManageSignage ? `
                     <button class="task-del-btn" onclick="deletePlayer(${sp.id}, ${p.id})" title="Remover ecrã">
                       <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
                       </svg>
-                    </button>
+                    </button>` : ''}
                   </div>
                 </div>
               `;
@@ -1178,6 +1486,11 @@
           }
 
           modalDetalheBody.innerHTML = `
+            ${isViewer ? `
+            <div class="perm-disabled-banner" style="margin-bottom: 16px;">
+              👁️ <strong>Sessão de Consulta (Viewer):</strong> Modo de auditoria ativo. Apenas visualização de dados — alterações técnicas e financeiras bloqueadas.
+            </div>` : ''}
+
             <!-- Abas de Navegação do Modal -->
             <div class="modal-nav-tabs">
               <button type="button" class="modal-tab-btn ${currentActiveTab === 'tabTasks' ? 'active' : ''}" onclick="switchModalTab('tabTasks', this)">
@@ -1239,7 +1552,7 @@
                 <form id="formUpdateSignage" onsubmit="handleUpdateSignage(event, ${p.id})" style="display: grid; grid-template-columns: 1fr 1fr auto; gap: 12px; align-items: flex-end;">
                   <div class="form-group" style="margin-bottom: 0;">
                     <label class="form-label">Estado de Signage</label>
-                    <select id="editSignageStatus" class="form-select">
+                    <select id="editSignageStatus" class="form-select" ${canManageSignage ? '' : 'disabled style="opacity: 0.7; cursor: not-allowed;"'}>
                       <option value="pendente" ${p.signage_status === 'pendente' ? 'selected' : ''}>Pendente de Instalação</option>
                       <option value="configuracao" ${p.signage_status === 'configuracao' ? 'selected' : ''}>Em Configuração de IPs</option>
                       <option value="validacao" ${p.signage_status === 'validacao' ? 'selected' : ''}>Em Validação de Telas</option>
@@ -1248,14 +1561,16 @@
                   </div>
                   <div class="form-group" style="margin-bottom: 0;">
                     <label class="form-label">Versão da Playlist</label>
-                    <input type="text" id="editPlaylistVersion" class="form-input" value="${p.playlist_version || 'v1.0'}" required>
+                    <input type="text" id="editPlaylistVersion" class="form-input" value="${p.playlist_version || 'v1.0'}" required ${canManageSignage ? '' : 'disabled style="opacity: 0.7; cursor: not-allowed;"'}>
                   </div>
+                  ${canManageSignage ? `
                   <button type="submit" class="btn-primary" style="height: 42px; padding: 0 16px;">
                     <svg width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
                     </svg>
                     <span>Atualizar</span>
-                  </button>
+                  </button>` : `
+                  <span class="badge-signage-testing" style="padding: 10px 14px; font-size: 11px; align-self: center;">🔒 Apenas Multimédia</span>`}
                 </form>
               </div>
 
@@ -1263,12 +1578,13 @@
               <div class="modal-section-card">
                 <div class="modal-section-title">
                   <span>Checklist de Marcos Técnicos (${completedTasks}/${totalTasks} concluídos)</span>
+                  ${canCreateTask ? `
                   <button type="button" class="add-task-toggle" onclick="toggleAddTaskForm()">
                     <svg width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4.5v15m7.5-7.5h-15"></path>
                     </svg>
                     <span>Novo Marco Técnico</span>
-                  </button>
+                  </button>` : ''}
                 </div>
 
                 <!-- Formulário Desdobrável para Novo Marco -->
@@ -1332,6 +1648,11 @@
                  ================================================================= -->
             <div class="tab-pane ${currentActiveTab === 'tabCosts' ? 'active' : ''}" id="tabCosts">
               
+              ${!canManageCosts && !isViewer ? `
+              <div class="perm-disabled-banner" style="margin-bottom: 16px;">
+                🔒 <strong>Gestor de Loja (Acesso de Leitura):</strong> O registo e eliminação de custos orçamentais é reservado ao Gabinete Multimédia e Direção Financeira.
+              </div>` : ''}
+
               <!-- Cartões de KPIs Financeiros -->
               <div class="financial-kpi-grid">
                 <div class="fin-card">
@@ -1367,12 +1688,13 @@
               <div class="modal-section-card">
                 <div class="modal-section-title">
                   <span>Histórico de Despesas & Diárias (${fin.entriesCount || 0} registos)</span>
+                  ${canManageCosts ? `
                   <button type="button" class="add-task-toggle" onclick="toggleAddCostForm()">
                     <svg width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4.5v15m7.5-7.5h-15"></path>
                     </svg>
                     <span>Registar Custo / Diária</span>
-                  </button>
+                  </button>` : ''}
                 </div>
 
                 <!-- Formulário Desdobrável para Novo Custo -->
@@ -1430,12 +1752,13 @@
               <div class="modal-section-card">
                 <div class="modal-section-title">
                   <span>Parque de Displays & Media Players (${players.length} ecrãs)</span>
+                  ${canManageSignage ? `
                   <button type="button" class="add-task-toggle" onclick="toggleAddPlayerForm()">
                     <svg width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4.5v15m7.5-7.5h-15"></path>
                     </svg>
                     <span>Associar Novo Ecrã / Player</span>
-                  </button>
+                  </button>` : ''}
                 </div>
 
                 <!-- Formulário Desdobrável para Novo Player -->
@@ -1504,10 +1827,47 @@
             </div>
           `;
 
+          // Renderizar Ações de Projeto no Rodapé (Eliminação restrita a Admin)
+          const actionsEl = document.getElementById('modalDetalheProjectActions');
+          if (actionsEl) {
+            if (isAdmin) {
+              actionsEl.innerHTML = `
+                <button type="button" class="btn-secondary" style="color: var(--darty-red); border-color: rgba(239, 68, 68, 0.4); font-size: 12px; display: inline-flex; align-items: center; gap: 6px;" onclick="deleteProject(${p.id})">
+                  <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                  </svg>
+                  <span>Eliminar Projeto</span>
+                </button>
+              `;
+            } else {
+              actionsEl.innerHTML = '';
+            }
+          }
+
           modalDetalhe.classList.add('active');
         }
       } catch (err) {
         showToast('Erro ao carregar detalhes: ' + err.message, 'error');
+      }
+    }
+
+    // Ação: Eliminar Projeto de Abertura (Apenas Admin)
+    async function deleteProject(projectId) {
+      if (!confirm('ATENÇÃO CRÍTICA: Tem a certeza absoluta que deseja eliminar este projeto de abertura de loja e todos os seus marcos, registos orçamentais e ecrãs associados? Esta ação é irreversível.')) {
+        return;
+      }
+      try {
+        const res = await fetch(`/api/v1/projects/${projectId}`, { method: 'DELETE' });
+        const json = await res.json();
+        if (json.success) {
+          showToast('Projeto de abertura eliminado permanentemente com sucesso!', 'success');
+          modalDetalhe.classList.remove('active');
+          await loadProjects();
+        } else {
+          showToast(json.message || 'Erro ao eliminar projeto', 'error');
+        }
+      } catch (err) {
+        showToast('Erro de comunicação: ' + err.message, 'error');
       }
     }
 
@@ -1814,6 +2174,10 @@
         const players = jsonSp.data || [];
         const stats = jsonStats.data || {};
 
+        const role = currentUser?.role || 'admin';
+        const canManageSignage = role === 'admin' || role === 'multimedia_user';
+        const canPing = role !== 'viewer';
+
         // Renderizar Grid de Playlists
         let playlistCardsHtml = playlists.map(pl => {
           let statusBadgeClass = 'badge-signage-ok';
@@ -1845,7 +2209,7 @@
               <div class="playlist-stats-footer">
                 <div style="display: flex; align-items: center; gap: 6px;">
                   <span style="font-size: 11px; color: var(--text-muted);">Estado:</span>
-                  <select class="form-select" style="padding: 2px 6px; font-size: 11px; height: 26px; width: auto;" onchange="updatePlaylistStatus(${pl.id}, this.value)">
+                  <select class="form-select" style="padding: 2px 6px; font-size: 11px; height: 26px; width: auto;" ${canManageSignage ? `onchange="updatePlaylistStatus(${pl.id}, this.value)"` : 'disabled style="opacity: 0.65; cursor: not-allowed;"'}>
                     <option value="publicada" ${pl.status === 'publicada' ? 'selected' : ''}>Publicada</option>
                     <option value="em_validacao" ${pl.status === 'em_validacao' ? 'selected' : ''}>Em Validação</option>
                     <option value="draft" ${pl.status === 'draft' ? 'selected' : ''}>Rascunho</option>
@@ -1854,11 +2218,12 @@
                 </div>
                 <div style="display: flex; align-items: center; gap: 10px;">
                   <span style="color: var(--fnac-gold); font-weight: 700;">📺 ${pl.linked_players_count || 0} telas</span>
+                  ${canManageSignage ? `
                   <button class="task-del-btn" onclick="deletePlaylist(${pl.id})" title="Remover playlist">
                     <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
                     </svg>
-                  </button>
+                  </button>` : ''}
                 </div>
               </div>
             </div>
@@ -1899,12 +2264,13 @@
                 </div>
               </td>
               <td>
+                ${canPing ? `
                 <button class="btn-ping" onclick="pingPlayerFromHub(${sp.id})" title="Enviar sinal de teste / ping">
                   <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
                   </svg>
                   <span>Ping</span>
-                </button>
+                </button>` : '<span style="font-size: 11px; color: var(--text-dim);">Consulta</span>'}
               </td>
             </tr>
           `;
@@ -1952,12 +2318,13 @@
             <div class="modal-section-card">
               <div class="modal-section-title">
                 <span>Versões de Conteúdo Publicitário & Institucional</span>
+                ${canManageSignage ? `
                 <button type="button" class="add-task-toggle" onclick="toggleAddPlaylistForm()">
                   <svg width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4.5v15m7.5-7.5h-15"></path>
                   </svg>
                   <span>Nova Versão de Playlist</span>
-                </button>
+                </button>` : ''}
               </div>
 
               <!-- Formulário Desdobrável para Nova Playlist -->
@@ -2208,8 +2575,61 @@
       });
     }
 
+    // Eventos de Autenticação & Controlo de Acessos
+    const btnOpenAuth = document.getElementById('btnOpenAuthModal');
+    const btnCloseAuth = document.getElementById('btnCloseAuthModal');
+    const btnCancelAuth = document.getElementById('btnCancelLogin');
+    const btnLogoutEl = document.getElementById('btnLogout');
+    const navRoles = document.getElementById('nav-roles');
+    const navUsers = document.getElementById('nav-users');
+    const modalAuth = document.getElementById('modalAuthLogin');
+
+    if (btnOpenAuth) btnOpenAuth.addEventListener('click', openAuthModal);
+    if (btnCloseAuth) btnCloseAuth.addEventListener('click', closeAuthModal);
+    if (btnCancelAuth) btnCancelAuth.addEventListener('click', closeAuthModal);
+    if (btnLogoutEl) btnLogoutEl.addEventListener('click', logoutUser);
+    if (navRoles) navRoles.addEventListener('click', (e) => { e.preventDefault(); openAuthModal(); });
+    if (navUsers) navUsers.addEventListener('click', (e) => { e.preventDefault(); openAuthModal(); });
+    if (modalAuth) {
+      modalAuth.addEventListener('click', (e) => {
+        if (e.target === modalAuth) closeAuthModal();
+      });
+    }
+
+    // Fechar modais com tecla ESC
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        closeAuthModal();
+        if (modalDetalhe) modalDetalhe.classList.remove('active');
+        if (modalHubSignage) modalHubSignage.classList.remove('active');
+        const modalNova = document.getElementById('modalNovaAbertura');
+        if (modalNova) modalNova.classList.remove('active');
+      }
+    });
+
     // Arranque Inicial
-    document.addEventListener('DOMContentLoaded', () => {
+    document.addEventListener('DOMContentLoaded', async () => {
+      // 1. Inicializar Sessão Auth
+      const storedToken = localStorage.getItem('retaillaunch_token');
+      if (storedToken) {
+        currentToken = storedToken;
+        try {
+          currentUser = JSON.parse(localStorage.getItem('retaillaunch_user'));
+          currentPermissions = JSON.parse(localStorage.getItem('retaillaunch_perms'));
+        } catch (e) {
+          currentUser = null;
+        }
+      }
+
+      if (!currentToken || !currentUser) {
+        // Se não existir sessão persistida, entrar por defeito como Administrador no Piloto
+        await loginAsRole('admin');
+      } else {
+        renderUserWidget();
+        applyRolePermissions();
+      }
+
+      // 2. Carregar Projetos e KPIs
       loadProjects();
     });
   </script>

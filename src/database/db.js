@@ -43,6 +43,17 @@ function initSchema() {
       } else {
         console.error('❌ [DB] Ficheiro schema.sql não encontrado em:', schemaPath);
       }
+    } else {
+      // Garantir que todos os 4 utilizadores semente padrão existem
+      const userCount = db.prepare("SELECT COUNT(*) as count FROM users;").get()?.count || 0;
+      if (userCount < 4) {
+        console.log('🔄 [DB] A sincronizar utilizadores semente do sistema...');
+        const schemaPath = path.join(dbDir, 'schema.sql');
+        if (fs.existsSync(schemaPath)) {
+          const schemaSql = fs.readFileSync(schemaPath, 'utf8');
+          db.exec(schemaSql);
+        }
+      }
     }
   } catch (error) {
     console.error('❌ [DB Error] Erro ao inicializar esquema:', error.message);

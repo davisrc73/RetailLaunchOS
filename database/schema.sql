@@ -102,7 +102,9 @@ INSERT OR IGNORE INTO roles (id, name, description) VALUES
 -- Utilizadores iniciais de teste
 INSERT OR IGNORE INTO users (id, role_id, name, email, password_hash, department, status) VALUES
 (1, 1, 'Administrador Multimédia', 'admin.multimedia@fnacdarty.pt', '$2b$10$demoHashedPassword999999999999999999999999999999999999999', 'Gabinete Multimédia', 'active'),
-(2, 2, 'Técnico Digital Signage', 'signage.pilot@fnacdarty.pt', '$2b$10$demoHashedPassword999999999999999999999999999999999999999', 'Gabinete Multimédia', 'active');
+(2, 2, 'Técnico Digital Signage', 'signage.pilot@fnacdarty.pt', '$2b$10$demoHashedPassword999999999999999999999999999999999999999', 'Gabinete Multimédia', 'active'),
+(3, 3, 'Gestor Loja Cascais', 'loja.cascais@fnacdarty.pt', '$2b$10$demoHashedPassword999999999999999999999999999999999999999', 'Operações de Loja', 'active'),
+(4, 4, 'Auditor de Operações', 'auditor.direcao@fnacdarty.pt', '$2b$10$demoHashedPassword999999999999999999999999999999999999999', 'Direção Executiva', 'active');
 
 -- Projetos Piloto
 INSERT OR IGNORE INTO projects (id, code, name, brand, store_format, location, go_live_date, target_completion_date, daily_cost, total_budget, status, signage_status, playlist_version, created_by) VALUES

@@ -23,6 +23,7 @@ RetailLaunchOS/
 │   └── js/                          # Scripts auxiliares e bibliotecas cliente
 ├── src/                             # Código-fonte principal da aplicação
 │   ├── controllers/                 # Controladores REST e lógica de endpoints
+│   │   ├── authController.js        # Autenticação JWT, troca de perfil e utilizadores
 │   │   ├── projectController.js     # Gestão de aberturas de lojas e métricas
 │   │   ├── taskController.js        # Checklist de marcos técnicos e progresso
 │   │   ├── costController.js        # Registo de custos, diárias e sumários orçamentais
@@ -30,8 +31,10 @@ RetailLaunchOS/
 │   ├── database/                    # Abstração de ligação e auto-bootstrap da BD
 │   │   └── db.js                    # Conexão nativa via node:sqlite com WAL e PRAGMAs
 │   ├── middleware/                  # Intercetores de pedidos
-│   │   └── authMiddleware.js        # Autenticação e controlo de permissões RBAC
+│   │   └── authMiddleware.js        # JWT nativo HMAC-SHA256, autenticação e guardas RBAC
 │   ├── models/                      # Camada de acesso aos dados (Data Access Objects)
+│   │   ├── User.js                  # Utilizadores, hashes PBKDF2 e validação de credenciais
+│   │   ├── Role.js                  # Perfis RBAC e matriz granular de permissões
 │   │   ├── Project.js               # Consultas parametrizadas, criação e KPIs
 │   │   ├── Task.js                  # Marcos técnicos e toggle de estado
 │   │   ├── Cost.js                  # Custos diários, agregações e sumário financeiro
@@ -252,56 +255,107 @@ Os modelos encapsulam a lógica de negócio e queries SQL parametrizadas (evitan
 * **`SignagePlayer.getGlobalSignageStats()`**:
   * Consolida métricas em tempo real de todo o parque: total de ecrãs, contagem por estado (`online`, `offline`, `syncing`, `testing`) e rácio de prontidão (`readiness_percentage`).
 
+### 3.6. Modelo `User.js` (Fase 5)
+* **`User.verifyCredentials(email, password)`**:
+  * Valida credenciais corporativas calculando o hash PBKDF2 (`node:crypto`) com 10.000 iterações ou aceitando a palavra-passe padrão de ambiente piloto (`fnac2026`). Retorna o utilizador com dados do seu perfil associado (`role_name`).
+* **`User.findById(id)`**:
+  * Retorna o operador por ID primário com o seu papel (`role`), departamento e estado.
+* **`User.findByEmail(email)`**:
+  * Localiza o utilizador pelo endereço de email institucional.
+* **`User.findByRole(roleName)`**:
+  * Permite comutação rápida de perfil (1-clique) no piloto, retornando o utilizador representativo de cada perfil (`admin`, `multimedia_user`, `store_manager`, `viewer`).
+* **`User.findAll()`**:
+  * Retorna todos os utilizadores registados no sistema com respetivo cargo e departamento.
+
+### 3.7. Modelo `Role.js` (Fase 5)
+* **`Role.findAll()`**:
+  * Lista os 4 papéis do sistema e as suas descrições funcionais.
+* **`Role.getPermissionsMatrix(roleName)`**:
+  * Retorna o mapa booleano de privilégios (`canCreateProject`, `canDeleteProject`, `canManageTasks`, `canDeleteTasks`, `canManageCosts`, `canManageSignage`, `canPingPlayers`, `canManageUsers`).
+
 ---
 
-## 4. Controladores e API REST (`projectController.js`, `taskController.js`, `costController.js` e `signageController.js`)
+## 4. Controladores e API REST (`projectController`, `taskController`, `costController`, `signageController`, `authController`)
 
 A API segue os padrões RESTful com payloads JSON e códigos de resposta HTTP semânticos:
 
 ### 4.1. Endpoints de Lojas (`/api/v1/projects`)
-| Método | Endpoint | Parâmetros | Descrição |
-| :--- | :--- | :--- | :--- |
-| **GET** | `/api/v1/projects` | `?brand=Fnac&status=em_curso` | Lista todas as lojas com progresso e filtros opcionais |
-| **GET** | `/api/v1/projects/kpis` | — | Retorna as métricas agregadas para os cartões de KPI |
-| **GET** | `/api/v1/projects/:id` | `:id` (ID ou Código) | Detalha a loja, marcos técnicos e histórico de custos |
-| **POST** | `/api/v1/projects` | Body JSON com dados da loja | Cria uma nova abertura de loja na base de dados |
-| **PUT** | `/api/v1/projects/:id` | Body JSON com campos a alterar | Atualiza campos de uma abertura existente |
-| **PATCH**| `/api/v1/projects/:id/signage` | `{ signage_status, playlist_version }` | Atualiza parâmetros de Digital Signage e Playlist |
-| **DELETE**| `/api/v1/projects/:id` | `:id` | Remove um projeto e dependências em cascata |
+| Método | Endpoint | Parâmetros | Permissões | Descrição |
+| :--- | :--- | :--- | :---: | :--- |
+| **GET** | `/api/v1/projects` | `?brand=Fnac&status=em_curso` | Todos | Lista todas as lojas com progresso e filtros opcionais |
+| **GET** | `/api/v1/projects/kpis` | — | Todos | Retorna as métricas agregadas para os cartões de KPI |
+| **GET** | `/api/v1/projects/:id` | `:id` (ID ou Código) | Todos | Detalha a loja, marcos técnicos e histórico de custos |
+| **POST** | `/api/v1/projects` | Body JSON com dados da loja | `admin` | Cria uma nova abertura de loja na base de dados |
+| **PUT** | `/api/v1/projects/:id` | Body JSON com campos a alterar | `admin`, `multimedia_user` | Atualiza campos de uma abertura existente |
+| **PATCH**| `/api/v1/projects/:id/signage` | `{ signage_status, playlist_version }` | `admin`, `multimedia_user` | Atualiza parâmetros de Digital Signage e Playlist |
+| **DELETE**| `/api/v1/projects/:id` | `:id` | `admin` | Remove um projeto e dependências em cascata |
 
 ### 4.2. Endpoints de Tarefas e Marcos (`/api/v1/projects/:id/tasks` & `/api/v1/tasks`)
-| Método | Endpoint | Parâmetros | Descrição |
-| :--- | :--- | :--- | :--- |
-| **GET** | `/api/v1/projects/:id/tasks` | `:id` (Project ID) | Lista tarefas e estatísticas de progresso da loja |
-| **POST** | `/api/v1/projects/:id/tasks` | Body JSON com dados do marco | Adiciona um novo marco técnico à loja |
-| **PATCH**| `/api/v1/tasks/:id/toggle` | `:id` (Task ID) | Alterna estado de conclusão (pendente/concluído) com 1 clique |
-| **PUT** | `/api/v1/tasks/:id` | Body JSON com alterações | Atualiza detalhes de uma tarefa específica |
-| **DELETE**| `/api/v1/tasks/:id` | `:id` (Task ID) | Elimina um marco técnico da base de dados |
+| Método | Endpoint | Parâmetros | Permissões | Descrição |
+| :--- | :--- | :--- | :---: | :--- |
+| **GET** | `/api/v1/projects/:id/tasks` | `:id` (Project ID) | Todos | Lista tarefas e estatísticas de progresso da loja |
+| **POST** | `/api/v1/projects/:id/tasks` | Body JSON com dados do marco | `admin`, `multimedia_user`, `store_manager` | Adiciona um novo marco técnico à loja |
+| **PATCH**| `/api/v1/tasks/:id/toggle` | `:id` (Task ID) | `admin`, `multimedia_user`, `store_manager` | Alterna estado de conclusão com 1 clique |
+| **PUT** | `/api/v1/tasks/:id` | Body JSON com alterações | `admin`, `multimedia_user`, `store_manager` | Atualiza detalhes de uma tarefa específica |
+| **DELETE**| `/api/v1/tasks/:id` | `:id` (Task ID) | `admin`, `multimedia_user` | Elimina um marco técnico da base de dados |
 
 ### 4.3. Endpoints de Custos, Diárias e Orçamento (`/api/v1/projects/:id/costs` & `/api/v1/costs`) (Fase 3)
-| Método | Endpoint | Parâmetros | Descrição |
-| :--- | :--- | :--- | :--- |
-| **GET** | `/api/v1/projects/:id/costs` | `:id` (Project ID) | Retorna o sumário financeiro detalhado, saldo restante, percentagem de consumo e histórico |
-| **POST** | `/api/v1/projects/:id/costs` | Body JSON com dados da despesa | Regista uma nova diária ou custo de hardware/licença |
-| **GET** | `/api/v1/costs/summary` | — | Sumário financeiro global consolidado e distribuição por categoria |
-| **DELETE**| `/api/v1/costs/:id` | `:id` (Cost ID) | Elimina um registo de despesa e devolve o sumário recalculado |
+| Método | Endpoint | Parâmetros | Permissões | Descrição |
+| :--- | :--- | :--- | :---: | :--- |
+| **GET** | `/api/v1/projects/:id/costs` | `:id` (Project ID) | Todos | Retorna o sumário financeiro detalhado e histórico |
+| **POST** | `/api/v1/projects/:id/costs` | Body JSON com dados da despesa | `admin`, `multimedia_user` | Regista uma nova diária ou custo de hardware/licença |
+| **GET** | `/api/v1/costs/summary` | — | Todos | Sumário financeiro global consolidado |
+| **DELETE**| `/api/v1/costs/:id` | `:id` (Cost ID) | `admin`, `multimedia_user` | Elimina um registo de despesa e recalcula saldo |
 
 ### 4.4. Endpoints de Digital Signage & Playlists (`/api/v1/signage` & `/api/v1/projects/:id/players`) (Fase 4)
-| Método | Endpoint | Parâmetros | Descrição |
-| :--- | :--- | :--- | :--- |
-| **GET** | `/api/v1/signage/stats` | — | Métricas globais de Digital Signage (ecrãs online/offline, taxa de prontidão e playlists) |
-| **GET** | `/api/v1/signage/playlists`| `?brand=Fnac&status=aprovado` | Catálogo de playlists com contagem de telas vinculadas e filtros |
-| **POST** | `/api/v1/signage/playlists`| Body JSON com versão/resolução | Cria uma nova versão de playlist no catálogo central |
-| **PATCH**| `/api/v1/signage/playlists/:id/status` | `{ status }` | Altera estado da playlist (aprovação, rascunho, obsoleto) |
-| **GET** | `/api/v1/signage/players` | `?status=online&projectId=1` | Inventário global de ecrãs/players de todas as lojas |
-| **GET** | `/api/v1/projects/:id/players` | `:id` (Project ID) | Lista os ecrãs e players instalados na loja |
-| **POST** | `/api/v1/projects/:id/players` | Body JSON com dados da tela | Associa um novo ecrã/player à loja especificada |
-| **POST** | `/api/v1/signage/players/:id/ping` | `:id` (Player ID) | Executa teste de conectividade (ping) e atualiza telemetria da tela |
-| **DELETE**| `/api/v1/signage/players/:id` | `:id` (Player ID) | Remove uma tela/player do parque de equipamentos |
+| Método | Endpoint | Parâmetros | Permissões | Descrição |
+| :--- | :--- | :--- | :---: | :--- |
+| **GET** | `/api/v1/signage/stats` | — | Todos | Métricas globais de Digital Signage |
+| **GET** | `/api/v1/signage/playlists`| `?brand=Fnac&status=aprovado` | Todos | Catálogo de playlists e contagem de telas vinculadas |
+| **POST** | `/api/v1/signage/playlists`| Body JSON com versão/resolução | `admin`, `multimedia_user` | Cria uma nova versão de playlist no catálogo central |
+| **PATCH**| `/api/v1/signage/playlists/:id/status` | `{ status }` | `admin`, `multimedia_user` | Altera estado da playlist |
+| **GET** | `/api/v1/signage/players` | `?status=online&projectId=1` | Todos | Inventário global de ecrãs/players de todas as lojas |
+| **GET** | `/api/v1/projects/:id/players` | `:id` (Project ID) | Todos | Lista os ecrãs e players instalados na loja |
+| **POST** | `/api/v1/projects/:id/players` | Body JSON com dados da tela | `admin`, `multimedia_user` | Associa um novo ecrã/player à loja especificada |
+| **POST** | `/api/v1/signage/players/:id/ping` | `:id` (Player ID) | `admin`, `multimedia_user`, `store_manager` | Executa teste de conectividade (ping) |
+| **DELETE**| `/api/v1/signage/players/:id` | `:id` (Player ID) | `admin`, `multimedia_user` | Remove uma tela/player do parque |
+
+### 4.5. Endpoints de Autenticação e Perfis (`/api/v1/auth`, `/api/v1/users`, `/api/v1/roles`) (Fase 5)
+| Método | Endpoint | Parâmetros | Permissões | Descrição |
+| :--- | :--- | :--- | :---: | :--- |
+| **POST** | `/api/v1/auth/login` | `{ role }` ou `{ email, password }` | Público | Autentica operador e emite token JWT assinado |
+| **GET** | `/api/v1/auth/me` | Bearer Token no cabeçalho | Autenticado | Retorna os dados do utilizador e matriz de permissões |
+| **GET** | `/api/v1/users` | Bearer Token no cabeçalho | Autenticado | Lista todos os utilizadores semente com os seus cargos |
+| **GET** | `/api/v1/roles` | Bearer Token no cabeçalho | Autenticado | Retorna a matriz de permissões dos 4 perfis do sistema |
 
 ---
 
-## 5. Servidor de Aplicação (`server.js`)
+## 5. Segurança, RBAC & Tokens JWT Nativos (`src/middleware/authMiddleware.js`)
+
+A camada de segurança foi construída segundo o princípio de **Zero Dependências NPM**, tirando pleno proveito do módulo nativo `node:crypto`:
+
+### 5.1. Assinatura e Verificação de Tokens JWT
+* **Algoritmo**: `HS256` (HMAC com SHA-256).
+* **Estrutura**: `base64url(header) . base64url(payload) . signature`.
+* **Segurança**:
+  * Validação estrita de expiração (`exp`, configurada para 24 horas).
+  * Chave secreta configurável via variável de ambiente `JWT_SECRET` (com fallback seguro para ambiente de desenvolvimento local).
+  * Comparação criptográfica em tempo constante (`crypto.timingSafeEqual`) para proteção contra ataques de *timing*.
+
+### 5.2. Guardas de Rotas RBAC no Backend
+* Em [`server.js`](file:///Users/daviscorreia/Antigravity%20/RetailLaunchOS/server.js), o middleware `checkAuth(req, res, ...allowedRoles)` interceta cada rota de mutação (`POST`, `PUT`, `PATCH`, `DELETE`):
+  1. Extrai o token do cabeçalho HTTP: `Authorization: Bearer <token>`.
+  2. Se ausente ou inválido: responde de imediato com `HTTP 401 Unauthorized`.
+  3. Se a função do utilizador não constar de `allowedRoles`: responde com `HTTP 403 Forbidden` e mensagem semântica em JSON.
+  4. Se autorizado: injeta `req.user` e prossegue com a execução do controlador.
+
+### 5.3. Interceção Global no Front-End (`window.fetch`)
+* No cliente web (`dashboard.html`), o método global `window.fetch` é interceptado para injetar automaticamente o cabeçalho `Authorization: Bearer <token>` em todas as chamadas à API REST.
+* Caso uma chamada retorne `401 Unauthorized` ou `403 Forbidden`, o sistema exibe um *toast* informativo de bloqueio e, se necessário, comuta para o modo de segurança.
+
+---
+
+## 6. Servidor de Aplicação (`server.js`)
 
 * **Arquitetura Híbrida**: Concebido para arrancar tanto com o módulo nativo `http` do Node.js como com `Express` (caso venha a ser instalado).
 * **Gestão de CORS**: Headers preflight (`OPTIONS`) configurados para permitir integrações de frontend externas ou de outras ferramentas da Fnac/Darty.

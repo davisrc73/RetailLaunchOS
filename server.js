@@ -9,10 +9,11 @@ const path = require('path');
 const url = require('url');
 const config = require('./config/app');
 const projectController = require('./src/controllers/projectController');
-
 const taskController = require('./src/controllers/taskController');
 const costController = require('./src/controllers/costController');
 const signageController = require('./src/controllers/signageController');
+const authController = require('./src/controllers/authController');
+const authMiddleware = require('./src/middleware/authMiddleware');
 
 // Helper para responder JSON em servidor HTTP nativo
 function sendJson(res, statusCode, data) {
@@ -23,6 +24,30 @@ function sendJson(res, statusCode, data) {
     'Access-Control-Allow-Headers': 'Content-Type, Authorization'
   });
   res.end(JSON.stringify(data));
+}
+
+// Helper para validar autenticação e permissões de perfil (RBAC)
+function checkAuth(req, res, ...allowedRoles) {
+  const user = authMiddleware.extractUserFromRequest(req);
+  if (!user) {
+    sendJson(res, 401, {
+      success: false,
+      message: 'Autenticação necessária. Por favor inicie sessão ou envie o header Authorization: Bearer <token>.'
+    });
+    return null;
+  }
+
+  req.user = user;
+
+  if (allowedRoles.length > 0 && !allowedRoles.includes(user.role)) {
+    sendJson(res, 403, {
+      success: false,
+      message: `Acesso recusado: O seu perfil (${user.role}) não tem permissão para esta operação. Requer: [${allowedRoles.join(', ')}].`
+    });
+    return null;
+  }
+
+  return user;
 }
 
 // Servidor de Aplicação
@@ -42,6 +67,49 @@ const server = http.createServer(async (req, res) => {
     return;
   }
 
+  // Anexar utilizador autenticado opcionalmente a todas as requisições
+  req.user = authMiddleware.extractUserFromRequest(req);
+
+  // --- API ROUTES: /api/v1/auth ---
+  if (pathname.startsWith('/api/v1/auth')) {
+    // 1. POST /api/v1/auth/login
+    if ((pathname === '/api/v1/auth/login' || pathname === '/api/v1/auth/login/') && method === 'POST') {
+      let body = '';
+      req.on('data', chunk => { body += chunk.toString(); });
+      req.on('end', async () => {
+        try {
+          req.body = body ? JSON.parse(body) : {};
+          const mockRes = { status: (code) => ({ json: (data) => sendJson(res, code, data) }) };
+          await authController.login(req, mockRes);
+        } catch (err) {
+          sendJson(res, 400, { success: false, message: 'JSON Inválido: ' + err.message });
+        }
+      });
+      return;
+    }
+
+    // 2. GET /api/v1/auth/me
+    if ((pathname === '/api/v1/auth/me' || pathname === '/api/v1/auth/me/') && method === 'GET') {
+      const mockRes = { status: (code) => ({ json: (data) => sendJson(res, code, data) }) };
+      return authController.getCurrentUser(req, mockRes);
+    }
+  }
+
+  // --- API ROUTES: /api/v1/users & /api/v1/roles ---
+  if (pathname === '/api/v1/users' || pathname === '/api/v1/users/') {
+    if (method === 'GET') {
+      const mockRes = { status: (code) => ({ json: (data) => sendJson(res, code, data) }) };
+      return authController.getUsersList(req, mockRes);
+    }
+  }
+
+  if (pathname === '/api/v1/roles' || pathname === '/api/v1/roles/') {
+    if (method === 'GET') {
+      const mockRes = { status: (code) => ({ json: (data) => sendJson(res, code, data) }) };
+      return authController.getRolesList(req, mockRes);
+    }
+  }
+
   // --- API ROUTES: /api/v1/projects ---
   if (pathname.startsWith('/api/v1/projects')) {
     // 1. GET /api/v1/projects/kpis
@@ -57,8 +125,10 @@ const server = http.createServer(async (req, res) => {
       return projectController.getAll(req, mockRes);
     }
 
-    // 3. POST /api/v1/projects (criação de nova loja)
+    // 3. POST /api/v1/projects (criação de nova loja - restrito a Admin)
     if ((pathname === '/api/v1/projects' || pathname === '/api/v1/projects/') && method === 'POST') {
+      if (!checkAuth(req, res, 'admin')) return;
+
       let body = '';
       req.on('data', chunk => { body += chunk.toString(); });
       req.on('end', async () => {
@@ -83,6 +153,8 @@ const server = http.createServer(async (req, res) => {
 
     // 5. POST /api/v1/projects/:id/tasks (criar tarefa para projeto)
     if (tasksMatch && method === 'POST') {
+      if (!checkAuth(req, res, 'admin', 'multimedia_user', 'store_manager')) return;
+
       req.params = { projectId: tasksMatch[1] };
       let body = '';
       req.on('data', chunk => { body += chunk.toString(); });
@@ -108,6 +180,8 @@ const server = http.createServer(async (req, res) => {
 
     // 7. POST /api/v1/projects/:id/costs (lançar despesa ou diária)
     if (costsMatch && method === 'POST') {
+      if (!checkAuth(req, res, 'admin', 'multimedia_user')) return;
+
       req.params = { projectId: costsMatch[1] };
       let body = '';
       req.on('data', chunk => { body += chunk.toString(); });
@@ -133,6 +207,8 @@ const server = http.createServer(async (req, res) => {
 
     // 9. POST /api/v1/projects/:id/players (registar display/player para loja)
     if (playersMatch && method === 'POST') {
+      if (!checkAuth(req, res, 'admin', 'multimedia_user')) return;
+
       req.params = { projectId: playersMatch[1] };
       let body = '';
       req.on('data', chunk => { body += chunk.toString(); });
@@ -152,6 +228,8 @@ const server = http.createServer(async (req, res) => {
     // 10. PATCH ou PUT /api/v1/projects/:id/signage (atualizar signage e playlist)
     const signageMatch = pathname.match(/^\/api\/v1\/projects\/([^\/]+)\/signage$/);
     if (signageMatch && (method === 'PATCH' || method === 'PUT')) {
+      if (!checkAuth(req, res, 'admin', 'multimedia_user')) return;
+
       req.params = { id: signageMatch[1] };
       let body = '';
       req.on('data', chunk => { body += chunk.toString(); });
@@ -175,8 +253,10 @@ const server = http.createServer(async (req, res) => {
       return projectController.getById(req, mockRes);
     }
 
-    // 12. DELETE /api/v1/projects/:id
+    // 12. DELETE /api/v1/projects/:id (restrito exclusivamente a Admin)
     if (singleMatch && method === 'DELETE') {
+      if (!checkAuth(req, res, 'admin')) return;
+
       req.params = { id: singleMatch[1] };
       const mockRes = { status: (code) => ({ json: (data) => sendJson(res, code, data) }) };
       return projectController.delete(req, mockRes);
@@ -200,6 +280,8 @@ const server = http.createServer(async (req, res) => {
 
     // 3. POST /api/v1/signage/playlists
     if ((pathname === '/api/v1/signage/playlists' || pathname === '/api/v1/signage/playlists/') && method === 'POST') {
+      if (!checkAuth(req, res, 'admin', 'multimedia_user')) return;
+
       let body = '';
       req.on('data', chunk => { body += chunk.toString(); });
       req.on('end', async () => {
@@ -217,6 +299,8 @@ const server = http.createServer(async (req, res) => {
     // 4. PATCH /api/v1/signage/playlists/:id/status
     const playlistStatusMatch = pathname.match(/^\/api\/v1\/signage\/playlists\/([^\/]+)\/status$/);
     if (playlistStatusMatch && (method === 'PATCH' || method === 'POST')) {
+      if (!checkAuth(req, res, 'admin', 'multimedia_user')) return;
+
       req.params = { id: playlistStatusMatch[1] };
       let body = '';
       req.on('data', chunk => { body += chunk.toString(); });
@@ -240,8 +324,10 @@ const server = http.createServer(async (req, res) => {
       return signageController.getPlaylistById(req, mockRes);
     }
 
-    // 6. DELETE /api/v1/signage/playlists/:id
+    // 6. DELETE /api/v1/signage/playlists/:id (restrito a Admin)
     if (singlePlaylistMatch && method === 'DELETE') {
+      if (!checkAuth(req, res, 'admin')) return;
+
       req.params = { id: singlePlaylistMatch[1] };
       const mockRes = { status: (code) => ({ json: (data) => sendJson(res, code, data) }) };
       return signageController.deletePlaylist(req, mockRes);
@@ -256,6 +342,8 @@ const server = http.createServer(async (req, res) => {
 
     // 8. POST /api/v1/signage/players
     if ((pathname === '/api/v1/signage/players' || pathname === '/api/v1/signage/players/') && method === 'POST') {
+      if (!checkAuth(req, res, 'admin', 'multimedia_user')) return;
+
       let body = '';
       req.on('data', chunk => { body += chunk.toString(); });
       req.on('end', async () => {
@@ -273,6 +361,8 @@ const server = http.createServer(async (req, res) => {
     // 9. POST /api/v1/signage/players/:id/ping
     const playerPingMatch = pathname.match(/^\/api\/v1\/signage\/players\/([^\/]+)\/ping$/);
     if (playerPingMatch && method === 'POST') {
+      if (!checkAuth(req, res, 'admin', 'multimedia_user', 'store_manager')) return;
+
       req.params = { id: playerPingMatch[1] };
       const mockRes = { status: (code) => ({ json: (data) => sendJson(res, code, data) }) };
       return signageController.pingPlayer(req, mockRes);
@@ -281,6 +371,8 @@ const server = http.createServer(async (req, res) => {
     // 10. PATCH ou PUT /api/v1/signage/players/:id
     const singlePlayerMatch = pathname.match(/^\/api\/v1\/signage\/players\/([^\/]+)$/);
     if (singlePlayerMatch && (method === 'PATCH' || method === 'PUT')) {
+      if (!checkAuth(req, res, 'admin', 'multimedia_user')) return;
+
       req.params = { id: singlePlayerMatch[1] };
       let body = '';
       req.on('data', chunk => { body += chunk.toString(); });
@@ -298,6 +390,8 @@ const server = http.createServer(async (req, res) => {
 
     // 11. DELETE /api/v1/signage/players/:id
     if (singlePlayerMatch && method === 'DELETE') {
+      if (!checkAuth(req, res, 'admin', 'multimedia_user')) return;
+
       req.params = { id: singlePlayerMatch[1] };
       const mockRes = { status: (code) => ({ json: (data) => sendJson(res, code, data) }) };
       return signageController.deletePlayer(req, mockRes);
@@ -315,6 +409,8 @@ const server = http.createServer(async (req, res) => {
     // 2. DELETE /api/v1/costs/:id
     const singleCostMatch = pathname.match(/^\/api\/v1\/costs\/([^\/]+)$/);
     if (singleCostMatch && method === 'DELETE') {
+      if (!checkAuth(req, res, 'admin', 'multimedia_user')) return;
+
       req.params = { id: singleCostMatch[1] };
       const mockRes = { status: (code) => ({ json: (data) => sendJson(res, code, data) }) };
       return costController.delete(req, mockRes);
@@ -327,6 +423,8 @@ const server = http.createServer(async (req, res) => {
     // 1. PATCH /api/v1/tasks/:id/toggle
     const toggleMatch = pathname.match(/^\/api\/v1\/tasks\/([^\/]+)\/toggle$/);
     if (toggleMatch && (method === 'PATCH' || method === 'POST')) {
+      if (!checkAuth(req, res, 'admin', 'multimedia_user', 'store_manager')) return;
+
       req.params = { id: toggleMatch[1] };
       const mockRes = { status: (code) => ({ json: (data) => sendJson(res, code, data) }) };
       return taskController.toggle(req, mockRes);
@@ -335,6 +433,8 @@ const server = http.createServer(async (req, res) => {
     // 2. PUT ou PATCH /api/v1/tasks/:id
     const singleTaskMatch = pathname.match(/^\/api\/v1\/tasks\/([^\/]+)$/);
     if (singleTaskMatch && (method === 'PUT' || method === 'PATCH')) {
+      if (!checkAuth(req, res, 'admin', 'multimedia_user', 'store_manager')) return;
+
       req.params = { id: singleTaskMatch[1] };
       let body = '';
       req.on('data', chunk => { body += chunk.toString(); });
@@ -352,6 +452,8 @@ const server = http.createServer(async (req, res) => {
 
     // 3. DELETE /api/v1/tasks/:id
     if (singleTaskMatch && method === 'DELETE') {
+      if (!checkAuth(req, res, 'admin', 'multimedia_user')) return;
+
       req.params = { id: singleTaskMatch[1] };
       const mockRes = { status: (code) => ({ json: (data) => sendJson(res, code, data) }) };
       return taskController.delete(req, mockRes);

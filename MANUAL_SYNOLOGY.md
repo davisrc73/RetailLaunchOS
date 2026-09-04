@@ -45,6 +45,13 @@ docker compose up -d --build
 ```
 A aplicação ficará acessível na rede local através de: `http://<IP_DO_NAS>:3000`.
 
+### Passo D: Variáveis de Ambiente Opcionais (`docker-compose.yml`)
+Podes definir variáveis de ambiente personalizadas no ficheiro `docker-compose.yml` ou num ficheiro `.env` na raiz:
+* `PORT`: Porta HTTP do servidor (predefinição: `3000`).
+* `JWT_SECRET`: Chave secreta de assinatura criptográfica HMAC-SHA256 para os tokens de autenticação RBAC (predefinição: chave padrão de piloto).
+* `DATA_DIR`: Diretório de persistência da base de dados SQLite (predefinição: `/app/database`).
+* **Zero Dependências Adicionais**: O módulo de autenticação e criptografia utiliza exclusivamente o módulo nativo `node:crypto`, sem requerer instalação de pacotes adicionais no contentor Alpine.
+
 ---
 
 ## 3. Como Atualizar no NAS Sempre que Houver Novas Alterações
