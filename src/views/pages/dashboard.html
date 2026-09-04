@@ -718,12 +718,18 @@
     let allProjects = [];
     let currentFilter = 'all';
     let countdownInterval = null;
-    let currentProjectIdInModal = null;
 
     // Estado de Autenticação e RBAC (Fase 5)
     let currentToken = localStorage.getItem('retaillaunch_token') || null;
-    let currentUser = JSON.parse(localStorage.getItem('retaillaunch_user') || 'null');
-    let currentPermissions = JSON.parse(localStorage.getItem('retaillaunch_perms') || 'null');
+    let currentUser = null;
+    let currentPermissions = null;
+    try {
+      currentUser = JSON.parse(localStorage.getItem('retaillaunch_user') || 'null');
+      currentPermissions = JSON.parse(localStorage.getItem('retaillaunch_perms') || 'null');
+    } catch (err) {
+      currentUser = null;
+      currentPermissions = null;
+    }
 
     // Intercetor global para anexar Authorization: Bearer <token> e gerir 401/403
     const _originalFetch = window.fetch;
@@ -866,8 +872,8 @@
       const role = currentUser.role || 'admin';
 
       // 1. Botão "+ Nova Abertura" (apenas Admin)
-      const btnNewProject = document.getElementById('btnNovaAberturaHeader') || document.querySelector('.btn-primary');
-      if (btnNewProject && btnNewProject.innerText.includes('Nova Abertura')) {
+      const btnNewProject = document.getElementById('btnNovaAbertura');
+      if (btnNewProject) {
         if (role === 'admin') {
           btnNewProject.classList.remove('perm-hidden');
         } else {
@@ -2520,11 +2526,39 @@
     if (btnCloseHubSignage) btnCloseHubSignage.addEventListener('click', () => modalHubSignage.classList.remove('active'));
     if (btnFecharHubSignage) btnFecharHubSignage.addEventListener('click', () => modalHubSignage.classList.remove('active'));
 
-    // Navegação Sidebar: Abrir Hub de Digital Signage & Playlists
+    // Navegação Sidebar: Links e Módulos
     const navSignage = document.getElementById('nav-signage');
     const navPlaylists = document.getElementById('nav-playlists');
+    const navDashboard = document.getElementById('nav-dashboard');
+    const navProjetos = document.getElementById('nav-projetos');
+    const navCustos = document.getElementById('nav-custos');
+
     if (navSignage) navSignage.addEventListener('click', (e) => { e.preventDefault(); openSignageHub('hubPlayers'); });
     if (navPlaylists) navPlaylists.addEventListener('click', (e) => { e.preventDefault(); openSignageHub('hubPlaylists'); });
+    if (navDashboard) navDashboard.addEventListener('click', (e) => { e.preventDefault(); window.scrollTo({ top: 0, behavior: 'smooth' }); });
+    if (navProjetos) navProjetos.addEventListener('click', (e) => {
+      e.preventDefault();
+      const el = document.getElementById('aberturas-section');
+      if (el) el.scrollIntoView({ behavior: 'smooth' });
+    });
+    if (navCustos) navCustos.addEventListener('click', (e) => {
+      e.preventDefault();
+      if (allProjects && allProjects.length > 0) {
+        currentActiveTab = 'tabCosts';
+        openProjectDetails(allProjects[0].id);
+      } else {
+        const el = document.getElementById('aberturas-section');
+        if (el) el.scrollIntoView({ behavior: 'smooth' });
+      }
+    });
+
+    const userWidget = document.getElementById('sidebarUserWidget');
+    if (userWidget) {
+      userWidget.addEventListener('click', (e) => {
+        if (e.target.closest('#btnLogout')) return;
+        openAuthModal();
+      });
+    }
 
 
 
