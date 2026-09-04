@@ -2294,3 +2294,268 @@ body {
   gap: 8px;
   margin-bottom: 12px;
 }
+
+/* ==============================================================================
+   MÓDULO DE GESTÃO DE UTILIZADORES (Fase 7)
+   ============================================================================== */
+
+/* Toolbar de ações do modal de utilizadores */
+.users-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 18px;
+  flex-wrap: wrap;
+}
+
+.users-search-input {
+  flex: 1;
+  min-width: 200px;
+  max-width: 340px;
+  padding: 9px 14px 9px 38px;
+  background: var(--bg-input);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  color: var(--text-main);
+  font-size: 13px;
+  font-family: inherit;
+  transition: var(--transition);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' fill='none' stroke='%2394A3B8' viewBox='0 0 24 24'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M21 21l-4.35-4.35M17 11A6 6 0 115 11a6 6 0 0112 0z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: 12px center;
+}
+
+.users-search-input:focus {
+  outline: none;
+  border-color: var(--fnac-gold);
+  box-shadow: 0 0 0 3px var(--fnac-gold-glow);
+}
+
+/* Tabela de Utilizadores */
+.users-mgmt-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.users-mgmt-table th {
+  padding: 10px 14px;
+  text-align: left;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+  border-bottom: 1px solid var(--border-color);
+  background: transparent;
+  white-space: nowrap;
+}
+
+.users-mgmt-table td {
+  padding: 13px 14px;
+  vertical-align: middle;
+  border-bottom: 1px solid var(--border-color);
+  color: var(--text-main);
+}
+
+.users-mgmt-table tr:last-child td {
+  border-bottom: none;
+}
+
+.users-mgmt-table tr:hover td {
+  background: var(--bg-hover-row);
+}
+
+/* Célula de avatar + nome + email */
+.user-cell-identity {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 200px;
+}
+
+.user-cell-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: 800;
+  flex-shrink: 0;
+  letter-spacing: -0.5px;
+}
+
+.user-cell-avatar.admin        { background: rgba(245, 176, 39, 0.18); color: var(--fnac-gold); border: 1px solid rgba(245, 176, 39, 0.35); }
+.user-cell-avatar.multimedia_user { background: rgba(145, 71, 255, 0.18); color: var(--sec-purple); border: 1px solid rgba(145, 71, 255, 0.35); }
+.user-cell-avatar.store_manager { background: rgba(0, 110, 250, 0.18); color: var(--sec-blue); border: 1px solid rgba(0, 110, 250, 0.35); }
+.user-cell-avatar.viewer       { background: rgba(40, 228, 171, 0.14); color: var(--sec-teal); border: 1px solid rgba(40, 228, 171, 0.3); }
+
+.user-cell-name {
+  font-weight: 600;
+  color: var(--text-white);
+  font-size: 13px;
+  line-height: 1.3;
+}
+
+.user-cell-email {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-top: 1px;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+/* Badges de estado de utilizador */
+.status-badge-active {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 700;
+  background: var(--status-success-bg);
+  color: var(--sec-green);
+  border: 1px solid rgba(57, 214, 106, 0.3);
+}
+
+.status-badge-inactive {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 700;
+  background: rgba(100, 116, 139, 0.14);
+  color: #94A3B8;
+  border: 1px solid rgba(100, 116, 139, 0.3);
+}
+
+/* Botões de ação inline na tabela */
+.user-action-btns {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.btn-user-action {
+  padding: 5px 10px;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  white-space: nowrap;
+}
+
+.btn-user-action:hover {
+  border-color: var(--fnac-gold);
+  color: var(--fnac-gold);
+  background: var(--fnac-gold-glow);
+}
+
+.btn-user-action.deactivate:hover {
+  border-color: var(--darty-red);
+  color: var(--darty-red);
+  background: var(--darty-red-glow);
+}
+
+.btn-user-action.reactivate:hover {
+  border-color: var(--sec-green);
+  color: var(--sec-green);
+  background: rgba(57, 214, 106, 0.12);
+}
+
+/* Formulário de criação / edição de utilizador */
+.user-form-panel {
+  background: var(--bg-modal-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: 20px 22px;
+  margin-bottom: 20px;
+  animation: slideDown 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.user-form-panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.user-form-panel-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-white);
+}
+
+.user-form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px 20px;
+}
+
+@media (max-width: 600px) {
+  .user-form-grid { grid-template-columns: 1fr; }
+  .users-toolbar { flex-direction: column; align-items: stretch; }
+  .users-search-input { max-width: 100%; }
+}
+
+/* Adaptações Modo Claro para componentes de utilizadores */
+[data-theme="light"] .users-mgmt-table th {
+  background: #F8FAFC;
+}
+
+[data-theme="light"] .users-search-input {
+  background: #FFFFFF;
+}
+
+[data-theme="light"] .user-form-panel {
+  background: #F8FAFC;
+}
+
+[data-theme="light"] .user-cell-name {
+  color: var(--text-main);
+}
+
+/* Linha do utilizador inativo na tabela */
+.users-mgmt-table tr.user-row-inactive td {
+  opacity: 0.55;
+}
+
+.users-mgmt-table tr.user-row-inactive td .user-cell-name {
+  text-decoration: line-through;
+  text-decoration-color: #94A3B8;
+}
+
+/* Empty state da tabela */
+.users-empty-state {
+  text-align: center;
+  padding: 40px 20px;
+  color: var(--text-muted);
+  font-size: 13px;
+}
+
+.users-empty-state .empty-icon {
+  font-size: 32px;
+  margin-bottom: 10px;
+  opacity: 0.5;
+}
+
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+

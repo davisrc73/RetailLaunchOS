@@ -123,7 +123,22 @@
             <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z"></path>
             </svg>
-            <span>Utilizadores Gabinete</span>
+            <span>Utilizadores</span>
+          </a>
+        </li>
+      </ul>
+    </div>
+
+    <!-- Configurações do Sistema -->
+    <div class="nav-section">
+      <div class="nav-section-title">Configurações</div>
+      <ul class="sidebar-nav">
+        <li>
+          <a href="#" class="nav-link" id="nav-config-players">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M9 17.25v1.007a3 3 0 01-.879 2.122L7.5 21h9l-.621-.621A3 3 0 0115 18.257V17.25m6-12V15a2.25 2.25 0 01-2.25 2.25H5.25A2.25 2.25 0 013 15V5.25m18 0A2.25 2.25 0 0018.75 3H5.25A2.25 2.25 0 003 5.25m18 0H3"></path>
+            </svg>
+            <span>Telas &amp; Players</span>
           </a>
         </li>
       </ul>
@@ -637,6 +652,111 @@
   </div>
 
   <!-- =========================================================================
+       MODAL: GESTÃO DE UTILIZADORES (FASE 7)
+       ========================================================================= -->
+  <div class="modal-backdrop" id="modalUsersManagement">
+    <div class="modal-card" style="max-width: 860px; width: 95%;">
+      <div class="modal-header">
+        <div class="modal-title">
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="color: var(--fnac-gold);">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 18.72a9.094 9.094 0 003.741-.479 3 3 0 00-4.682-2.72m.94 3.198l.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0112 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 016 18.719m12 0a5.971 5.971 0 00-.941-3.197m0 0A5.995 5.995 0 0012 12.75a5.995 5.995 0 00-5.058 2.772m0 0a3 3 0 00-4.681 2.72 8.986 8.986 0 003.74.477m.94-3.197a5.971 5.971 0 00-.94 3.197M15 6.75a3 3 0 11-6 0 3 3 0 016 0zm6 3a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0zm-13.5 0a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0z"></path>
+            </svg>
+            <span>Utilizadores • Gestão de Equipa</span>
+          </div>
+        </div>
+        <button class="modal-close-btn" id="btnCloseUsersModal" aria-label="Fechar">
+          <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+          </svg>
+        </button>
+      </div>
+
+      <div class="modal-body" style="padding: 20px 24px;">
+        <!-- Formulário de criação/edição (oculto por defeito) -->
+        <div id="userFormPanel" class="user-form-panel" style="display: none;">
+          <div class="user-form-panel-header">
+            <div class="user-form-panel-title" id="userFormPanelTitle">➕ Novo Utilizador</div>
+            <button type="button" class="btn-secondary" onclick="cancelUserForm()" style="font-size: 12px; padding: 5px 12px;">✕ Cancelar</button>
+          </div>
+          <form id="formUserCrud" onsubmit="saveUserForm(event)">
+            <input type="hidden" id="editUserId" value="">
+            <div class="user-form-grid">
+              <div class="form-group">
+                <label class="form-label" for="userFormName">Nome Completo *</label>
+                <input type="text" id="userFormName" class="form-input" placeholder="ex: Ana Costa" required>
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="userFormEmail">Email Corporativo *</label>
+                <input type="email" id="userFormEmail" class="form-input" placeholder="ex: ana.costa@fnacdarty.pt" required>
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="userFormPassword">Password <span style="color: var(--text-muted); font-weight: 400;">(deixar vazio para manter)</span></label>
+                <input type="password" id="userFormPassword" class="form-input" placeholder="Mínimo 6 caracteres" autocomplete="new-password">
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="userFormDept">Departamento</label>
+                <input type="text" id="userFormDept" class="form-input" placeholder="ex: Gabinete Multimédia" value="Gabinete Multimédia">
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="userFormRole">Perfil de Acesso *</label>
+                <select id="userFormRole" class="form-input" required>
+                  <option value="">— Selecionar Perfil —</option>
+                  <option value="1">🛡️ Administrador</option>
+                  <option value="2">🎬 Técnico Multimédia</option>
+                  <option value="3">🏪 Gestor de Loja</option>
+                  <option value="4">👁️ Direção / Auditor</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="userFormStatus">Estado</label>
+                <select id="userFormStatus" class="form-input">
+                  <option value="active">✅ Ativo</option>
+                  <option value="inactive">🔒 Inativo</option>
+                </select>
+              </div>
+            </div>
+            <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 16px;">
+              <button type="button" class="btn-secondary" onclick="cancelUserForm()">Cancelar</button>
+              <button type="submit" class="btn-primary" id="btnSaveUser">💾 Guardar Utilizador</button>
+            </div>
+          </form>
+        </div>
+
+        <!-- Toolbar: pesquisa + botão novo -->
+        <div class="users-toolbar">
+          <div style="font-size: 13px; color: var(--text-muted);" id="usersCountLabel">A carregar...</div>
+          <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+            <input type="search" id="usersSearchInput" class="users-search-input" placeholder="Pesquisar por nome ou email..." oninput="filterUsersTable(this.value)">
+            <button type="button" class="btn-primary perm-hidden" id="btnNewUser" onclick="openCreateUserForm()" style="font-size: 13px; padding: 8px 16px; white-space: nowrap;">
+              ＋ Novo Utilizador
+            </button>
+          </div>
+        </div>
+
+        <!-- Tabela de Utilizadores -->
+        <div style="overflow-x: auto; border-radius: var(--radius-md); border: 1px solid var(--border-color);">
+          <table class="users-mgmt-table">
+            <thead>
+              <tr>
+                <th>Utilizador</th>
+                <th>Departamento</th>
+                <th>Perfil</th>
+                <th>Estado</th>
+                <th>Criado em</th>
+                <th style="text-align: right;">Ações</th>
+              </tr>
+            </thead>
+            <tbody id="usersTableBody">
+              <tr><td colspan="6" class="users-empty-state"><div class="empty-icon">⏳</div>A carregar utilizadores...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================================================
        MODAL: AUTENTICAÇÃO, ACESSOS & TROCA DE PERFIL (RBAC FASE 5)
        ========================================================================= -->
   <div class="modal-backdrop" id="modalAuthLogin">
@@ -800,6 +920,268 @@
       return response;
     };
 
+    // ==============================================================================
+    // MÓDULO DE GESTÃO DE UTILIZADORES (FASE 7)
+    // ==============================================================================
+    let _allUsersData = [];
+
+    async function openUsersManagement() {
+      const modal = document.getElementById('modalUsersManagement');
+      if (!modal) return;
+      modal.classList.add('active');
+
+      // Ocultar formulário ao abrir
+      cancelUserForm();
+
+      // Visibilidade do botão "Novo Utilizador" conforme permissões
+      const btnNew = document.getElementById('btnNewUser');
+      if (btnNew) {
+        if (currentPermissions?.canManageUsers) {
+          btnNew.classList.remove('perm-hidden');
+        } else {
+          btnNew.classList.add('perm-hidden');
+        }
+      }
+
+      // Pesquisa limpa
+      const searchInput = document.getElementById('usersSearchInput');
+      if (searchInput) searchInput.value = '';
+
+      // Carregar utilizadores
+      await loadUsersTable();
+    }
+
+    function closeUsersManagement() {
+      const modal = document.getElementById('modalUsersManagement');
+      if (modal) modal.classList.remove('active');
+      cancelUserForm();
+    }
+
+    async function loadUsersTable() {
+      const tbody = document.getElementById('usersTableBody');
+      const countLabel = document.getElementById('usersCountLabel');
+      if (!tbody) return;
+
+      tbody.innerHTML = `<tr><td colspan="6" class="users-empty-state"><div class="empty-icon">⏳</div>A carregar utilizadores...</td></tr>`;
+
+      try {
+        const res = await fetch('/api/v1/users');
+        const json = await res.json();
+        if (!json.success) throw new Error(json.message);
+
+        _allUsersData = json.data || [];
+        renderUsersTable(_allUsersData);
+        if (countLabel) countLabel.textContent = `${_allUsersData.length} utilizador${_allUsersData.length !== 1 ? 'es' : ''} registado${_allUsersData.length !== 1 ? 's' : ''}`;
+      } catch (err) {
+        tbody.innerHTML = `<tr><td colspan="6" class="users-empty-state"><div class="empty-icon">❌</div>Erro ao carregar utilizadores: ${err.message}</td></tr>`;
+      }
+    }
+
+    function renderUsersTable(users) {
+      const tbody = document.getElementById('usersTableBody');
+      if (!tbody) return;
+
+      if (!users || users.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="6" class="users-empty-state"><div class="empty-icon">👥</div>Nenhum utilizador encontrado.</td></tr>`;
+        return;
+      }
+
+      const canManage = currentPermissions?.canManageUsers;
+
+      const roleLabels = {
+        admin: { icon: '🛡️', label: 'Administrador', cls: 'admin' },
+        multimedia_user: { icon: '🎬', label: 'Técnico Multimédia', cls: 'multimedia_user' },
+        store_manager: { icon: '🏪', label: 'Gestor de Loja', cls: 'store_manager' },
+        viewer: { icon: '👁️', label: 'Auditor / Direção', cls: 'viewer' }
+      };
+
+      tbody.innerHTML = users.map(u => {
+        const isActive = u.status === 'active';
+        const initials = u.name.split(' ').slice(0, 2).map(w => w[0]).join('').toUpperCase();
+        const rInfo = roleLabels[u.role] || { icon: '👤', label: u.role, cls: '' };
+        const createdDate = u.created_at ? new Date(u.created_at).toLocaleDateString('pt-PT') : '—';
+
+        const statusBadge = isActive
+          ? `<span class="status-badge-active">● Ativo</span>`
+          : `<span class="status-badge-inactive">● Inativo</span>`;
+
+        const actionBtns = canManage
+          ? `<div class="user-action-btns">
+               <button type="button" class="btn-user-action" onclick="openEditUserForm(${u.id})" title="Editar utilizador">
+                 ✏️ Editar
+               </button>
+               ${isActive
+                 ? `<button type="button" class="btn-user-action deactivate" onclick="deactivateUserAction(${u.id}, '${u.name.replace(/'/g, "\\'")}')" title="Desativar utilizador">
+                      🔒 Desativar
+                    </button>`
+                 : `<button type="button" class="btn-user-action reactivate" onclick="reactivateUserAction(${u.id}, '${u.name.replace(/'/g, "\\'")}')" title="Reativar utilizador">
+                      🔓 Reativar
+                    </button>`}
+             </div>`
+          : '<span style="color: var(--text-muted); font-size: 12px;">—</span>';
+
+        return `<tr class="${isActive ? '' : 'user-row-inactive'}">
+          <td>
+            <div class="user-cell-identity">
+              <div class="user-cell-avatar ${rInfo.cls}">${initials}</div>
+              <div>
+                <div class="user-cell-name">${u.name}</div>
+                <div class="user-cell-email">${u.email}</div>
+              </div>
+            </div>
+          </td>
+          <td style="color: var(--text-muted); font-size: 12px;">${u.department || '—'}</td>
+          <td><span class="role-badge ${rInfo.cls}">${rInfo.icon} ${rInfo.label}</span></td>
+          <td>${statusBadge}</td>
+          <td style="color: var(--text-muted); font-size: 12px;">${createdDate}</td>
+          <td>${actionBtns}</td>
+        </tr>`;
+      }).join('');
+    }
+
+    function filterUsersTable(query) {
+      const q = (query || '').toLowerCase().trim();
+      if (!q) {
+        renderUsersTable(_allUsersData);
+        return;
+      }
+      const filtered = _allUsersData.filter(u =>
+        u.name.toLowerCase().includes(q) || u.email.toLowerCase().includes(q)
+      );
+      renderUsersTable(filtered);
+      const countLabel = document.getElementById('usersCountLabel');
+      if (countLabel) countLabel.textContent = `${filtered.length} de ${_allUsersData.length} utilizadores`;
+    }
+
+    function openCreateUserForm() {
+      const panel = document.getElementById('userFormPanel');
+      const title = document.getElementById('userFormPanelTitle');
+      const editId = document.getElementById('editUserId');
+      if (!panel) return;
+
+      document.getElementById('formUserCrud').reset();
+      document.getElementById('userFormDept').value = 'Gabinete Multimédia';
+      if (editId) editId.value = '';
+      if (title) title.textContent = '➕ Novo Utilizador';
+      panel.style.display = '';
+      panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+
+    function openEditUserForm(userId) {
+      const user = _allUsersData.find(u => u.id === userId);
+      if (!user) return showToast('Utilizador não encontrado na lista.', 'error');
+
+      const panel = document.getElementById('userFormPanel');
+      const title = document.getElementById('userFormPanelTitle');
+      if (!panel) return;
+
+      document.getElementById('editUserId').value = user.id;
+      document.getElementById('userFormName').value = user.name;
+      document.getElementById('userFormEmail').value = user.email;
+      document.getElementById('userFormPassword').value = '';
+      document.getElementById('userFormDept').value = user.department || 'Gabinete Multimédia';
+      document.getElementById('userFormStatus').value = user.status;
+
+      // Mapear role_name para role_id
+      const roleMap = { admin: '1', multimedia_user: '2', store_manager: '3', viewer: '4' };
+      document.getElementById('userFormRole').value = roleMap[user.role] || '';
+
+      if (title) title.textContent = `✏️ Editar Utilizador: ${user.name}`;
+      panel.style.display = '';
+      panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+
+    function cancelUserForm() {
+      const panel = document.getElementById('userFormPanel');
+      if (panel) panel.style.display = 'none';
+      const form = document.getElementById('formUserCrud');
+      if (form) form.reset();
+      const editId = document.getElementById('editUserId');
+      if (editId) editId.value = '';
+    }
+
+    async function saveUserForm(e) {
+      e.preventDefault();
+      const editId = document.getElementById('editUserId')?.value;
+      const isEdit = !!editId;
+
+      const payload = {
+        name: document.getElementById('userFormName')?.value?.trim(),
+        email: document.getElementById('userFormEmail')?.value?.trim(),
+        role_id: parseInt(document.getElementById('userFormRole')?.value, 10),
+        department: document.getElementById('userFormDept')?.value?.trim(),
+        status: document.getElementById('userFormStatus')?.value
+      };
+
+      const pwd = document.getElementById('userFormPassword')?.value?.trim();
+      if (pwd) payload.password = pwd;
+
+      const btn = document.getElementById('btnSaveUser');
+      if (btn) { btn.disabled = true; btn.textContent = 'A guardar...'; }
+
+      try {
+        const url = isEdit ? `/api/v1/users/${editId}` : '/api/v1/users';
+        const method = isEdit ? 'PATCH' : 'POST';
+        const res = await fetch(url, {
+          method,
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        const json = await res.json();
+
+        if (json.success) {
+          showToast(json.message, 'success');
+          cancelUserForm();
+          await loadUsersTable();
+        } else {
+          showToast(json.message || 'Erro ao guardar utilizador.', 'error');
+        }
+      } catch (err) {
+        showToast('Erro de ligação: ' + err.message, 'error');
+      } finally {
+        if (btn) { btn.disabled = false; btn.textContent = '💾 Guardar Utilizador'; }
+      }
+    }
+
+    async function deactivateUserAction(userId, userName) {
+      if (!confirm(`Desativar o utilizador "${userName}"?\n\nO acesso ao sistema será revogado mas os dados históricos serão preservados.`)) return;
+      try {
+        const res = await fetch(`/api/v1/users/${userId}`, { method: 'DELETE' });
+        const json = await res.json();
+        if (json.success) {
+          showToast(json.message, 'success');
+          await loadUsersTable();
+        } else {
+          showToast(json.message || 'Erro ao desativar utilizador.', 'error');
+        }
+      } catch (err) {
+        showToast('Erro de ligação: ' + err.message, 'error');
+      }
+    }
+
+    async function reactivateUserAction(userId, userName) {
+      if (!confirm(`Reativar o utilizador "${userName}"?\n\nO acesso ao sistema será restaurado.`)) return;
+      try {
+        const res = await fetch(`/api/v1/users/${userId}`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ status: 'active' })
+        });
+        const json = await res.json();
+        if (json.success) {
+          showToast(json.message, 'success');
+          await loadUsersTable();
+        } else {
+          showToast(json.message || 'Erro ao reativar utilizador.', 'error');
+        }
+      } catch (err) {
+        showToast('Erro de ligação: ' + err.message, 'error');
+      }
+    }
+
+    // ==============================================================================
+    // FUNÇÕES DE GESTÃO DE AUTENTICAÇÃO & RBAC
+    // ==============================================================================
     // Funções de Gestão de Autenticação & RBAC
     function openAuthModal() {
       const modal = document.getElementById('modalAuthLogin');
@@ -2724,10 +3106,22 @@
     if (btnCancelAuth) btnCancelAuth.addEventListener('click', closeAuthModal);
     if (btnLogoutEl) btnLogoutEl.addEventListener('click', logoutUser);
     if (navRoles) navRoles.addEventListener('click', (e) => { e.preventDefault(); openAuthModal(); });
-    if (navUsers) navUsers.addEventListener('click', (e) => { e.preventDefault(); openAuthModal(); });
+    if (navUsers) navUsers.addEventListener('click', (e) => { e.preventDefault(); openUsersManagement(); });
+    const navConfigPlayers = document.getElementById('nav-config-players');
+    if (navConfigPlayers) navConfigPlayers.addEventListener('click', (e) => { e.preventDefault(); openSignageHub('hubPlayers'); });
     if (modalAuth) {
       modalAuth.addEventListener('click', (e) => {
         if (e.target === modalAuth) closeAuthModal();
+      });
+    }
+
+    // Modal Gestão de Utilizadores — fechar
+    const btnCloseUsersModal = document.getElementById('btnCloseUsersModal');
+    const modalUsersEl = document.getElementById('modalUsersManagement');
+    if (btnCloseUsersModal) btnCloseUsersModal.addEventListener('click', closeUsersManagement);
+    if (modalUsersEl) {
+      modalUsersEl.addEventListener('click', (e) => {
+        if (e.target === modalUsersEl) closeUsersManagement();
       });
     }
 
@@ -2735,6 +3129,7 @@
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Escape') {
         closeAuthModal();
+        closeUsersManagement();
         if (modalDetalhe) modalDetalhe.classList.remove('active');
         if (modalHubSignage) modalHubSignage.classList.remove('active');
         const modalNova = document.getElementById('modalNovaAbertura');

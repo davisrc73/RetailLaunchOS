@@ -351,4 +351,55 @@ Por cima da tabela, clica nos botões:
 6. **Sessões e Auditoria**: Em postos partilhados na loja ou no auditório, terminar sempre a sessão ou mudar para o perfil `viewer` para prevenir edições acidentais no planeamento técnico.
 7. **Modo de Ecrã**: Recomenda-se o uso do modo **Dia** em auditorias durante o horário de abertura de loja e o modo **Noite** durante as montagens noturnas para reduzir a luminosidade excessiva.
 
+---
+
+## 10. Módulo de Gestão de Utilizadores (Fase 7)
+
+**Acesso**: Barra lateral esquerda → secção **"Controlo de Acessos"** → **"Utilizadores"**
+
+> ⚠️ **Permissão Necessária**: As operações de criação, edição e desativação de utilizadores estão restritas ao perfil **Administrador**. Os restantes perfis apenas visualizam a lista de utilizadores.
+
+### 10.1. Abrir o Módulo de Utilizadores
+1. Clica no item **"Utilizadores"** na barra lateral (secção *Controlo de Acessos*).
+2. O modal de gestão abre com a lista completa de todos os utilizadores registados.
+
+### 10.2. Pesquisar Utilizadores
+* Usa o campo de pesquisa **"Pesquisar por nome ou email..."** para filtrar a tabela em tempo real.
+* A contagem no topo atualiza automaticamente com o número de resultados.
+
+### 10.3. Criar um Novo Utilizador (apenas Admin)
+1. Clica no botão **"＋ Novo Utilizador"** (visível apenas para o perfil *Administrador*).
+2. Preenche o formulário que surge no topo do modal:
+
+| Campo | Obrigatório | Descrição |
+| :--- | :---: | :--- |
+| **Nome Completo** | ✅ | Nome de exibição do operador |
+| **Email Corporativo** | ✅ | Email único (ex: `nome@fnacdarty.pt`) |
+| **Password** | ✅ | Mínimo 6 caracteres. Padrão piloto: `fnac2026` |
+| **Departamento** | — | Por defeito: `Gabinete Multimédia` |
+| **Perfil de Acesso** | ✅ | Um dos 4 perfis RBAC disponíveis |
+| **Estado** | — | Ativo (por defeito) ou Inativo |
+
+3. Clica em **"💾 Guardar Utilizador"** para registar na base de dados.
+4. O sistema exibe um *toast* de confirmação e atualiza a tabela.
+
+### 10.4. Editar um Utilizador (apenas Admin)
+1. Na linha do utilizador pretendido, clica em **"✏️ Editar"**.
+2. O formulário de edição pré-preenche todos os campos existentes.
+3. Modifica os campos necessários (a password pode ser deixada em branco para não alterar).
+4. Clica em **"💾 Guardar Utilizador"** para aplicar as alterações.
+
+### 10.5. Desativar um Utilizador (apenas Admin)
+1. Na linha do utilizador ativo, clica em **"🔒 Desativar"**.
+2. Um diálogo de confirmação é apresentado antes de prosseguir.
+3. Após confirmação, o utilizador fica com estado `Inativo` e não poderá fazer login.
+4. Os dados históricos (projetos, tarefas, custos) são **preservados integralmente**.
+
+### 10.6. Reativar um Utilizador (apenas Admin)
+1. Na linha do utilizador inativo (apresentada com opacidade reduzida), clica em **"🔓 Reativar"**.
+2. Após confirmação, o acesso ao sistema é restaurado.
+
+### 10.7. Secção "Configurações" na Barra Lateral
+Uma nova secção **"Configurações"** foi adicionada na parte inferior da barra lateral, com acesso direto a:
+* **"Telas & Players"**: Abre o hub de Digital Signage diretamente na aba de gestão de ecrãs e players, para configuração do parque de displays das lojas.
 

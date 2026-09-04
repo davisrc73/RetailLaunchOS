@@ -16,6 +16,7 @@ Este diretório armazena todos os registos históricos de planeamento técnico (
 | **4** | **Digital Signage & Versionamento de Playlists** | [FASE_4_PLANO.md](file:///Users/daviscorreia/Antigravity%20/RetailLaunchOS/docs/implementation_plans/FASE_4_PLANO.md) | [FASE_4_WALKTHROUGH.md](file:///Users/daviscorreia/Antigravity%20/RetailLaunchOS/docs/walkthroughs/FASE_4_WALKTHROUGH.md) | ✅ Concluído |
 | **5** | **Controlo de Permissões (RBAC) & Autenticação** | [FASE_5_PLANO.md](file:///Users/daviscorreia/Antigravity%20/RetailLaunchOS/docs/implementation_plans/FASE_5_PLANO.md) | [FASE_5_WALKTHROUGH.md](file:///Users/daviscorreia/Antigravity%20/RetailLaunchOS/docs/walkthroughs/FASE_5_WALKTHROUGH.md) | ✅ Concluído |
 | **6** | **Redesign Visual, Motor Multi-Tema & Paleta Oficial Fnac / Darty** | [FASE_6_PLANO.md](file:///Users/daviscorreia/Antigravity%20/RetailLaunchOS/docs/implementation_plans/FASE_6_PLANO.md) | [FASE_6_WALKTHROUGH.md](file:///Users/daviscorreia/Antigravity%20/RetailLaunchOS/docs/walkthroughs/FASE_6_WALKTHROUGH.md) | ✅ Concluído |
+| **7** | **Módulo de Gestão de Utilizadores & Secção "Configurações" na Sidebar** | [FASE_7_PLANO.md](file:///Users/daviscorreia/Antigravity%20/RetailLaunchOS/docs/implementation_plans/FASE_7_PLANO.md) | [FASE_7_WALKTHROUGH.md](file:///Users/daviscorreia/Antigravity%20/RetailLaunchOS/docs/walkthroughs/FASE_7_WALKTHROUGH.md) | ✅ Concluído |
 
 ---
 

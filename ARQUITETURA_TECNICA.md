@@ -320,13 +320,17 @@ A API segue os padrões RESTful com payloads JSON e códigos de resposta HTTP se
 | **POST** | `/api/v1/signage/players/:id/ping` | `:id` (Player ID) | `admin`, `multimedia_user`, `store_manager` | Executa teste de conectividade (ping) |
 | **DELETE**| `/api/v1/signage/players/:id` | `:id` (Player ID) | `admin`, `multimedia_user` | Remove uma tela/player do parque |
 
-### 4.5. Endpoints de Autenticação e Perfis (`/api/v1/auth`, `/api/v1/users`, `/api/v1/roles`) (Fase 5)
+### 4.5. Endpoints de Autenticação e Perfis (`/api/v1/auth`, `/api/v1/users`, `/api/v1/roles`) (Fases 5 & 7)
 | Método | Endpoint | Parâmetros | Permissões | Descrição |
 | :--- | :--- | :--- | :---: | :--- |
 | **POST** | `/api/v1/auth/login` | `{ role }` ou `{ email, password }` | Público | Autentica operador e emite token JWT assinado |
 | **GET** | `/api/v1/auth/me` | Bearer Token no cabeçalho | Autenticado | Retorna os dados do utilizador e matriz de permissões |
-| **GET** | `/api/v1/users` | Bearer Token no cabeçalho | Autenticado | Lista todos os utilizadores semente com os seus cargos |
+| **GET** | `/api/v1/users` | Bearer Token no cabeçalho | Autenticado | Lista todos os utilizadores com os seus cargos e estado |
+| **POST** | `/api/v1/users` | Body JSON: `{ name, email, role_id, password?, department?, status? }` | `admin` | Cria um novo utilizador no sistema |
+| **PATCH** | `/api/v1/users/:id` | `:id` (User ID) + Body JSON com campos a atualizar | `admin` | Atualiza dados de um utilizador (nome, email, perfil, departamento, password, estado) |
+| **DELETE** | `/api/v1/users/:id` | `:id` (User ID) | `admin` | Desativa um utilizador (*soft delete* — status `inactive`, dados históricos preservados) |
 | **GET** | `/api/v1/roles` | Bearer Token no cabeçalho | Autenticado | Retorna a matriz de permissões dos 4 perfis do sistema |
+
 
 ---
 

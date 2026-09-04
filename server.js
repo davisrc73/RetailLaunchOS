@@ -101,6 +101,48 @@ const server = http.createServer(async (req, res) => {
       const mockRes = { status: (code) => ({ json: (data) => sendJson(res, code, data) }) };
       return authController.getUsersList(req, mockRes);
     }
+    if (method === 'POST') {
+      if (!checkAuth(req, res, 'admin')) return;
+      let body = '';
+      req.on('data', chunk => { body += chunk.toString(); });
+      req.on('end', async () => {
+        try {
+          req.body = body ? JSON.parse(body) : {};
+          const mockRes = { status: (code) => ({ json: (data) => sendJson(res, code, data) }) };
+          await authController.createUser(req, mockRes);
+        } catch (err) {
+          sendJson(res, 400, { success: false, message: 'JSON Inválido: ' + err.message });
+        }
+      });
+      return;
+    }
+  }
+
+  // PATCH /api/v1/users/:id — atualizar dados do utilizador
+  // DELETE /api/v1/users/:id — desativar utilizador (soft delete)
+  const usersUpdateMatch = pathname.match(/^\/api\/v1\/users\/(\d+)\/?$/);
+  if (usersUpdateMatch) {
+    req.params = { id: usersUpdateMatch[1] };
+    if (method === 'PATCH') {
+      if (!checkAuth(req, res, 'admin')) return;
+      let body = '';
+      req.on('data', chunk => { body += chunk.toString(); });
+      req.on('end', async () => {
+        try {
+          req.body = body ? JSON.parse(body) : {};
+          const mockRes = { status: (code) => ({ json: (data) => sendJson(res, code, data) }) };
+          await authController.updateUser(req, mockRes);
+        } catch (err) {
+          sendJson(res, 400, { success: false, message: 'JSON Inválido: ' + err.message });
+        }
+      });
+      return;
+    }
+    if (method === 'DELETE') {
+      if (!checkAuth(req, res, 'admin')) return;
+      const mockRes = { status: (code) => ({ json: (data) => sendJson(res, code, data) }) };
+      return authController.deactivateUser(req, mockRes);
+    }
   }
 
   if (pathname === '/api/v1/roles' || pathname === '/api/v1/roles/') {

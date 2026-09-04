@@ -158,6 +158,108 @@ class AuthController {
       });
     }
   }
+
+  /**
+   * Cria um novo utilizador no sistema
+   * POST /api/v1/users
+   * Restrito a: admin
+   */
+  static async createUser(req, res) {
+    try {
+      const { name, email, password, role_id, department, status } = req.body || {};
+
+      if (!name || !email || !role_id) {
+        return res.status(400).json({
+          success: false,
+          message: 'Campos obrigatórios em falta: nome, email e perfil (role_id) são necessários.'
+        });
+      }
+
+      const newUser = User.create({ name, email, password, role_id, department, status });
+      return res.status(201).json({
+        success: true,
+        message: `Utilizador '${newUser.name}' criado com sucesso.`,
+        data: newUser
+      });
+    } catch (error) {
+      console.error('[AuthController.createUser Error]', error);
+      const status = error.message.includes('Já existe') ? 409 : 500;
+      return res.status(status).json({
+        success: false,
+        message: error.message
+      });
+    }
+  }
+
+  /**
+   * Atualiza os dados de um utilizador existente
+   * PATCH /api/v1/users/:id
+   * Restrito a: admin
+   */
+  static async updateUser(req, res) {
+    try {
+      const id = parseInt(req.params?.id, 10);
+      if (!id || isNaN(id)) {
+        return res.status(400).json({ success: false, message: 'ID de utilizador inválido.' });
+      }
+
+      const data = req.body || {};
+      if (Object.keys(data).length === 0) {
+        return res.status(400).json({ success: false, message: 'Nenhum campo de atualização fornecido.' });
+      }
+
+      const updatedUser = User.update(id, data);
+      return res.status(200).json({
+        success: true,
+        message: `Utilizador '${updatedUser.name}' atualizado com sucesso.`,
+        data: updatedUser
+      });
+    } catch (error) {
+      console.error('[AuthController.updateUser Error]', error);
+      const status = error.message.includes('não encontrado') ? 404 : 500;
+      return res.status(status).json({
+        success: false,
+        message: error.message
+      });
+    }
+  }
+
+  /**
+   * Desativa um utilizador (soft delete — preserva dados históricos)
+   * DELETE /api/v1/users/:id
+   * Restrito a: admin
+   */
+  static async deactivateUser(req, res) {
+    try {
+      const id = parseInt(req.params?.id, 10);
+      if (!id || isNaN(id)) {
+        return res.status(400).json({ success: false, message: 'ID de utilizador inválido.' });
+      }
+
+      // Impedir que o admin desative a sua própria conta
+      const requestingUser = req.user;
+      if (requestingUser && requestingUser.id === id) {
+        return res.status(409).json({
+          success: false,
+          message: 'Não é permitido desativar a sua própria conta de administrador.'
+        });
+      }
+
+      const deactivated = User.update(id, { status: 'inactive' });
+      return res.status(200).json({
+        success: true,
+        message: `Utilizador '${deactivated.name}' foi desativado. O acesso ao sistema foi revogado.`,
+        data: deactivated
+      });
+    } catch (error) {
+      console.error('[AuthController.deactivateUser Error]', error);
+      const status = error.message.includes('não encontrado') ? 404 : 500;
+      return res.status(status).json({
+        success: false,
+        message: error.message
+      });
+    }
+  }
 }
 
 module.exports = AuthController;
