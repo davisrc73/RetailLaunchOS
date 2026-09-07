@@ -321,7 +321,7 @@ O painel superior do Dashboard atualiza-se em tempo real com os indicadores chav
    * **Formatos**: Contagem de resoluções de saída distintas utilizadas nesta loja (ex.: *4K*, *FHD*, *LED Wall*).
    * **Playlists**: Estado de vinculação de campanhas para as telas desta loja (`100% OK`, `X a Associar` ou `0 Telas`).
 2. **Infraestrutura Multimédia**:
-   * Central de comando operacional em formato alargado, concebida para concentrar a monitorização técnica do parque audiovisual em 4 micro-painéis temáticos em tempo real:
+   * Central de comando operacional em formato alargado, concentrando a monitorização técnica do parque audiovisual em **3 micro-painéis temáticos em tempo real**:
      * **A. Hardware**:
        * Total de ecrãs e players físicos instalados ou em stock.
        * Chips desagregados com as marcas e modelos (ex.: *BrightSign XT*, *Samsung Tizen*, *LG webOS*).
@@ -335,11 +335,15 @@ O painel superior do Dashboard atualiza-se em tempo real com os indicadores chav
        * Badge de validação (`✓ 100% Telas Vinculadas` quando todas as telas têm conteúdo atribuído, ou aviso dourado com o número de telas pendentes).
        * Total de campanhas ativas e publicadas no catálogo prontas para broadcast.
        * *Interação*: Clicar neste bloco abre diretamente o **Catálogo de Playlists**.
-     * **D. Aberturas**:
-       * Total de lojas/obras integradas no piloto Fnac / Darty.
-       * Desagregação por estágio de execução: `Em Curso`, `Planeamento` e `Concluído`.
-       * Sumário rápido do estado de Digital Signage das lojas (`Pronto`, `Configuração` ou `Pendente`).
-       * *Interação*: Clicar neste bloco faz scroll suave instantâneo para a tabela de aberturas.
+
+3. **Resumo Operacional de Aberturas (Cabeçalho da Tabela)**:
+   * Posicionado no topo da secção *"Aberturas em Curso"*, diretamente abaixo do texto descritivo, sintetiza o volume global de projetos em 5 indicadores integrados:
+     * **Em Curso**: Lojas com trabalhos técnicos e montagem de telas em execução ativa.
+     * **Planeamento**: Lojas em fase de provisionamento, licenciamento e agendamento.
+     * **Concluído**: Lojas com inauguração realizada e entregues à operação.
+     * **Total**: Número global de lojas piloto no portfólio.
+     * **Signage**: Síntese de prontidão de telas em lote (`Pronto`, `Configuração`, `Pendente`).
+   * **Cálculo Rigoroso de Progresso (%)**: O progresso exibido nas barras e percentagens tanto no cartão de *Próxima Abertura* como na tabela de *Aberturas em Curso* reflete com precisão matemática a proporção de tarefas técnicas concluídas na base de dados (`(concluídas / total) * 100`). Se uma nova loja tiver 0 tarefas concluídas de 3, exibirá 0% em todos os componentes, subindo em tempo real conforme as tarefas forem validadas no modal.
 
 *(Nota: Na secção inferior do Dashboard, o cartão **"Atividade Recente • Gabinete Multimédia"** passa a ocupar a largura total do ecrã, tendo o antigo resumo estático sido unificado na central superior de Infraestrutura Multimédia).*
 

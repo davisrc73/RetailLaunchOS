@@ -46,7 +46,9 @@
 ---
 
 ## Refinamentos Finais Concluídos
-1. **Grelha Superior**: Removido cartão *"Playlists & Signage"*, ficando 2 cartões de alto impacto: *Próxima Abertura* e *Infraestrutura Multimédia*.
-2. **Tabela de Aberturas**: Título renomeado para *"Aberturas em Curso"* e removida coluna *"Custo / Dia"*.
-3. **Secção Inferior**: Removido bloco antigo de infraestrutura e expandido *"Atividade Recente • Gabinete Multimédia"* para full-width (100%).
+1. **Grelha Superior**: Removido cartão *"Playlists & Signage"*, ficando 2 cartões de alto impacto: *Próxima Abertura* e *Infraestrutura Multimédia* (com 3 sub-painéis: Hardware, Resoluções e Playlists).
+2. **Resumo Operacional de Aberturas**: Migrado para o cabeçalho da secção *"Aberturas em Curso"*, exibindo contadores de *Em Curso*, *Planeamento*, *Concluído*, *Total* e estado de *Signage* abaixo da descrição da tabela.
+3. **Consistência de Progresso da Loja (%)**: Corrigido o operador `|| 25` na interpolação do JavaScript para `(p.progress ?? 0)`, garantindo coerência matemática absoluta entre o cartão de topo e a tabela (ex.: Fnac Famalicão a 0% em ambos com 0 de 3 tarefas concluídas).
+4. **Tabela de Aberturas**: Título renomeado para *"Aberturas em Curso"* e removida coluna *"Custo / Dia"*.
+5. **Secção Inferior**: Removido bloco antigo de infraestrutura e expandido *"Atividade Recente • Gabinete Multimédia"* para full-width (100%).
 

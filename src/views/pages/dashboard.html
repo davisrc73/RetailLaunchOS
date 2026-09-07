@@ -375,30 +375,6 @@
               </div>
             </div>
 
-            <!-- Sub-painel 4: Aberturas & Estado -->
-            <div class="infra-sub-block" id="infraOpeningsBlock" title="Ver tabela de aberturas" onclick="document.getElementById('aberturas-section')?.scrollIntoView({ behavior: 'smooth' });" style="cursor: pointer;">
-              <div class="infra-sub-header">
-                <span class="infra-sub-title">Aberturas</span>
-                <span class="infra-total-pill" id="infraOpeningsTotal">0 Lojas</span>
-              </div>
-              <div class="infra-openings-breakdown">
-                <div class="opening-status-row">
-                  <span class="opening-label"><span class="opening-badge-dot em-curso"></span>Em Curso:</span>
-                  <strong id="infraOpeningsEmCurso">0</strong>
-                </div>
-                <div class="opening-status-row">
-                  <span class="opening-label"><span class="opening-badge-dot planeamento"></span>Planeamento:</span>
-                  <strong id="infraOpeningsPlaneamento">0</strong>
-                </div>
-                <div class="opening-status-row">
-                  <span class="opening-label"><span class="opening-badge-dot concluido"></span>Concluído:</span>
-                  <strong id="infraOpeningsConcluido">0</strong>
-                </div>
-              </div>
-              <div class="infra-sub-footer" id="infraSignageOpeningsFooter">
-                Signage: 0 Pronto • 0 Config • 0 Pendente
-              </div>
-            </div>
           </div>
         </div>
 
@@ -412,6 +388,33 @@
           <div class="section-title-wrap">
             <h2>Aberturas em Curso</h2>
             <p>Monitorização de marcos de inauguração e prontidão audiovisual das lojas</p>
+            
+            <!-- Resumo Operacional de Aberturas (Fase 9) -->
+            <div class="openings-summary-strip" id="openingsSummaryStrip">
+              <div class="summary-status-pill pill-em-curso" title="Lojas com trabalhos em execução">
+                <span class="status-dot-pulse em-curso"></span>
+                <span class="summary-pill-label">Em Curso:</span>
+                <strong class="summary-pill-val" id="openingsEmCurso">0</strong>
+              </div>
+              <div class="summary-status-pill pill-planeamento" title="Lojas em fase de planeamento">
+                <span class="status-dot-pulse planeamento"></span>
+                <span class="summary-pill-label">Planeamento:</span>
+                <strong class="summary-pill-val" id="openingsPlaneamento">0</strong>
+              </div>
+              <div class="summary-status-pill pill-concluido" title="Lojas com inauguração concluída">
+                <span class="status-dot-pulse concluido"></span>
+                <span class="summary-pill-label">Concluído:</span>
+                <strong class="summary-pill-val" id="openingsConcluido">0</strong>
+              </div>
+              <div class="summary-status-pill pill-total" title="Total de lojas piloto">
+                <span class="summary-pill-label">Total:</span>
+                <strong class="summary-pill-val" id="openingsTotal">0 Lojas</strong>
+              </div>
+              <div class="summary-signage-status" id="openingsSignageStatus">
+                <span class="signage-sub-label">Signage:</span>
+                <span class="signage-sub-values" id="openingsSignageValues">0 Pronto • 0 Config • 0 Pendente</span>
+              </div>
+            </div>
           </div>
 
           <!-- Filtros Rápidos -->
@@ -2067,9 +2070,9 @@
           <td>
             <div class="progress-bar-container">
               <div class="progress-track">
-                <div class="progress-fill-bar ${brandClass === 'darty' ? 'progress-fill-red' : 'progress-fill-gold'}" style="width: ${p.progress || 25}%;"></div>
+                <div class="progress-fill-bar ${brandClass === 'darty' ? 'progress-fill-red' : 'progress-fill-gold'}" style="width: ${(p.progress !== undefined && p.progress !== null) ? p.progress : 0}%;"></div>
               </div>
-              <span class="progress-percent-label">${p.progress || 25}%</span>
+              <span class="progress-percent-label">${(p.progress !== undefined && p.progress !== null) ? p.progress : 0}%</span>
             </div>
           </td>
           <td>
@@ -2266,22 +2269,22 @@
               }
             }
 
-            // 4. Número de Aberturas e Estado
+            // 4. Resumo de Aberturas e Estado (Exibido no Cabeçalho da Tabela)
             if (infra.openings) {
-              const totalOpeningsEl = document.getElementById('infraOpeningsTotal');
+              const totalOpeningsEl = document.getElementById('openingsTotal') || document.getElementById('infraOpeningsTotal');
               if (totalOpeningsEl) totalOpeningsEl.innerText = `${infra.openings.total || 0} Lojas`;
 
-              const emCursoEl = document.getElementById('infraOpeningsEmCurso');
-              const planeamentoEl = document.getElementById('infraOpeningsPlaneamento');
-              const concluidoEl = document.getElementById('infraOpeningsConcluido');
+              const emCursoEl = document.getElementById('openingsEmCurso') || document.getElementById('infraOpeningsEmCurso');
+              const planeamentoEl = document.getElementById('openingsPlaneamento') || document.getElementById('infraOpeningsPlaneamento');
+              const concluidoEl = document.getElementById('openingsConcluido') || document.getElementById('infraOpeningsConcluido');
               if (emCursoEl) emCursoEl.innerText = infra.openings.byStatus?.em_curso || 0;
               if (planeamentoEl) planeamentoEl.innerText = infra.openings.byStatus?.planeamento || 0;
               if (concluidoEl) concluidoEl.innerText = infra.openings.byStatus?.concluido || 0;
 
-              const footerEl = document.getElementById('infraSignageOpeningsFooter');
-              if (footerEl && infra.openings.bySignageStatus) {
+              const signageValEl = document.getElementById('openingsSignageValues') || document.getElementById('infraSignageOpeningsFooter');
+              if (signageValEl && infra.openings.bySignageStatus) {
                 const ss = infra.openings.bySignageStatus;
-                footerEl.innerText = `Signage: ${ss.pronto || 0} Pronto • ${ss.configuracao || 0} Config • ${ss.pendente || 0} Pendente`;
+                signageValEl.innerText = `${ss.pronto || 0} Pronto • ${ss.configuracao || 0} Config • ${ss.pendente || 0} Pendente`;
               }
             }
           }

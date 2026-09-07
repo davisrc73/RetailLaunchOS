@@ -517,8 +517,11 @@ O método [`Project.getDashboardMetrics()`](file:///Users/daviscorreia/Antigravi
 
 ### 9.1. Organização do Dashboard Principal
 * **Grelha Superior de KPIs**:
-  * **Card 1: Próxima Abertura**: Relógio decrescente em tempo real com meta-informação técnica enriquecida (% Progresso da obra, Displays alocados, Formatos de saída e estado das Playlists).
-  * **Card 2: Infraestrutura Multimédia**: Central de comando operacional em 4 blocos dinâmicos (`Hardware`, `Resoluções`, `Playlists` e `Aberturas`), com layout responsivo dinâmico (`repeat(auto-fit, minmax(180px, 1fr))`).
-* **Tabela de Aberturas em Curso**: Foco na monitorização do go-live, status de signage e progresso, sem a coluna de custos diários na visualização inicial (custos mantidos no detalhe individual da loja).
+  * **Card 1: Próxima Abertura**: Relógio decrescente em tempo real com meta-informação técnica enriquecida (% Progresso da obra calculado estritamente pelas tarefas concluídas, Displays alocados, Formatos de saída e estado das Playlists).
+  * **Card 2: Infraestrutura Multimédia**: Central de comando operacional focada em 3 blocos dinâmicos (`Hardware`, `Resoluções` e `Playlists`), distribuídos simetricamente em grelha de 3 colunas (`grid-template-columns: repeat(3, 1fr)`).
+* **Tabela de Aberturas em Curso**:
+  * **Resumo Operacional no Cabeçalho**: Strip integrado com micro-pills com estado das lojas (`Em Curso`, `Planeamento`, `Concluído`, `Total` e síntese de `Signage`).
+  * **Consistência de Progresso (%)**: Renderização precisa do progresso derivado das tarefas técnicas sem fallbacks forçados (exibindo 0% quando 0 tarefas foram concluídas).
+  * Foco na monitorização do go-live, status de signage e progresso, sem a coluna de custos diários na visualização inicial (custos mantidos no detalhe individual da loja).
 * **Secção Inferior**: O cartão **"Atividade Recente • Gabinete Multimédia"** ocupa 100% da largura (`grid-template-columns: 1fr`).
 

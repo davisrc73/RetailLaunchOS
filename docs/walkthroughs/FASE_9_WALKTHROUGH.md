@@ -111,9 +111,11 @@ curl -s http://localhost:3000/api/v1/projects/kpis
 
 1. **Grelha Superior de 2 Cartões de Alto Impacto**:
    - Retirado o antigo cartão *"Playlists & Signage"*, permitindo uma distribuição equilibrada e focada:
-     - **Card 1**: *Próxima Abertura* (380px com relógio de contagem decrescente, barra de progresso em % e 3 indicadores-chave da loja).
-     - **Card 2**: *Infraestrutura Multimédia* (ocupa toda a restante largura com os 4 blocos operacionais: *Hardware*, *Resoluções*, *Playlists* e *Aberturas*).
+     - **Card 1**: *Próxima Abertura* (380px com relógio de contagem decrescente, barra de progresso em % rigorosa e 3 indicadores-chave da loja).
+     - **Card 2**: *Infraestrutura Multimédia* (ocupa a restante largura em grelha de 3 colunas perfeitamente simétricas com os blocos operacionais: *Hardware*, *Resoluções* e *Playlists*). O bloco de Aberturas foi deslocalizado para o contexto direto da tabela.
 2. **Tabela de Aberturas em Curso**:
+   - **Resumo de Aberturas Integrado**: Adicionado um strip visual elegante com os contadores de *Em Curso*, *Planeamento*, *Concluído*, *Total de Lojas* e síntese de *Signage*, situado logo abaixo do texto descritivo no cabeçalho da tabela.
+   - **Correção e Sincronização do Progresso da Loja (%)**: Eliminado o operador `|| 25` na interpolação do JavaScript, garantindo que lojas com 0 tarefas concluídas (como *Fnac Famalicão*) exibam rigorosamente **0%** tanto no cartão de *Próxima Abertura* quanto na linha da tabela.
    - Título simplificado para **"Aberturas em Curso"** (removido sufixo redundante *"• Piloto Gabinete Multimédia"*).
    - Retirada a coluna **"Custo / Dia"** do cabeçalho e das linhas da tabela principal, priorizando a clareza dos prazos e status operacional das telas (os custos continuam disponíveis na gaveta detalhada de cada projeto).
 3. **Secção Inferior Full-Width**:
@@ -124,7 +126,7 @@ curl -s http://localhost:3000/api/v1/projects/kpis
 
 ## 4. Conformidade de Documentação
 
-- `MANUAL_UTILIZADOR_MODAIS.md`: Atualizado com a arquitetura de 2 cartões no topo, tabela focada em signage e feed inferior full-width.
-- `ARQUITETURA_TECNICA.md`: Secção 9 documenta a agregação SQL em tempo real e o contrato REST de métricas de infraestrutura.
+- `MANUAL_UTILIZADOR_MODAIS.md`: Atualizado com a arquitetura de 2 cartões no topo, tabela com strip de resumo e feed inferior full-width.
+- `ARQUITETURA_TECNICA.md`: Secção 9 documenta a agregação SQL em tempo real, contrato REST de métricas e organização de ecrã.
 - `MANUAL_BASE_DE_DADOS.md`: Guia de referência das entidades de dados SQLite e relacionamentos de suporte ao Gabinete Multimédia.
 - `docs/README.md`: Tabela de fases atualizada com a Fase 9 registada e validada.
