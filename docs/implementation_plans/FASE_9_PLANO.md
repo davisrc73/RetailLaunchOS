@@ -38,6 +38,15 @@
 
 ### Documentação Contínua (`AGENTS.md`)
 - `MANUAL_UTILIZADOR_MODAIS.md`: Atualização da Secção 7 com a descrição detalhada do cartão e dos 4 micro-painéis.
-- `ARQUITETURA_TECNICA.md`: Atualização das secções 3.1 e 4.1 com o esquema de dados do endpoint.
+- `ARQUITETURA_TECNICA.md`: Atualização das secções 3.1, 4.1 e 9 com o esquema de dados do endpoint.
+- `MANUAL_BASE_DE_DADOS.md`: Guia de referência das entidades de dados SQLite e relacionamentos de suporte ao Gabinete Multimédia.
 - `docs/README.md`: Registo da Fase 9 na tabela de entregas.
 - `docs/implementation_plans/FASE_9_PLANO.md` e `docs/walkthroughs/FASE_9_WALKTHROUGH.md`.
+
+---
+
+## Refinamentos Finais Concluídos
+1. **Grelha Superior**: Removido cartão *"Playlists & Signage"*, ficando 2 cartões de alto impacto: *Próxima Abertura* e *Infraestrutura Multimédia*.
+2. **Tabela de Aberturas**: Título renomeado para *"Aberturas em Curso"* e removida coluna *"Custo / Dia"*.
+3. **Secção Inferior**: Removido bloco antigo de infraestrutura e expandido *"Atividade Recente • Gabinete Multimédia"* para full-width (100%).
+

@@ -649,11 +649,17 @@ body {
   gap: 32px;
 }
 
-/* KPI CARDS GRID */
+/* KPI CARDS GRID (FASE 9: 2 Cartões de Topo) */
 .kpi-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
+  grid-template-columns: minmax(320px, 380px) 1fr;
   gap: 20px;
+}
+
+@media (max-width: 1080px) {
+  .kpi-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 .kpi-card {
@@ -914,12 +920,6 @@ body {
 /* ==============================================================================
    FASE 9: CARTÃO DE INFRAESTRUTURA MULTIMÉDIA (PILOTO MULTIMÉDIA)
    ============================================================================== */
-@media (min-width: 1200px) {
-  .kpi-card.infra-multimedia-card {
-    grid-column: span 2;
-  }
-}
-
 .infra-multimedia-card {
   display: flex;
   flex-direction: column;
@@ -970,7 +970,7 @@ body {
 
 .infra-metrics-grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
   gap: 12px;
   margin-top: 4px;
 }
@@ -1498,7 +1498,7 @@ body {
    ============================================================================== */
 .bottom-grid {
   display: grid;
-  grid-template-columns: 2fr 1fr;
+  grid-template-columns: 1fr;
   gap: 20px;
 }
 
@@ -1583,12 +1583,6 @@ body {
 }
 
 /* RESPONSIVE DESIGN */
-@media (max-width: 1180px) {
-  .bottom-grid {
-    grid-template-columns: 1fr;
-  }
-}
-
 @media (max-width: 900px) {
   .app-sidebar {
     transform: translateX(-100%);

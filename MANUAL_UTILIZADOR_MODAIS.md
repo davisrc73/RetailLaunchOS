@@ -320,11 +320,8 @@ O painel superior do Dashboard atualiza-se em tempo real com os indicadores chav
    * **Displays**: Quantidade total de ecrãs/players alocados a esta abertura específica.
    * **Formatos**: Contagem de resoluções de saída distintas utilizadas nesta loja (ex.: *4K*, *FHD*, *LED Wall*).
    * **Playlists**: Estado de vinculação de campanhas para as telas desta loja (`100% OK`, `X a Associar` ou `0 Telas`).
-2. **Playlists & Signage**:
-   * Barra de prontidão percentual calculada a partir do rácio de ecrãs `Online` face ao total do parque.
-   * Sub-contadores dinâmicos: `Players Ativos`, `Em Teste` e `Falhas` alimentados diretamente pela base de dados.
-3. **Infraestrutura Multimédia**:
-   * Cartão integrado e proeminente (com largura expandida na grelha desktop) concebido para substituir os antigos indicadores puramente financeiros e centralizar a monitorização técnica do parque audiovisual em 4 micro-painéis temáticos em tempo real:
+2. **Infraestrutura Multimédia**:
+   * Central de comando operacional em formato alargado, concebida para concentrar a monitorização técnica do parque audiovisual em 4 micro-painéis temáticos em tempo real:
      * **A. Hardware**:
        * Total de ecrãs e players físicos instalados ou em stock.
        * Chips desagregados com as marcas e modelos (ex.: *BrightSign XT*, *Samsung Tizen*, *LG webOS*).
@@ -343,6 +340,8 @@ O painel superior do Dashboard atualiza-se em tempo real com os indicadores chav
        * Desagregação por estágio de execução: `Em Curso`, `Planeamento` e `Concluído`.
        * Sumário rápido do estado de Digital Signage das lojas (`Pronto`, `Configuração` ou `Pendente`).
        * *Interação*: Clicar neste bloco faz scroll suave instantâneo para a tabela de aberturas.
+
+*(Nota: Na secção inferior do Dashboard, o cartão **"Atividade Recente • Gabinete Multimédia"** passa a ocupar a largura total do ecrã, tendo o antigo resumo estático sido unificado na central superior de Infraestrutura Multimédia).*
 
 ---
 

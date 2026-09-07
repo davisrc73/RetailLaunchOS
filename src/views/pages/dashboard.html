@@ -309,34 +309,7 @@
           </div>
         </div>
 
-        <!-- KPI 2: Estado de Playlists & Digital Signage -->
-        <div class="kpi-card">
-          <div class="kpi-header">
-            <span class="kpi-label">Playlists & Signage</span>
-            <div class="kpi-icon-wrap" style="background: rgba(16, 185, 129, 0.12); color: #10B981;">
-              <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-              </svg>
-            </div>
-          </div>
-          
-          <div class="kpi-val" id="kpiSignageReadiness">87%</div>
-          <div class="kpi-subtitle">Conteúdos e Telas Prontas para Broadcast</div>
-
-          <div class="signage-meter-wrap">
-            <div class="signage-progress-bar">
-              <div class="signage-progress-fill" id="kpiSignageFill" style="width: 87%;"></div>
-            </div>
-          </div>
-
-          <div class="signage-sub-stats">
-            <span id="kpiSignageActive"><strong>4</strong> Players Ativos</span>
-            <span id="kpiSignageTesting"><strong>0</strong> Em Teste</span>
-            <span id="kpiSignageOffline" style="color: #10B981;"><strong>0</strong> Falhas</span>
-          </div>
-        </div>
-
-        <!-- KPI 3: Infraestrutura Multimédia (Fase 9 • Piloto Gabinete Multimédia) -->
+        <!-- KPI 2 (Fase 9): Infraestrutura Multimédia (Piloto Gabinete Multimédia) -->
         <div class="kpi-card infra-multimedia-card" id="kpiInfraMultimedia">
           <div class="kpi-header">
             <div class="infra-title-block">
@@ -437,8 +410,8 @@
       <section class="table-section" id="aberturas-section">
         <div class="section-header">
           <div class="section-title-wrap">
-            <h2>Aberturas em Curso • Piloto Gabinete Multimédia</h2>
-            <p>Monitorização de marcos de inauguração, prontidão audiovisual e custos por dia</p>
+            <h2>Aberturas em Curso</h2>
+            <p>Monitorização de marcos de inauguração e prontidão audiovisual das lojas</p>
           </div>
 
           <!-- Filtros Rápidos -->
@@ -465,7 +438,6 @@
                 <th>Projeto & Loja</th>
                 <th>Insígnia / Formato</th>
                 <th>Go-Live Previsto</th>
-                <th>Custo / Dia</th>
                 <th>Estado Signage</th>
                 <th>Progresso</th>
                 <th>Ações</th>
@@ -525,33 +497,6 @@
                 <div>Topologia de rede e switch PoE provisionados para <strong>Darty Parque das Nações</strong>.</div>
                 <div class="feed-timestamp">Ontem às 17:40 • Departamento Redes & IT</div>
               </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Resumo Rápido de Infraestrutura -->
-        <div class="feed-card">
-          <div class="section-title-wrap">
-            <h2 style="font-size: 15px; font-weight: 700; color: var(--text-white);">Infraestrutura Multimédia</h2>
-            <p style="font-size: 12px; color: var(--text-muted);">Sumário de inventário alocado ao piloto</p>
-          </div>
-
-          <div class="stats-summary-box">
-            <div class="stat-row">
-              <span>Ecrãs LED / Displays 4K</span>
-              <strong>36 Unidades</strong>
-            </div>
-            <div class="stat-row">
-              <span>Players Digitais BrightSign</span>
-              <strong>18 Ativos</strong>
-            </div>
-            <div class="stat-row">
-              <span>Sistemas de Áudio Zoneado</span>
-              <strong>3 Lojas</strong>
-            </div>
-            <div class="stat-row">
-              <span>Versão Central de Playlists</span>
-              <strong style="color: var(--fnac-gold);">v2.4-RC1</strong>
             </div>
           </div>
         </div>
@@ -2059,7 +2004,7 @@
       if (!projects || projects.length === 0) {
         tbody.innerHTML = `
           <tr>
-            <td colspan="7" style="text-align: center; padding: 32px; color: var(--text-dim);">
+            <td colspan="6" style="text-align: center; padding: 32px; color: var(--text-dim);">
               Nenhum projeto encontrado com os filtros selecionados.
             </td>
           </tr>
@@ -2111,10 +2056,6 @@
               <span>${formatDate(p.go_live_date)}</span>
               <span class="date-countdown-tag ${tagClass}">${daysLeft} dias</span>
             </div>
-          </td>
-          <td>
-            <div class="cost-day-cell">${formatCurrency(p.daily_cost)} <span class="cost-period">/ dia</span></div>
-            <div class="cost-period">Budget: ${formatCurrency(p.total_budget)}</div>
           </td>
           <td>
             <span class="status-badge ${signageBadgeClass}">
@@ -2221,25 +2162,6 @@
                 'atrasado': 'Atrasado'
               };
               statusEl.innerText = statusMap[kpis.nextOpening.status] || kpis.nextOpening.status;
-            }
-          }
-
-          // Atualizar Signage Readiness & Sub-estatísticas
-          const signageVal = document.getElementById('kpiSignageReadiness');
-          const signageFill = document.getElementById('kpiSignageFill');
-          if (signageVal) signageVal.innerText = `${kpis.signageReadiness || 87}%`;
-          if (signageFill) signageFill.style.width = `${kpis.signageReadiness || 87}%`;
-
-          if (kpis.signageStats) {
-            const actEl = document.getElementById('kpiSignageActive');
-            const testEl = document.getElementById('kpiSignageTesting');
-            const offEl = document.getElementById('kpiSignageOffline');
-            if (actEl) actEl.innerHTML = `<strong>${kpis.signageStats.online || 0}</strong> Players Ativos`;
-            if (testEl) testEl.innerHTML = `<strong>${kpis.signageStats.testing || 0}</strong> Em Teste`;
-            if (offEl) {
-              const fails = kpis.signageStats.offline || 0;
-              offEl.style.color = fails > 0 ? 'var(--darty-red)' : '#10B981';
-              offEl.innerHTML = `<strong>${fails}</strong> Falhas`;
             }
           }
 

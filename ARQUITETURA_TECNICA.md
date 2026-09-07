@@ -463,3 +463,62 @@ flowchart TD
   * Mapeia o volume `retaillaunch_data` para `/app/database`, garantindo que o ficheiro `retaillaunch.sqlite` nunca é perdido ao atualizar ou reiniciar o contentor.
 * **Sincronização (`sync_github.sh`)**:
   * Script de 1 comando para versionamento e push automático para a branch `main` do GitHub.
+
+---
+
+## 9. Agregação de KPIs & Central de Infraestrutura Multimédia (Fase 9)
+
+O método [`Project.getDashboardMetrics()`](file:///Users/daviscorreia/Antigravity%20/RetailLaunchOS/src/models/Project.js) centraliza todas as métricas operacionais do Gabinete Multimédia através de agregação SQL em tempo real (`GET /api/v1/projects/kpis`):
+
+```json
+{
+  "success": true,
+  "data": {
+    "nextOpening": {
+      "name": "Fnac Famalicão",
+      "go_live_date": "2026-09-16",
+      "progress": 75,
+      "displaysCount": 4,
+      "formatsCount": 2,
+      "playlistsState": "100% OK",
+      "playlistsStateClass": "ok"
+    },
+    "infraMultimedia": {
+      "hardware": {
+        "total": 6,
+        "byModel": [
+          { "model": "BrightSign XT1144 4K", "count": 2 },
+          { "model": "Samsung SSP (Tizen 6.5)", "count": 2 }
+        ],
+        "status": { "online": 4, "testing": 1, "syncing": 1, "offline": 0 }
+      },
+      "resolutions": {
+        "distinctCount": 3,
+        "list": [
+          { "resolution": "1920x1080 (FHD)", "count": 4 },
+          { "resolution": "3840x2160 (4K)", "count": 1 }
+        ]
+      },
+      "playlists": {
+        "unassignedPlayersCount": 0,
+        "assignedPlayersCount": 6,
+        "totalPlaylists": 4,
+        "publishedPlaylists": 2
+      },
+      "openings": {
+        "total": 3,
+        "byStatus": { "em_curso": 1, "planeamento": 2, "concluido": 0 },
+        "bySignageStatus": { "pronto": 1, "configuracao": 1, "pendente": 1 }
+      }
+    }
+  }
+}
+```
+
+### 9.1. Organização do Dashboard Principal
+* **Grelha Superior de KPIs**:
+  * **Card 1: Próxima Abertura**: Relógio decrescente em tempo real com meta-informação técnica enriquecida (% Progresso da obra, Displays alocados, Formatos de saída e estado das Playlists).
+  * **Card 2: Infraestrutura Multimédia**: Central de comando operacional em 4 blocos dinâmicos (`Hardware`, `Resoluções`, `Playlists` e `Aberturas`), com layout responsivo dinâmico (`repeat(auto-fit, minmax(180px, 1fr))`).
+* **Tabela de Aberturas em Curso**: Foco na monitorização do go-live, status de signage e progresso, sem a coluna de custos diários na visualização inicial (custos mantidos no detalhe individual da loja).
+* **Secção Inferior**: O cartão **"Atividade Recente • Gabinete Multimédia"** ocupa 100% da largura (`grid-template-columns: 1fr`).
+

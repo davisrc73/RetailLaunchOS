@@ -107,8 +107,24 @@ curl -s http://localhost:3000/api/v1/projects/kpis
 
 ---
 
-## 3. Conformidade de Documentação
+## 3. Refinamentos Finais de Layout & Experiência de Utilizador (Sprint Final)
 
-- `MANUAL_UTILIZADOR_MODAIS.md`: Secção 7 atualizada com as novas funcionalidades e atalhos operacionais do Gabinete Multimédia.
-- `ARQUITETURA_TECNICA.md`: Secções 3.1 e 4.1 atualizadas com o novo contrato de dados da API.
-- `docs/README.md`: Tabela de fases atualizada com a Fase 9 registada.
+1. **Grelha Superior de 2 Cartões de Alto Impacto**:
+   - Retirado o antigo cartão *"Playlists & Signage"*, permitindo uma distribuição equilibrada e focada:
+     - **Card 1**: *Próxima Abertura* (380px com relógio de contagem decrescente, barra de progresso em % e 3 indicadores-chave da loja).
+     - **Card 2**: *Infraestrutura Multimédia* (ocupa toda a restante largura com os 4 blocos operacionais: *Hardware*, *Resoluções*, *Playlists* e *Aberturas*).
+2. **Tabela de Aberturas em Curso**:
+   - Título simplificado para **"Aberturas em Curso"** (removido sufixo redundante *"• Piloto Gabinete Multimédia"*).
+   - Retirada a coluna **"Custo / Dia"** do cabeçalho e das linhas da tabela principal, priorizando a clareza dos prazos e status operacional das telas (os custos continuam disponíveis na gaveta detalhada de cada projeto).
+3. **Secção Inferior Full-Width**:
+   - Retirado o antigo bloco estático redundante de *"Infraestrutura Multimédia"* da secção inferior.
+   - O cartão **"Atividade Recente • Gabinete Multimédia"** passa a ocupar 100% da largura (`grid-template-columns: 1fr`), proporcionando leitura desafogada do feed de auditoria.
+
+---
+
+## 4. Conformidade de Documentação
+
+- `MANUAL_UTILIZADOR_MODAIS.md`: Atualizado com a arquitetura de 2 cartões no topo, tabela focada em signage e feed inferior full-width.
+- `ARQUITETURA_TECNICA.md`: Secção 9 documenta a agregação SQL em tempo real e o contrato REST de métricas de infraestrutura.
+- `MANUAL_BASE_DE_DADOS.md`: Guia de referência das entidades de dados SQLite e relacionamentos de suporte ao Gabinete Multimédia.
+- `docs/README.md`: Tabela de fases atualizada com a Fase 9 registada e validada.
