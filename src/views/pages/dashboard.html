@@ -309,46 +309,97 @@
           </div>
         </div>
 
-        <!-- KPI 3: Custo Diário Médio -->
-        <div class="kpi-card">
+        <!-- KPI 3: Infraestrutura Multimédia (Fase 9 • Piloto Gabinete Multimédia) -->
+        <div class="kpi-card infra-multimedia-card" id="kpiInfraMultimedia">
           <div class="kpi-header">
-            <span class="kpi-label">Custo Diário Médio</span>
-            <div class="kpi-icon-wrap" style="background: rgba(245, 158, 11, 0.12); color: var(--fnac-gold);">
+            <div class="infra-title-block">
+              <span class="kpi-label">Infraestrutura Multimédia</span>
+              <span class="infra-badge-pilot">Piloto Multimédia</span>
+            </div>
+            <div class="kpi-icon-wrap" style="background: rgba(56, 189, 248, 0.12); color: #38BDF8;">
               <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v12m-3-2.818l.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
               </svg>
             </div>
           </div>
 
-          <div class="kpi-val" id="kpiAvgDailyCost">€ 378,50</div>
-          <div class="kpi-trend positive">
-            <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4.5 19.5l15-15m0 0H8.25m11.25 0v11.25"></path>
-            </svg>
-            <span id="kpiActiveStoresCount">Alocado a 3 lojas ativas</span>
-          </div>
-          <div class="kpi-subtitle" style="margin-top: 8px;">
-            Total mensal registado: <strong id="kpiMonthlyCost" style="color: var(--text-white);">€ 11.355,00</strong>
-          </div>
-        </div>
-
-        <!-- KPI 4: Orçamento Total em Execução -->
-        <div class="kpi-card">
-          <div class="kpi-header">
-            <span class="kpi-label">Budget Global Alocado</span>
-            <div class="kpi-icon-wrap" style="background: rgba(59, 130, 246, 0.12); color: #60A5FA;">
-              <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.75 3v11.25A2.25 2.25 0 006 16.5h2.25M3.75 3h-1.5m1.5 0h16.5m0 0h1.5m-1.5 0v11.25A2.25 2.25 0 0118 16.5h-2.25m-7.5 0h7.5m-7.5 0l-1 3m8.5-3l1 3m0 0l.5 1.5m-.5-1.5h-9.5m0 0l-.5 1.5M9 11.25v1.5M12 9v3.75m3-6v6"></path>
-              </svg>
+          <div class="infra-metrics-grid">
+            <!-- Sub-painel 1: Modelos de Hardware & Estado -->
+            <div class="infra-sub-block" id="infraHwBlock" title="Clique para abrir Catálogo Global de Hardware" onclick="if(typeof openPlayersCatalog === 'function') openPlayersCatalog();" style="cursor: pointer;">
+              <div class="infra-sub-header">
+                <span class="infra-sub-title">Modelos de Hardware</span>
+                <span class="infra-total-pill" id="infraHwTotal">0 Displays</span>
+              </div>
+              <div class="infra-hardware-models" id="infraHwModelsList">
+                <span class="hw-model-chip">A carregar hardware...</span>
+              </div>
+              <div class="infra-status-breakdown" id="infraHwStatusBreakdown">
+                <span class="status-indicator-chip online"><span class="dot"></span> <span id="infraStatOnline">0</span> Online</span>
+                <span class="status-indicator-chip testing"><span class="dot"></span> <span id="infraStatTesting">0</span> Teste</span>
+                <span class="status-indicator-chip syncing"><span class="dot"></span> <span id="infraStatSyncing">0</span> Sync</span>
+                <span class="status-indicator-chip offline"><span class="dot"></span> <span id="infraStatOffline">0</span> Off</span>
+              </div>
             </div>
-          </div>
 
-          <div class="kpi-val" id="kpiTotalBudget">€ 98.500,00</div>
-          <div class="kpi-trend" style="color: var(--text-muted);">
-            <span>Executado: <strong style="color: var(--fnac-gold);">54.2%</strong> (€ 53.387)</span>
-          </div>
-          <div class="kpi-subtitle" style="margin-top: 8px;">
-            Multimédia, Áudio e Infraestrutura
+            <!-- Sub-painel 2: Resoluções de Saída -->
+            <div class="infra-sub-block" id="infraResBlock" title="Clique para ver Catálogo de Hardware" onclick="if(typeof openPlayersCatalog === 'function') openPlayersCatalog();" style="cursor: pointer;">
+              <div class="infra-sub-header">
+                <span class="infra-sub-title">Resoluções de Saída</span>
+                <span class="infra-total-pill" id="infraResDistinctCount">0 Formatos</span>
+              </div>
+              <div class="infra-resolution-chips" id="infraResChipsList">
+                <span class="res-chip">A carregar resoluções...</span>
+              </div>
+              <div class="infra-sub-footer">
+                Configurações ativas no parque de ecrãs
+              </div>
+            </div>
+
+            <!-- Sub-painel 3: Playlists a Associar -->
+            <div class="infra-sub-block" id="infraPlaylistsBlock" title="Clique para gerir Playlists" onclick="if(typeof openPlaylistCatalog === 'function') openPlaylistCatalog();" style="cursor: pointer;">
+              <div class="infra-sub-header">
+                <span class="infra-sub-title">Playlists a Associar</span>
+                <span class="infra-total-pill" id="infraPlaylistsBadge">0 Pendentes</span>
+              </div>
+              <div class="infra-playlist-stats">
+                <div class="infra-stat-row">
+                  <span class="infra-stat-label">Telas sem playlist:</span>
+                  <strong class="infra-stat-value" id="infraUnassignedCount">0 telas</strong>
+                </div>
+                <div class="infra-stat-row">
+                  <span class="infra-stat-label">Campanhas no catálogo:</span>
+                  <strong class="infra-stat-value" id="infraCatalogPlaylistsCount">0 prontas</strong>
+                </div>
+              </div>
+              <div class="infra-playlist-status-bar" id="infraPlaylistStatusBar">
+                <span class="infra-status-chip ready" id="infraPlaylistStatusText">✓ 100% Telas Vinculadas</span>
+              </div>
+            </div>
+
+            <!-- Sub-painel 4: Número de Aberturas & Estado -->
+            <div class="infra-sub-block" id="infraOpeningsBlock" title="Ver tabela de aberturas" onclick="document.getElementById('aberturas-section')?.scrollIntoView({ behavior: 'smooth' });" style="cursor: pointer;">
+              <div class="infra-sub-header">
+                <span class="infra-sub-title">Número de Aberturas</span>
+                <span class="infra-total-pill" id="infraOpeningsTotal">0 Lojas</span>
+              </div>
+              <div class="infra-openings-breakdown">
+                <div class="opening-status-row">
+                  <span class="opening-label"><span class="opening-badge-dot em-curso"></span>Em Curso:</span>
+                  <strong id="infraOpeningsEmCurso">0</strong>
+                </div>
+                <div class="opening-status-row">
+                  <span class="opening-label"><span class="opening-badge-dot planeamento"></span>Planeamento:</span>
+                  <strong id="infraOpeningsPlaneamento">0</strong>
+                </div>
+                <div class="opening-status-row">
+                  <span class="opening-label"><span class="opening-badge-dot concluido"></span>Concluído:</span>
+                  <strong id="infraOpeningsConcluido">0</strong>
+                </div>
+              </div>
+              <div class="infra-sub-footer" id="infraSignageOpeningsFooter">
+                Signage: 0 Pronto • 0 Config • 0 Pendente
+              </div>
+            </div>
           </div>
         </div>
 
@@ -2110,17 +2161,6 @@
             );
           }
 
-          // Atualizar Custo Médio
-          const avgCostEl = document.getElementById('kpiAvgDailyCost');
-          if (avgCostEl) avgCostEl.innerText = formatCurrency(kpis.avgDailyCost);
-
-          const countStoresEl = document.getElementById('kpiActiveStoresCount');
-          if (countStoresEl) countStoresEl.innerText = `Alocado a ${kpis.activeProjectsCount} lojas ativas`;
-
-          // Atualizar Total Budget
-          const budgetEl = document.getElementById('kpiTotalBudget');
-          if (budgetEl) budgetEl.innerText = formatCurrency(kpis.totalBudget);
-
           // Atualizar Signage Readiness & Sub-estatísticas
           const signageVal = document.getElementById('kpiSignageReadiness');
           const signageFill = document.getElementById('kpiSignageFill');
@@ -2140,10 +2180,125 @@
             }
           }
 
-          // Custo Mensal
-          const monthlyEl = document.getElementById('kpiMonthlyCost');
-          if (monthlyEl && kpis.monthlyCostsAccumulated) {
-            monthlyEl.innerText = formatCurrency(kpis.monthlyCostsAccumulated);
+          // =================================================================
+          // FASE 9: Cartão Infraestrutura Multimédia (Piloto Gabinete Multimédia)
+          // =================================================================
+          if (kpis.infraMultimedia) {
+            const infra = kpis.infraMultimedia;
+
+            // 1. Modelos de Hardware e Estados
+            if (infra.hardware) {
+              const hwTotalEl = document.getElementById('infraHwTotal');
+              if (hwTotalEl) hwTotalEl.innerText = `${infra.hardware.total || 0} Displays`;
+
+              const hwModelsList = document.getElementById('infraHwModelsList');
+              if (hwModelsList && Array.isArray(infra.hardware.byModel)) {
+                if (infra.hardware.byModel.length === 0) {
+                  hwModelsList.innerHTML = '<span class="hw-model-chip">Sem modelos</span>';
+                } else {
+                  hwModelsList.innerHTML = infra.hardware.byModel.slice(0, 3).map(m => {
+                    let shortName = m.model || 'Display';
+                    if (shortName.includes('BrightSign XT')) shortName = 'BrightSign XT';
+                    else if (shortName.includes('BrightSign HD')) shortName = 'BrightSign HD';
+                    else if (shortName.includes('Samsung SSP')) shortName = 'Samsung Tizen';
+                    else if (shortName.includes('LG webOS')) shortName = 'LG webOS';
+                    const safeName = String(shortName).replace(/</g, '&lt;').replace(/>/g, '&gt;');
+                    const safeFull = String(m.model).replace(/"/g, '&quot;');
+                    return `<span class="hw-model-chip" title="${safeFull}">${safeName}: <strong>${m.count}</strong></span>`;
+                  }).join('');
+                  if (infra.hardware.byModel.length > 3) {
+                    const extra = infra.hardware.byModel.slice(3).reduce((acc, cur) => acc + cur.count, 0);
+                    hwModelsList.innerHTML += `<span class="hw-model-chip">+${extra} outros</span>`;
+                  }
+                }
+              }
+
+              if (infra.hardware.status) {
+                const s = infra.hardware.status;
+                const onEl = document.getElementById('infraStatOnline');
+                const testEl = document.getElementById('infraStatTesting');
+                const syncEl = document.getElementById('infraStatSyncing');
+                const offEl = document.getElementById('infraStatOffline');
+                if (onEl) onEl.innerText = s.online || 0;
+                if (testEl) testEl.innerText = s.testing || 0;
+                if (syncEl) syncEl.innerText = s.syncing || 0;
+                if (offEl) {
+                  offEl.innerText = s.offline || 0;
+                  const offChip = offEl.closest('.status-indicator-chip');
+                  if (offChip) offChip.style.color = (s.offline > 0) ? 'var(--darty-red)' : 'var(--text-muted)';
+                }
+              }
+            }
+
+            // 2. Resoluções de Saída
+            if (infra.resolutions) {
+              const resCountEl = document.getElementById('infraResDistinctCount');
+              if (resCountEl) resCountEl.innerText = `${infra.resolutions.distinctCount || 0} Formatos`;
+
+              const resChipsList = document.getElementById('infraResChipsList');
+              if (resChipsList && Array.isArray(infra.resolutions.list)) {
+                if (infra.resolutions.list.length === 0) {
+                  resChipsList.innerHTML = '<span class="res-chip">Sem resoluções</span>';
+                } else {
+                  resChipsList.innerHTML = infra.resolutions.list.map(r => {
+                    let shortRes = r.resolution || 'Standard';
+                    if (shortRes.includes('3840x2160')) shortRes = '4K UHD';
+                    else if (shortRes.includes('1920x1080')) shortRes = '1080p FHD';
+                    const safeRes = String(shortRes).replace(/</g, '&lt;').replace(/>/g, '&gt;');
+                    const safeFull = String(r.resolution).replace(/"/g, '&quot;');
+                    return `<span class="res-chip" title="${safeFull}">${safeRes} (<strong>${r.count}</strong>)</span>`;
+                  }).join('');
+                }
+              }
+            }
+
+            // 3. Playlists a Associar
+            if (infra.playlists) {
+              const unassigned = infra.playlists.unassignedPlayersCount || 0;
+              const available = (infra.playlists.publishedPlaylists || 0) + (infra.playlists.validatingPlaylists || 0);
+
+              const badgeEl = document.getElementById('infraPlaylistsBadge');
+              if (badgeEl) {
+                badgeEl.innerText = unassigned > 0 ? `${unassigned} Pendentes` : '0 Pendentes';
+                badgeEl.style.color = unassigned > 0 ? 'var(--fnac-gold)' : '#10B981';
+              }
+
+              const unassignedEl = document.getElementById('infraUnassignedCount');
+              if (unassignedEl) unassignedEl.innerText = `${unassigned} telas`;
+
+              const catalogCountEl = document.getElementById('infraCatalogPlaylistsCount');
+              if (catalogCountEl) catalogCountEl.innerText = `${available} disponíveis (${infra.playlists.totalPlaylists || 0} total)`;
+
+              const statusTextEl = document.getElementById('infraPlaylistStatusText');
+              if (statusTextEl) {
+                if (unassigned > 0) {
+                  statusTextEl.className = 'infra-status-chip warning';
+                  statusTextEl.innerHTML = `⚠️ ${unassigned} ecrã(s) a aguardar playlist`;
+                } else {
+                  statusTextEl.className = 'infra-status-chip ready';
+                  statusTextEl.innerHTML = `✓ 100% Telas Vinculadas`;
+                }
+              }
+            }
+
+            // 4. Número de Aberturas e Estado
+            if (infra.openings) {
+              const totalOpeningsEl = document.getElementById('infraOpeningsTotal');
+              if (totalOpeningsEl) totalOpeningsEl.innerText = `${infra.openings.total || 0} Lojas`;
+
+              const emCursoEl = document.getElementById('infraOpeningsEmCurso');
+              const planeamentoEl = document.getElementById('infraOpeningsPlaneamento');
+              const concluidoEl = document.getElementById('infraOpeningsConcluido');
+              if (emCursoEl) emCursoEl.innerText = infra.openings.byStatus?.em_curso || 0;
+              if (planeamentoEl) planeamentoEl.innerText = infra.openings.byStatus?.planeamento || 0;
+              if (concluidoEl) concluidoEl.innerText = infra.openings.byStatus?.concluido || 0;
+
+              const footerEl = document.getElementById('infraSignageOpeningsFooter');
+              if (footerEl && infra.openings.bySignageStatus) {
+                const ss = infra.openings.bySignageStatus;
+                footerEl.innerText = `Signage: ${ss.pronto || 0} Pronto • ${ss.configuracao || 0} Config • ${ss.pendente || 0} Pendente`;
+              }
+            }
           }
         }
       } catch (err) {

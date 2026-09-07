@@ -18,6 +18,7 @@ Este diretório armazena todos os registos históricos de planeamento técnico (
 | **6** | **Redesign Visual, Motor Multi-Tema & Paleta Oficial Fnac / Darty** | [FASE_6_PLANO.md](file:///Users/daviscorreia/Antigravity%20/RetailLaunchOS/docs/implementation_plans/FASE_6_PLANO.md) | [FASE_6_WALKTHROUGH.md](file:///Users/daviscorreia/Antigravity%20/RetailLaunchOS/docs/walkthroughs/FASE_6_WALKTHROUGH.md) | ✅ Concluído |
 | **7** | **Módulo de Gestão de Utilizadores & Secção "Configurações" na Sidebar** | [FASE_7_PLANO.md](file:///Users/daviscorreia/Antigravity%20/RetailLaunchOS/docs/implementation_plans/FASE_7_PLANO.md) | [FASE_7_WALKTHROUGH.md](file:///Users/daviscorreia/Antigravity%20/RetailLaunchOS/docs/walkthroughs/FASE_7_WALKTHROUGH.md) | ✅ Concluído |
 | **8** | **Catálogo Global de Telas & Players em "Configurações"** | [FASE_8_PLANO.md](file:///Users/daviscorreia/Antigravity%20/RetailLaunchOS/docs/implementation_plans/FASE_8_PLANO.md) | [FASE_8_WALKTHROUGH.md](file:///Users/daviscorreia/Antigravity%20/RetailLaunchOS/docs/walkthroughs/FASE_8_WALKTHROUGH.md) | ✅ Concluído |
+| **9** | **Adaptação do Dashboard para Piloto Multimédia (Infraestrutura Multimédia)** | [FASE_9_PLANO.md](file:///Users/daviscorreia/Antigravity%20/RetailLaunchOS/docs/implementation_plans/FASE_9_PLANO.md) | [FASE_9_WALKTHROUGH.md](file:///Users/daviscorreia/Antigravity%20/RetailLaunchOS/docs/walkthroughs/FASE_9_WALKTHROUGH.md) | ✅ Concluído |
 
 ---
 

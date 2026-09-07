@@ -163,7 +163,66 @@ class Project {
       LIMIT 1
     `) || db.get(`SELECT * FROM projects ORDER BY go_live_date ASC LIMIT 1`);
 
-    // 2. Médias e Totais Financeiros
+    // 2. Métricas de Hardware & Displays (signage_players)
+    const playerMetrics = db.get(`
+      SELECT 
+        COUNT(*) as total_players,
+        SUM(CASE WHEN status = 'online' OR status = 'syncing' THEN 1 ELSE 0 END) as ready_players,
+        SUM(CASE WHEN status = 'online' THEN 1 ELSE 0 END) as online_players,
+        SUM(CASE WHEN status = 'testing' THEN 1 ELSE 0 END) as testing_players,
+        SUM(CASE WHEN status = 'syncing' THEN 1 ELSE 0 END) as syncing_players,
+        SUM(CASE WHEN status = 'offline' THEN 1 ELSE 0 END) as offline_players,
+        SUM(CASE WHEN playlist_id IS NULL THEN 1 ELSE 0 END) as unassigned_players
+      FROM signage_players
+    `);
+
+    // Modelos de Hardware no Parque
+    const hardwareModels = db.query(`
+      SELECT device_model as model, COUNT(*) as count
+      FROM signage_players
+      GROUP BY device_model
+      ORDER BY count DESC
+    `);
+
+    // Formatos e Resoluções de Saída
+    const resolutions = db.query(`
+      SELECT resolution, COUNT(*) as count
+      FROM signage_players
+      GROUP BY resolution
+      ORDER BY count DESC
+    `);
+
+    // 3. Métricas de Playlists & Campanhas
+    const playlistMetrics = db.get(`
+      SELECT 
+        COUNT(*) as total_playlists,
+        SUM(CASE WHEN status = 'publicada' THEN 1 ELSE 0 END) as published,
+        SUM(CASE WHEN status = 'em_validacao' THEN 1 ELSE 0 END) as validating,
+        SUM(CASE WHEN status = 'draft' THEN 1 ELSE 0 END) as draft
+      FROM playlists
+    `);
+
+    // 4. Métricas de Aberturas / Projetos de Loja
+    const projectMetrics = db.get(`
+      SELECT 
+        COUNT(*) as total_openings,
+        SUM(CASE WHEN status = 'em_curso' THEN 1 ELSE 0 END) as em_curso,
+        SUM(CASE WHEN status = 'planeamento' THEN 1 ELSE 0 END) as planeamento,
+        SUM(CASE WHEN status = 'testes_signage' THEN 1 ELSE 0 END) as testes_signage,
+        SUM(CASE WHEN status = 'concluido' THEN 1 ELSE 0 END) as concluido,
+        SUM(CASE WHEN status = 'atrasado' THEN 1 ELSE 0 END) as atrasado,
+        SUM(CASE WHEN signage_status = 'pronto' THEN 1 ELSE 0 END) as signage_pronto,
+        SUM(CASE WHEN signage_status = 'validacao' THEN 1 ELSE 0 END) as signage_validacao,
+        SUM(CASE WHEN signage_status = 'configuracao' THEN 1 ELSE 0 END) as signage_configuracao,
+        SUM(CASE WHEN signage_status = 'pendente' THEN 1 ELSE 0 END) as signage_pendente
+      FROM projects
+    `);
+
+    const totalPl = playerMetrics?.total_players || 0;
+    const readyPl = playerMetrics?.ready_players || 0;
+    const signageReadiness = totalPl > 0 ? Math.round((readyPl / totalPl) * 100) : 87;
+
+    // Totais Financeiros (mantidos para compatibilidade do modelo)
     const financials = db.get(`
       SELECT 
         COUNT(*) as active_count,
@@ -174,27 +233,11 @@ class Project {
       WHERE status != 'concluido'
     `);
 
-    // 3. Custos Acumulados no Mês Atual
     const monthlyCosts = db.get(`
       SELECT SUM(amount) as month_total 
       FROM project_costs 
       WHERE strftime('%Y-%m', entry_date) = strftime('%Y-%m', 'now')
     `);
-
-    // 4. Prontidão Digital Signage (baseada em signage_players)
-    const playerMetrics = db.get(`
-      SELECT 
-        COUNT(*) as total_players,
-        SUM(CASE WHEN status = 'online' OR status = 'syncing' THEN 1 ELSE 0 END) as ready_players,
-        SUM(CASE WHEN status = 'online' THEN 1 ELSE 0 END) as online_players,
-        SUM(CASE WHEN status = 'testing' THEN 1 ELSE 0 END) as testing_players,
-        SUM(CASE WHEN status = 'offline' THEN 1 ELSE 0 END) as offline_players
-      FROM signage_players
-    `);
-
-    const totalPl = playerMetrics?.total_players || 0;
-    const readyPl = playerMetrics?.ready_players || 0;
-    const signageReadiness = totalPl > 0 ? Math.round((readyPl / totalPl) * 100) : 87;
 
     return {
       nextOpening,
@@ -203,7 +246,49 @@ class Project {
         total: totalPl,
         online: playerMetrics?.online_players || 0,
         testing: playerMetrics?.testing_players || 0,
+        syncing: playerMetrics?.syncing_players || 0,
         offline: playerMetrics?.offline_players || 0
+      },
+      // Dados dedicados para o cartão "Infraestrutura Multimédia" (Fase 9 Piloto)
+      infraMultimedia: {
+        hardware: {
+          total: totalPl,
+          byModel: hardwareModels || [],
+          status: {
+            online: playerMetrics?.online_players || 0,
+            testing: playerMetrics?.testing_players || 0,
+            syncing: playerMetrics?.syncing_players || 0,
+            offline: playerMetrics?.offline_players || 0
+          }
+        },
+        resolutions: {
+          distinctCount: resolutions ? resolutions.length : 0,
+          list: resolutions || []
+        },
+        playlists: {
+          unassignedPlayersCount: playerMetrics?.unassigned_players || 0,
+          assignedPlayersCount: totalPl - (playerMetrics?.unassigned_players || 0),
+          totalPlaylists: playlistMetrics?.total_playlists || 0,
+          publishedPlaylists: playlistMetrics?.published || 0,
+          validatingPlaylists: playlistMetrics?.validating || 0,
+          draftPlaylists: playlistMetrics?.draft || 0
+        },
+        openings: {
+          total: projectMetrics?.total_openings || 0,
+          byStatus: {
+            em_curso: projectMetrics?.em_curso || 0,
+            planeamento: projectMetrics?.planeamento || 0,
+            testes_signage: projectMetrics?.testes_signage || 0,
+            concluido: projectMetrics?.concluido || 0,
+            atrasado: projectMetrics?.atrasado || 0
+          },
+          bySignageStatus: {
+            pronto: projectMetrics?.signage_pronto || 0,
+            validacao: projectMetrics?.signage_validacao || 0,
+            configuracao: projectMetrics?.signage_configuracao || 0,
+            pendente: projectMetrics?.signage_pendente || 0
+          }
+        }
       },
       avgDailyCost: financials?.avg_daily_cost || 378.50,
       totalDailyCost: financials?.total_daily_cost || 1135.50,

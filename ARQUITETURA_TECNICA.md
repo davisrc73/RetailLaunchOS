@@ -196,8 +196,12 @@ Os modelos encapsulam a lógica de negócio e queries SQL parametrizadas (evitan
   * Sanitiza e insere valores padrão para datas e orçamentos.
 * **`Project.getKpis()`**:
   * Identifica a próxima abertura ativa: `SELECT * FROM projects WHERE go_live_date >= DATE('now') ORDER BY go_live_date ASC LIMIT 1`.
-  * Calcula médias de custos diários, orçamentos globais e volume acumulado no mês.
   * Agrega em tempo real o rácio global de prontidão das telas (`signageReadiness`) e contadores operacionais (`signageStats`) diretamente a partir da tabela `signage_players`.
+  * **Fase 9 (Piloto Multimédia)**: Compila o objeto consolidado `infraMultimedia`:
+    * `hardware`: Total de displays físicos, desagregação por modelo (`byModel`) e contadores por estado operacional (`online`, `testing`, `syncing`, `offline`).
+    * `resolutions`: Número de formatos de saída distintos (`distinctCount`) e lista de resoluções mapeadas (`list`).
+    * `playlists`: Quantidade de ecrãs sem campanha atribuída (`unassignedPlayersCount`), total de telas vinculadas e status do catálogo de playlists.
+    * `openings`: Total de aberturas de loja no piloto com desagregação por status de obra e status técnico de signage (`pronto`, `configuracao`, `pendente`).
 
 ### 3.2. Modelo `Task.js` (Fase 2)
 * **`Task.findByProject(projectId)`**:
@@ -283,7 +287,7 @@ A API segue os padrões RESTful com payloads JSON e códigos de resposta HTTP se
 | Método | Endpoint | Parâmetros | Permissões | Descrição |
 | :--- | :--- | :--- | :---: | :--- |
 | **GET** | `/api/v1/projects` | `?brand=Fnac&status=em_curso` | Todos | Lista todas as lojas com progresso e filtros opcionais |
-| **GET** | `/api/v1/projects/kpis` | — | Todos | Retorna as métricas agregadas para os cartões de KPI |
+| **GET** | `/api/v1/projects/kpis` | — | Todos | Retorna as métricas agregadas de contagem, signage e infraestrutura multimédia (hardware, resoluções, playlists pendentes, aberturas) |
 | **GET** | `/api/v1/projects/:id` | `:id` (ID ou Código) | Todos | Detalha a loja, marcos técnicos e histórico de custos |
 | **POST** | `/api/v1/projects` | Body JSON com dados da loja | `admin` | Cria uma nova abertura de loja na base de dados |
 | **PUT** | `/api/v1/projects/:id` | Body JSON com campos a alterar | `admin`, `multimedia_user` | Atualiza campos de uma abertura existente |
