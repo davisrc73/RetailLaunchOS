@@ -156,12 +156,64 @@ class Project {
   // Métricas agregadas em tempo real para os KPIs do Dashboard
   static async getKpis() {
     // 1. Próxima Abertura Mais Iminente
-    const nextOpening = db.get(`
+    let nextOpening = db.get(`
       SELECT * FROM projects 
       WHERE go_live_date >= DATE('now')
       ORDER BY go_live_date ASC 
       LIMIT 1
     `) || db.get(`SELECT * FROM projects ORDER BY go_live_date ASC LIMIT 1`);
+
+    if (nextOpening) {
+      // Progresso da loja (%) com base nas tarefas técnicas
+      const storeTasks = db.get(`
+        SELECT 
+          COUNT(*) as total,
+          SUM(CASE WHEN status = 'concluido' THEN 1 ELSE 0 END) as completed
+        FROM tasks 
+        WHERE project_id = ?
+      `, [nextOpening.id]);
+
+      const tTotal = storeTasks?.total || 0;
+      const tComp = storeTasks?.completed || 0;
+      const progress = tTotal > 0 
+        ? Math.round((tComp / tTotal) * 100) 
+        : (nextOpening.status === 'em_curso' ? 75 : (nextOpening.status === 'concluido' ? 100 : 25));
+
+      // Contagem de Displays e Formatos / Resoluções na loja
+      const storePlayers = db.get(`
+        SELECT 
+          COUNT(*) as displays_count,
+          COUNT(DISTINCT resolution) as formats_count,
+          SUM(CASE WHEN playlist_id IS NOT NULL THEN 1 ELSE 0 END) as assigned_playlists,
+          SUM(CASE WHEN playlist_id IS NULL THEN 1 ELSE 0 END) as unassigned_playlists
+        FROM signage_players 
+        WHERE project_id = ?
+      `, [nextOpening.id]);
+
+      const displaysCount = storePlayers?.displays_count || 0;
+      const formatsCount = storePlayers?.formats_count || 0;
+      const unassignedPl = storePlayers?.unassigned_playlists || 0;
+
+      let playlistsState = '100% OK';
+      let playlistsStateClass = 'ready';
+      if (displaysCount === 0) {
+        playlistsState = '0 Telas';
+        playlistsStateClass = 'pending';
+      } else if (unassignedPl > 0) {
+        playlistsState = `${unassignedPl} a Associar`;
+        playlistsStateClass = 'warning';
+      }
+
+      nextOpening = {
+        ...nextOpening,
+        progress,
+        displaysCount,
+        formatsCount,
+        playlistsState,
+        playlistsStateClass,
+        unassignedPlaylistsCount: unassignedPl
+      };
+    }
 
     // 2. Métricas de Hardware & Displays (signage_players)
     const playerMetrics = db.get(`

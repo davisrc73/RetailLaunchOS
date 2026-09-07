@@ -316,25 +316,29 @@ O painel superior do Dashboard atualiza-se em tempo real com os indicadores chav
 1. **Próxima Abertura (Hero Card)**:
    * Deteta automaticamente a loja com data de go-live mais iminente.
    * Apresenta um relógio com contagem decrescente ativa ao segundo: `[Dias : Horas : Minutos : Segundos]`.
+   * **Progresso da Loja (%)**: Barra de progresso visual com cálculo automático baseado na percentagem de marcos e tarefas técnicas concluídas para esta loja.
+   * **Displays**: Quantidade total de ecrãs/players alocados a esta abertura específica.
+   * **Formatos**: Contagem de resoluções de saída distintas utilizadas nesta loja (ex.: *4K*, *FHD*, *LED Wall*).
+   * **Playlists**: Estado de vinculação de campanhas para as telas desta loja (`100% OK`, `X a Associar` ou `0 Telas`).
 2. **Playlists & Signage**:
    * Barra de prontidão percentual calculada a partir do rácio de ecrãs `Online` face ao total do parque.
    * Sub-contadores dinâmicos: `Players Ativos`, `Em Teste` e `Falhas` alimentados diretamente pela base de dados.
-3. **Infraestrutura Multimédia (Fase 9 • Piloto Gabinete Multimédia)**:
+3. **Infraestrutura Multimédia**:
    * Cartão integrado e proeminente (com largura expandida na grelha desktop) concebido para substituir os antigos indicadores puramente financeiros e centralizar a monitorização técnica do parque audiovisual em 4 micro-painéis temáticos em tempo real:
-     * **A. Modelos de Hardware & Estado**:
+     * **A. Hardware**:
        * Total de ecrãs e players físicos instalados ou em stock.
-       * Chips desagregados com as marcas e modelos (ex.: *BrightSign XT1144 4K*, *Samsung Tizen*, *LG webOS*).
+       * Chips desagregados com as marcas e modelos (ex.: *BrightSign XT*, *Samsung Tizen*, *LG webOS*).
        * Linha de estado operacional imediato com micro-indicadores luminosos: `Online` (verde), `Em Teste` (âmbar), `Syncing` (azul) e `Offline` (vermelho).
        * *Interação*: Clicar neste bloco abre diretamente o **Catálogo Global de Telas & Players** em "Configurações".
-     * **B. Resoluções de Saída**:
+     * **B. Resoluções**:
        * Contagem de formatos de saída distintos presentes no ecossistema (ex.: `4K UHD`, `1080p FHD`, `Video Wall LED`).
        * Chips com as resoluções e o número de displays mapeados com cada resolução.
-     * **C. Playlists a Associar**:
+     * **C. Playlists**:
        * Rácio de ecrãs do parque que ainda se encontram sem campanha atribuída (`playlist_id IS NULL`).
        * Badge de validação (`✓ 100% Telas Vinculadas` quando todas as telas têm conteúdo atribuído, ou aviso dourado com o número de telas pendentes).
        * Total de campanhas ativas e publicadas no catálogo prontas para broadcast.
        * *Interação*: Clicar neste bloco abre diretamente o **Catálogo de Playlists**.
-     * **D. Número de Aberturas & Estado**:
+     * **D. Aberturas**:
        * Total de lojas/obras integradas no piloto Fnac / Darty.
        * Desagregação por estágio de execução: `Em Curso`, `Planeamento` e `Concluído`.
        * Sumário rápido do estado de Digital Signage das lojas (`Pronto`, `Configuração` ou `Pendente`).

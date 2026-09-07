@@ -752,6 +752,102 @@ body {
   color: var(--text-white);
 }
 
+/* Próxima Abertura: Progresso e Métricas Técnicas */
+.hero-progress-section {
+  margin-top: 10px;
+}
+
+.hero-progress-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 11px;
+  margin-bottom: 5px;
+}
+
+.hero-progress-header span {
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+.hero-progress-header strong {
+  color: var(--fnac-gold);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11.5px;
+}
+
+.hero-store-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin-top: 12px;
+  padding-top: 10px;
+  border-top: 1px solid var(--border-subtle);
+}
+
+.hero-stat-pill {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  padding: 6px 4px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  text-align: center;
+  transition: var(--transition);
+}
+
+.hero-stat-pill:hover {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(245, 176, 39, 0.3);
+}
+
+.hero-stat-pill-label {
+  font-size: 9.5px;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: var(--text-muted);
+  letter-spacing: 0.4px;
+}
+
+.hero-stat-pill-val {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-white);
+}
+
+.hero-stat-badge {
+  font-size: 9.5px;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 4px;
+  display: inline-flex;
+  align-items: center;
+  text-align: center;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
+.hero-stat-badge.ready {
+  color: #10B981;
+  background: rgba(16, 185, 129, 0.12);
+  border: 1px solid rgba(16, 185, 129, 0.25);
+}
+
+.hero-stat-badge.warning {
+  color: var(--fnac-gold);
+  background: rgba(245, 176, 39, 0.12);
+  border: 1px solid rgba(245, 176, 39, 0.25);
+}
+
+.hero-stat-badge.pending {
+  color: var(--text-muted);
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--border-subtle);
+}
+
 /* Metric Display Values */
 .kpi-val {
   font-size: 30px;

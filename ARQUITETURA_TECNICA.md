@@ -196,6 +196,11 @@ Os modelos encapsulam a lógica de negócio e queries SQL parametrizadas (evitan
   * Sanitiza e insere valores padrão para datas e orçamentos.
 * **`Project.getKpis()`**:
   * Identifica a próxima abertura ativa: `SELECT * FROM projects WHERE go_live_date >= DATE('now') ORDER BY go_live_date ASC LIMIT 1`.
+  * **Fase 9 (Refinamento Hero Card)**: O objeto `nextOpening` é enriquecido em tempo real com métricas da loja iminente:
+    * `progress`: Percentagem de progresso real calculado com base nas tarefas técnicas concluídas.
+    * `displaysCount`: Quantidade de displays/players associados à loja.
+    * `formatsCount`: Contagem de formatos/resoluções distintas utilizadas na loja.
+    * `playlistsState` & `playlistsStateClass`: Estado de associação de playlists (`100% OK`, `X a Associar` ou `0 Telas`).
   * Agrega em tempo real o rácio global de prontidão das telas (`signageReadiness`) e contadores operacionais (`signageStats`) diretamente a partir da tabela `signage_players`.
   * **Fase 9 (Piloto Multimédia)**: Compila o objeto consolidado `infraMultimedia`:
     * `hardware`: Total de displays físicos, desagregação por modelo (`byModel`) e contadores por estado operacional (`online`, `testing`, `syncing`, `offline`).

@@ -11,12 +11,14 @@
 
 No âmbito do desenvolvimento focado no **piloto exclusivo para o Gabinete Multimédia**, a secção superior de KPIs do Dashboard foi otimizada para refletir diretamente o trabalho técnico dos especialistas de Digital Signage:
 - **Remoção Concluída**: Foram retirados os cartões *"Custo Diário Médio"* e *"Budget Global Alocado"*.
-- **Novo Cartão Ativo**: Integração do cartão proeminente **"Infraestrutura Multimédia"** com expansão de 2 colunas em monitores desktop (`>= 1200px`), preenchendo harmoniosamente a grelha de 4 colunas com o Hero Countdown e o indicador de Playlists & Signage.
-- **4 Micro-Painéis Técnicos em Tempo Real**:
-  1. **Modelos de Hardware & Estado**: Exibe o total de dispositivos (6 Displays), chips de modelo (*BrightSign XT*, *BrightSign HD*, *Samsung Tizen*, *LG webOS*) e badges operacionais (`4 Online`, `1 Teste`, `1 Sync`, `0 Off`). Clicar neste bloco abre diretamente o Catálogo Global de Hardware.
-  2. **Resoluções de Saída**: Apresenta a quantidade de formatos distintos (3 Formatos) e chips com as contagens de displays configurados (*1080p FHD: 4*, *Video Wall LED: 1*, *4K UHD: 1*).
-  3. **Playlists a Associar**: Monitoriza ecrãs sem conteúdo vinculado (0 telas pendentes) com badge de validação (`✓ 100% Telas Vinculadas`) e contagem de campanhas ativas no catálogo. Clicar neste bloco abre o Catálogo de Playlists.
-  4. **Número de Aberturas & Estado**: Consolidação de lojas em preparação (3 Lojas no piloto: *1 Em Curso*, *2 Planeamento*, *0 Concluído*) e sumário de prontidão de Digital Signage (*1 Pronto*, *1 Configuração*, *1 Pendente*). Clicar neste bloco faz scroll imediato para a tabela de aberturas.
+- **Novo Cartão "Infraestrutura Multimédia"**: Integração do cartão com expansão de 2 colunas em desktop (`>= 1200px`), com títulos simplificados (**Hardware**, **Resoluções**, **Playlists**, **Aberturas**) e remoção do subtítulo redundante.
+  1. **Hardware**: Total de dispositivos (6 Displays), chips de modelo (*BrightSign XT*, *BrightSign HD*, *Samsung Tizen*, *LG webOS*) e badges operacionais (`4 Online`, `1 Teste`, `1 Sync`, `0 Off`).
+  2. **Resoluções**: Formatos distintos (3 Formatos) e chips com as contagens de displays configurados (*1080p FHD: 4*, *Video Wall LED: 1*, *4K UHD: 1*).
+  3. **Playlists**: Monitorização de ecrãs sem conteúdo vinculado (0 telas pendentes) com badge de validação (`✓ 100% Telas Vinculadas`) e campanhas prontas no catálogo.
+  4. **Aberturas**: Consolidação de lojas piloto (3 Lojas: *1 Em Curso*, *2 Planeamento*, *0 Concluído*) e sumário de signage (*1 Pronto*, *1 Configuração*, *1 Pendente*).
+- **Refinamento do Cartão "Próxima Abertura" (Hero Countdown)**:
+  - Adicionada **Barra de Progresso da Loja (%)** alimentada pelas tarefas técnicas.
+  - Adicionado grid de métricas da loja iminente: **Displays** (quantidade de ecrãs), **Formatos** (resoluções distintas) e **Playlists** (estado de associação de conteúdos).
 
 ---
 

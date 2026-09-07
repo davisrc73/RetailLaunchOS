@@ -276,9 +276,36 @@
             </div>
           </div>
 
+          <!-- Progresso da Loja (%) -->
+          <div class="hero-progress-section">
+            <div class="hero-progress-header">
+              <span>Progresso da Loja</span>
+              <strong id="kpiHeroProgressVal">0%</strong>
+            </div>
+            <div class="signage-progress-bar" style="height: 6px;">
+              <div class="signage-progress-fill" id="kpiHeroProgressFill" style="width: 0%; background: linear-gradient(90deg, var(--fnac-gold), #FFDB00);"></div>
+            </div>
+          </div>
+
+          <!-- Métricas Multimédia da Loja: Displays, Formatos, Playlists a Associar -->
+          <div class="hero-store-stats-grid">
+            <div class="hero-stat-pill">
+              <span class="hero-stat-pill-label">Displays</span>
+              <strong class="hero-stat-pill-val" id="kpiHeroDisplays">0</strong>
+            </div>
+            <div class="hero-stat-pill">
+              <span class="hero-stat-pill-label">Formatos</span>
+              <strong class="hero-stat-pill-val" id="kpiHeroFormats">0</strong>
+            </div>
+            <div class="hero-stat-pill">
+              <span class="hero-stat-pill-label">Playlists</span>
+              <span class="hero-stat-badge pending" id="kpiHeroPlaylists">0 Telas</span>
+            </div>
+          </div>
+
           <div class="target-store-meta">
             <span>Inauguração: <strong id="kpiHeroTargetDate">22 Set 2026</strong></span>
-            <span class="status-badge badge-signage-testing" id="kpiHeroStatus">Validação Final</span>
+            <span class="status-badge badge-signage-testing" id="kpiHeroStatus">Planeamento</span>
           </div>
         </div>
 
@@ -314,7 +341,6 @@
           <div class="kpi-header">
             <div class="infra-title-block">
               <span class="kpi-label">Infraestrutura Multimédia</span>
-              <span class="infra-badge-pilot">Piloto Multimédia</span>
             </div>
             <div class="kpi-icon-wrap" style="background: rgba(56, 189, 248, 0.12); color: #38BDF8;">
               <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -324,10 +350,10 @@
           </div>
 
           <div class="infra-metrics-grid">
-            <!-- Sub-painel 1: Modelos de Hardware & Estado -->
+            <!-- Sub-painel 1: Hardware & Estado -->
             <div class="infra-sub-block" id="infraHwBlock" title="Clique para abrir Catálogo Global de Hardware" onclick="if(typeof openPlayersCatalog === 'function') openPlayersCatalog();" style="cursor: pointer;">
               <div class="infra-sub-header">
-                <span class="infra-sub-title">Modelos de Hardware</span>
+                <span class="infra-sub-title">Hardware</span>
                 <span class="infra-total-pill" id="infraHwTotal">0 Displays</span>
               </div>
               <div class="infra-hardware-models" id="infraHwModelsList">
@@ -341,10 +367,10 @@
               </div>
             </div>
 
-            <!-- Sub-painel 2: Resoluções de Saída -->
+            <!-- Sub-painel 2: Resoluções -->
             <div class="infra-sub-block" id="infraResBlock" title="Clique para ver Catálogo de Hardware" onclick="if(typeof openPlayersCatalog === 'function') openPlayersCatalog();" style="cursor: pointer;">
               <div class="infra-sub-header">
-                <span class="infra-sub-title">Resoluções de Saída</span>
+                <span class="infra-sub-title">Resoluções</span>
                 <span class="infra-total-pill" id="infraResDistinctCount">0 Formatos</span>
               </div>
               <div class="infra-resolution-chips" id="infraResChipsList">
@@ -355,10 +381,10 @@
               </div>
             </div>
 
-            <!-- Sub-painel 3: Playlists a Associar -->
+            <!-- Sub-painel 3: Playlists -->
             <div class="infra-sub-block" id="infraPlaylistsBlock" title="Clique para gerir Playlists" onclick="if(typeof openPlaylistCatalog === 'function') openPlaylistCatalog();" style="cursor: pointer;">
               <div class="infra-sub-header">
-                <span class="infra-sub-title">Playlists a Associar</span>
+                <span class="infra-sub-title">Playlists</span>
                 <span class="infra-total-pill" id="infraPlaylistsBadge">0 Pendentes</span>
               </div>
               <div class="infra-playlist-stats">
@@ -376,10 +402,10 @@
               </div>
             </div>
 
-            <!-- Sub-painel 4: Número de Aberturas & Estado -->
+            <!-- Sub-painel 4: Aberturas & Estado -->
             <div class="infra-sub-block" id="infraOpeningsBlock" title="Ver tabela de aberturas" onclick="document.getElementById('aberturas-section')?.scrollIntoView({ behavior: 'smooth' });" style="cursor: pointer;">
               <div class="infra-sub-header">
-                <span class="infra-sub-title">Número de Aberturas</span>
+                <span class="infra-sub-title">Aberturas</span>
                 <span class="infra-total-pill" id="infraOpeningsTotal">0 Lojas</span>
               </div>
               <div class="infra-openings-breakdown">
@@ -2151,7 +2177,7 @@
         if (json.success && json.data) {
           const kpis = json.data;
 
-          // Atualizar Hero Countdown
+          // Atualizar Hero Countdown e Métricas Técnicas da Próxima Abertura
           if (kpis.nextOpening) {
             setupCountdown(
               kpis.nextOpening.go_live_date,
@@ -2159,6 +2185,43 @@
               kpis.nextOpening.location,
               kpis.nextOpening.brand
             );
+
+            // 1. Progresso da Loja (%)
+            const progress = kpis.nextOpening.progress !== undefined ? kpis.nextOpening.progress : 0;
+            const progressValEl = document.getElementById('kpiHeroProgressVal');
+            const progressFillEl = document.getElementById('kpiHeroProgressFill');
+            if (progressValEl) progressValEl.innerText = `${progress}%`;
+            if (progressFillEl) progressFillEl.style.width = `${progress}%`;
+
+            // 2. Quantidade de Displays
+            const displaysEl = document.getElementById('kpiHeroDisplays');
+            if (displaysEl) displaysEl.innerText = kpis.nextOpening.displaysCount || 0;
+
+            // 3. Formatos
+            const formatsEl = document.getElementById('kpiHeroFormats');
+            if (formatsEl) formatsEl.innerText = kpis.nextOpening.formatsCount || 0;
+
+            // 4. Estado das Playlists a Associar
+            const playlistsBadgeEl = document.getElementById('kpiHeroPlaylists');
+            if (playlistsBadgeEl) {
+              const pState = kpis.nextOpening.playlistsState || '0 Telas';
+              const pClass = kpis.nextOpening.playlistsStateClass || 'ready';
+              playlistsBadgeEl.className = `hero-stat-badge ${pClass}`;
+              playlistsBadgeEl.innerText = pState;
+            }
+
+            // Status Badge
+            const statusEl = document.getElementById('kpiHeroStatus');
+            if (statusEl && kpis.nextOpening.status) {
+              const statusMap = {
+                'em_curso': 'Em Curso',
+                'planeamento': 'Planeamento',
+                'testes_signage': 'Testes Signage',
+                'concluido': 'Concluído',
+                'atrasado': 'Atrasado'
+              };
+              statusEl.innerText = statusMap[kpis.nextOpening.status] || kpis.nextOpening.status;
+            }
           }
 
           // Atualizar Signage Readiness & Sub-estatísticas
