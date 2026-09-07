@@ -36,6 +36,7 @@ Caso seja necessário recriar o ambiente a partir de raiz num novo servidor ou n
    - **Via Docker no Synology NAS**: `docker-compose up -d`
 3. **Mecanismo de Auto-Bootstrap**:
    - O ficheiro `src/database/db.js` deteta a ausência da base de dados e compila automaticamente o esquema relacional integral em `database/schema.sql`.
-4. **Consulta das Decisões de Engenharia**:
+4. **Consulta das Decisões de Engenharia & Dados**:
    - Consultar [`ARQUITETURA_TECNICA.md`](file:///Users/daviscorreia/Antigravity%20/RetailLaunchOS/ARQUITETURA_TECNICA.md) para detalhes de rotas, classes DAO e modelos relacionais.
+   - Consultar [`MANUAL_BASE_DE_DADOS.md`](file:///Users/daviscorreia/Antigravity%20/RetailLaunchOS/MANUAL_BASE_DE_DADOS.md) para documentação dos ficheiros SQLite, persistência em volumes Docker, backups e restauros.
    - Consultar [`MANUAL_UTILIZADOR_MODAIS.md`](file:///Users/daviscorreia/Antigravity%20/RetailLaunchOS/MANUAL_UTILIZADOR_MODAIS.md) para documentação de interface e fluxos de negócio do Gabinete Multimédia.

@@ -22,6 +22,9 @@ Para garantir um desenvolvimento organizado e de fácil manutenção, o projeto 
 * 🖥️ **[Manual de Deploy e Sincronização Synology NAS](file:///Users/daviscorreia/Antigravity%20/RetailLaunchOS/MANUAL_SYNOLOGY.md)**  
   *Procedimentos para correr a aplicação em contentor Docker no Synology Container Manager e automação de atualizações via Agendador de Tarefas do DSM.*
 
+* 🗄️ **[Manual de Gestão & Arquitetura da Base de Dados](file:///Users/daviscorreia/Antigravity%20/RetailLaunchOS/MANUAL_BASE_DE_DADOS.md)**  
+  *Guia de referência da base de dados: ficheiros SQLite (`database/retaillaunch.sqlite`), modo WAL, auto-bootstrap com `schema.sql`, persistência em volumes Docker, backups e ferramentas de consulta.*
+
 ---
 
 ## ⚡ Arranque Rápido
