@@ -202,11 +202,15 @@ Os modelos encapsulam a lógica de negócio e queries SQL parametrizadas (evitan
     * `formatsCount`: Contagem de formatos/resoluções distintas utilizadas na loja.
     * `playlistsState` & `playlistsStateClass`: Estado de associação de playlists (`100% OK`, `X a Associar` ou `0 Telas`).
   * Agrega em tempo real o rácio global de prontidão das telas (`signageReadiness`) e contadores operacionais (`signageStats`) diretamente a partir da tabela `signage_players`.
-  * **Fase 10 (Gestão e Operações de Abertura)**:
+  * **Fase 10 (Gestão e Operações de Abertura • Layout Consolidado de 3 Cartões)**:
     * `planningProgress`: Agrega o progresso de planeamento de todas as lojas ativas (`percentage`, `totalTasks`, `completedTasks`, `pendingTasks`, `activeStoresCount`).
     * `checklistTasks`: Contabiliza tarefas pendentes globais com desagregação por prioridade (`critical`, `high`, `medium`, `low`).
     * `dueSoonTasks`: Calcula tarefas com prazo de entrega na semana corrente (próximos 7 dias) e tarefas em atraso (`overdue`, `thisWeek`, `total`).
     * `Project.create(data)`: Atualizado para auto-inicializar automaticamente 4 tarefas técnicas padrão essenciais para qualquer nova abertura criada.
+    * **Arquitetura de Apresentação Superior (3 Cartões de Alta Densidade)**:
+      1. *Próxima Abertura*: Contagem decrescente, displays, formatos e estado das playlists.
+      2. *Planeamento Lojas*: Renderizado via `renderStoresPlanningCard` com lista dinâmica de lojas, nomes, badges de marca e barras de progresso individuais.
+      3. *Checklists & Prazos*: Unifica em duas colunas internas de alta densidade o controlo de tarefas pendentes e o radar de alertas Due Soon da semana.
 
 ### 3.2. Modelo `Task.js` (Fases 2 & 10)
 * **`Task.findAllGlobal(filters)` (Novo na Fase 10)**:

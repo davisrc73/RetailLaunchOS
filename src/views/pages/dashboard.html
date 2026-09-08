@@ -309,88 +309,89 @@
           </div>
         </div>
 
-        <!-- KPI 2 (Fase 10): Progresso Global das Lojas em Planeamento -->
+        <!-- KPI 2 (Fase 10 Atualizada): Planeamento Lojas (Progresso Individual por Loja) -->
         <div class="kpi-card kpi-planning-card" id="kpiPlanningCard">
           <div class="kpi-header">
-            <span class="kpi-label">Progresso do Planeamento</span>
+            <div style="display: flex; flex-direction: column;">
+              <span class="kpi-label">Planeamento Lojas</span>
+              <span style="font-size: 11px; color: var(--text-dim); margin-top: 2px;">Progresso global por loja</span>
+            </div>
             <div class="kpi-icon-wrap" style="background: rgba(245, 176, 39, 0.12); color: var(--fnac-gold);">
               <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
               </svg>
             </div>
           </div>
           
-          <div class="kpi-val" id="kpiPlanningProgressPercent">0%</div>
-          <div class="kpi-subtitle" id="kpiPlanningProgressSub">Tarefas concluídas em lojas ativas</div>
-
-          <div class="signage-meter-wrap" style="margin-top: 14px;">
-            <div class="signage-progress-bar">
-              <div class="signage-progress-fill" id="kpiPlanningProgressFill" style="width: 0%;"></div>
+          <!-- Lista de Lojas com Nome e Barra de Progresso individual -->
+          <div class="stores-planning-list" id="storesPlanningList">
+            <div style="text-align: center; padding: 24px; color: var(--text-dim); font-size: 12px;">
+              A carregar lojas...
             </div>
           </div>
 
           <div class="planning-sub-stats" id="kpiPlanningSubStats">
-            <span><strong id="kpiPlanningTasksDone">0</strong> Concluídas</span>
-            <span><strong id="kpiPlanningTasksTotal">0</strong> Totais</span>
-            <span><strong id="kpiPlanningStoresCount">0</strong> Lojas</span>
+            <span><strong id="kpiPlanningStoresCount">0</strong> Lojas em Curso</span>
+            <span>Média: <strong id="kpiPlanningAvgPercent">0%</strong></span>
           </div>
         </div>
 
-        <!-- KPI 3 (Fase 10): Tarefas Pendentes de Checklist (Clicável) -->
-        <div class="kpi-card kpi-interactive kpi-checklist-card" id="kpiPendingTasksCard" onclick="openGlobalTasksModal('pending')" title="Clique para abrir e gerir a Checklist Global de Tarefas">
-          <div class="kpi-header">
-            <span class="kpi-label">Tarefas em Checklist</span>
+        <!-- KPI 3 (Fase 10 Atualizada): Checklists & Prazos (Cartão Unificado de Alta Densidade) -->
+        <div class="kpi-card kpi-tasks-deadlines-card" id="kpiTasksDeadlinesCard">
+          <div class="kpi-header" style="margin-bottom: 10px;">
+            <div style="display: flex; flex-direction: column;">
+              <span class="kpi-label">Checklists & Prazos</span>
+              <span style="font-size: 11px; color: var(--text-dim); margin-top: 2px;">Tarefas pendentes e alertas operacionais</span>
+            </div>
             <div class="kpi-icon-wrap" style="background: rgba(56, 189, 248, 0.12); color: #38BDF8;">
               <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path>
               </svg>
             </div>
           </div>
-          
-          <div class="kpi-val" id="kpiPendingTasksCount">0</div>
-          <div class="kpi-subtitle" id="kpiPendingTasksSub">Tarefas por concluir nas checklists</div>
 
-          <div class="kpi-action-strip">
-            <span class="kpi-interactive-link">
-              <span>Gerir Tarefas por Loja</span>
-              <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
-              </svg>
-            </span>
-          </div>
+          <div class="tasks-deadlines-grid">
+            <!-- Coluna 1: Tarefas em Checklist (Clicável) -->
+            <div class="td-column td-pending-block" id="blockPendingTasks" onclick="openGlobalTasksModal('pending')" title="Clique para abrir tarefas pendentes">
+              <div class="td-block-header">
+                <span class="td-block-tag pending">Checklist</span>
+                <span class="td-arrow-icon">↗</span>
+              </div>
+              <div class="td-val" id="kpiPendingTasksCount">0</div>
+              <div class="td-label">Tarefas Pendentes</div>
+              
+              <div class="td-chips-wrap">
+                <span class="p-chip p-critical" id="chipCritCount">0 Críticas</span>
+                <span class="p-chip p-high" id="chipHighCount">0 Altas</span>
+              </div>
+            </div>
 
-          <div class="checklist-priority-chips" id="kpiChecklistPriorityChips">
-            <span class="p-chip p-critical" id="chipCritCount">0 Críticas</span>
-            <span class="p-chip p-high" id="chipHighCount">0 Altas</span>
-          </div>
-        </div>
+            <!-- Separador Vertical -->
+            <div class="td-divider"></div>
 
-        <!-- KPI 4 (Fase 10): Tarefas Due Soon (Esta Semana / Alertas) (Clicável) -->
-        <div class="kpi-card kpi-interactive kpi-duesoon-card" id="kpiDueSoonCard" onclick="openGlobalTasksModal('due_soon')" title="Clique para ver alertas de tarefas com prazo na semana">
-          <div class="kpi-header">
-            <span class="kpi-label">Due Soon • Esta Semana</span>
-            <div class="kpi-icon-wrap" style="background: rgba(239, 68, 68, 0.12); color: #EF4444;">
-              <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-              </svg>
+            <!-- Coluna 2: Due Soon • Esta Semana (Clicável) -->
+            <div class="td-column td-duesoon-block" id="blockDueSoonTasks" onclick="openGlobalTasksModal('due_soon')" title="Clique para ver alertas de prazos na semana">
+              <div class="td-block-header">
+                <span class="td-block-tag duesoon">⚡ Due Soon</span>
+                <span class="td-arrow-icon">↗</span>
+              </div>
+              <div class="td-val alert-color" id="kpiDueSoonCount">0</div>
+              <div class="td-label">Prazos na Semana</div>
+
+              <div class="td-chips-wrap">
+                <span class="alert-pill overdue" id="pillOverdueCount" style="display: none;">0 Atrasadas</span>
+                <span class="alert-pill this-week" id="pillThisWeekCount">0 Esta Semana</span>
+              </div>
             </div>
           </div>
-          
-          <div class="kpi-val" id="kpiDueSoonCount" style="color: #F59E0B;">0</div>
-          <div class="kpi-subtitle" id="kpiDueSoonSub">Prazos a vencer nos próximos 7 dias</div>
 
-          <div class="kpi-action-strip">
-            <span class="kpi-interactive-link" style="color: #F59E0B;">
-              <span>Ver Alertas da Semana</span>
-              <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div class="kpi-action-strip" style="margin-top: 10px; justify-content: center; border-top: 1px solid rgba(255, 255, 255, 0.05); padding-top: 8px;">
+            <span class="kpi-interactive-link" onclick="openGlobalTasksModal('all')" style="cursor: pointer; color: var(--text-muted); font-size: 11.5px;">
+              <span>Abrir Gestão Global de Tarefas</span>
+              <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
               </svg>
             </span>
-          </div>
-
-          <div class="duesoon-alert-pills" id="kpiDueSoonAlertPills">
-            <span class="alert-pill overdue" id="pillOverdueCount" style="display: none;">0 Atrasadas</span>
-            <span class="alert-pill this-week" id="pillThisWeekCount">0 Esta Semana</span>
           </div>
         </div>
 
@@ -1059,6 +1060,8 @@
         </form>
       </div>
     </div>
+  </div>
+
   <!-- =========================================================================
        MODAL: CHECKLIST GLOBAL DE ABERTURAS & GESTÃO DE TAREFAS (FASE 10)
        ========================================================================= -->
@@ -2241,6 +2244,63 @@
       });
     }
 
+    // Renderizar Cartão "Planeamento Lojas" com Progresso Individual por Loja
+    function renderStoresPlanningCard(projects) {
+      const container = document.getElementById('storesPlanningList');
+      if (!container) return;
+
+      if (!projects || projects.length === 0) {
+        container.innerHTML = `
+          <div style="text-align: center; padding: 20px; color: var(--text-dim); font-size: 12px;">
+            Nenhuma loja em planeamento registada.
+          </div>
+        `;
+        const storesEl = document.getElementById('kpiPlanningStoresCount');
+        const avgEl = document.getElementById('kpiPlanningAvgPercent');
+        if (storesEl) storesEl.innerText = '0';
+        if (avgEl) avgEl.innerText = '0%';
+        return;
+      }
+
+      // Ordenar por data de go_live
+      const sorted = [...projects].sort((a, b) => new Date(a.go_live_date || '9999-12-31') - new Date(b.go_live_date || '9999-12-31'));
+
+      let totalPct = 0;
+      let html = '';
+
+      sorted.forEach(p => {
+        const brandClass = (p.brand && p.brand.toLowerCase() === 'darty') ? 'darty' : 'fnac';
+        const brandLabel = (p.brand && p.brand.toLowerCase() === 'darty') ? 'DARTY' : 'FNAC';
+        const pct = (p.progress !== undefined && p.progress !== null) ? p.progress : 0;
+        totalPct += pct;
+
+        html += `
+          <div class="store-planning-row" onclick="openProjectDetails(${p.id})" title="Clique para gerir ${escapeHtml(p.name)}">
+            <div class="store-planning-info">
+              <span class="store-brand-mini-badge ${brandClass}">${brandLabel}</span>
+              <span class="store-planning-name" title="${escapeHtml(p.name)}">${escapeHtml(p.name)}</span>
+            </div>
+            <div class="store-planning-progress-wrap">
+              <div class="store-planning-bar">
+                <div class="store-planning-fill ${brandClass}" style="width: ${pct}%;"></div>
+              </div>
+              <span class="store-planning-pct">${pct}%</span>
+            </div>
+          </div>
+        `;
+      });
+
+      container.innerHTML = html;
+
+      const storesEl = document.getElementById('kpiPlanningStoresCount');
+      const avgEl = document.getElementById('kpiPlanningAvgPercent');
+      if (storesEl) storesEl.innerText = sorted.length;
+      if (avgEl) {
+        const avg = sorted.length > 0 ? Math.round(totalPct / sorted.length) : 0;
+        avgEl.innerText = `${avg}%`;
+      }
+    }
+
     // Carregar Projetos da API REST
     async function loadProjects() {
       try {
@@ -2255,6 +2315,7 @@
 
           applyFilter(currentFilter);
           populateGlobalTasksStoreDropdowns();
+          renderStoresPlanningCard(allProjects);
           loadKpis();
         }
       } catch (err) {
@@ -2321,25 +2382,9 @@
           // FASE 10: Novos KPIs de Planeamento, Checklist e Alertas Due Soon
           // =================================================================
 
-          // 1. Progresso Global do Planeamento
-          if (kpis.planningProgress) {
-            const pp = kpis.planningProgress;
-            const pct = (pp.percentage !== undefined && pp.percentage !== null) ? pp.percentage : 0;
-            const pctEl = document.getElementById('kpiPlanningProgressPercent');
-            const fillEl = document.getElementById('kpiPlanningProgressFill');
-            const doneEl = document.getElementById('kpiPlanningTasksDone');
-            const totalEl = document.getElementById('kpiPlanningTasksTotal');
-            const storesEl = document.getElementById('kpiPlanningStoresCount');
-            const subEl = document.getElementById('kpiPlanningProgressSub');
-
-            if (pctEl) pctEl.innerText = `${pct}%`;
-            if (fillEl) fillEl.style.width = `${pct}%`;
-            if (doneEl) doneEl.innerText = pp.completedTasks || 0;
-            if (totalEl) totalEl.innerText = pp.totalTasks || 0;
-            if (storesEl) storesEl.innerText = pp.activeStores || 0;
-            if (subEl) {
-              subEl.innerText = `${pp.completedTasks || 0} de ${pp.totalTasks || 0} tarefas concluídas (${pp.activeStores || 0} lojas)`;
-            }
+          // 1. Planeamento Lojas (Lista com Progresso Individual por Loja)
+          if (allProjects && allProjects.length > 0) {
+            renderStoresPlanningCard(allProjects);
           }
 
           // 2. Tarefas em Checklist (Pendentes)
@@ -3561,6 +3606,16 @@
       container.innerHTML = html;
     }
 
+    // Exposição global das funções do modal para garantir invocação sem restrições
+    window.openGlobalTasksModal = openGlobalTasksModal;
+    window.closeGlobalTasksModal = closeGlobalTasksModal;
+    window.setGlobalTaskFilter = setGlobalTaskFilter;
+    window.onGlobalTasksStoreChange = onGlobalTasksStoreChange;
+    window.toggleQuickAddTaskForm = toggleQuickAddTaskForm;
+    window.handleQuickAddTaskSubmit = handleQuickAddTaskSubmit;
+    window.toggleGlobalTask = toggleGlobalTask;
+    window.renderStoresPlanningCard = renderStoresPlanningCard;
+
     // Ação: Criar Novo Custo para a Loja
     async function handleCreateCost(e, projectId) {
       e.preventDefault();
@@ -4299,6 +4354,12 @@
 
       // 2. Carregar Projetos e KPIs
       loadProjects();
+
+      // 3. Vincular cliques nos blocos do Card Checklists & Prazos
+      const bPending = document.getElementById('blockPendingTasks');
+      if (bPending) bPending.addEventListener('click', () => openGlobalTasksModal('pending'));
+      const bDueSoon = document.getElementById('blockDueSoonTasks');
+      if (bDueSoon) bDueSoon.addEventListener('click', () => openGlobalTasksModal('due_soon'));
     });
   </script>
 </body>

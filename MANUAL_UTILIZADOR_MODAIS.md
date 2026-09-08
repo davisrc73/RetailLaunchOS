@@ -308,52 +308,47 @@ O sistema utiliza 6 cores secundárias normalizadas para identificação de peri
 5. **Turquesa Conetividade (`#28E4AB`)**: Aplicado em gradientes de prontidão de rede audiovisual e testes de broadcast.
 6. **Rosa Neon (`#FF7BF9`)**: Utilizado em custos e rubricas orçamentais diversas.
 
-## 7. Painel de KPIs & Contagem Decrescente (Fase 10: Gestão e Operações de Abertura)
+## 7. Painel de KPIs & Contagem Decrescente (Fase 10: Gestão, Planeamento de Lojas & Checklists)
 
-O painel superior do Dashboard é composto por **4 cartões estratégicos em tempo real**, especificamente reestruturados na **Fase 10** para apoiar, orientar e alertar os gestores e técnicos nas operações de abertura e refit de lojas:
+O painel superior do Dashboard é composto por **3 cartões estratégicos e equilibrados de alta densidade**, reestruturados na **Fase 10** para apoiar a operação sem desperdício de espaço e com visibilidade imediata de cada loja e marco:
 
-1. **Card 1: Próxima Abertura (Hero Card)**:
-   * Deteta automaticamente a loja com data de go-live mais iminente.
+1. **Card 1 • Próxima Abertura (Hero Card)**:
+   * Deteta automaticamente a loja com data de go-live mais iminente (*Fnac Famalicão*).
    * Apresenta relógio com contagem decrescente ativa ao segundo: `[Dias : Horas : Minutos : Segundos]`.
    * **Progresso da Loja (%)**: Barra de progresso calculada matematicamente a partir dos marcos concluídos da loja (`(concluídas / total) * 100`).
    * **Displays**: Quantidade total de ecrãs/players alocados a esta abertura específica.
    * **Formatos**: Contagem de formatos de saída distintos (ex.: *4K*, *FHD*, *LED Wall*).
    * **Playlists**: Estado de vinculação de campanhas para as telas da loja (`100% OK`, `X a Associar` ou `0 Telas`).
 
-2. **Card 2: Progresso do Planeamento (Novo na Fase 10)**:
-   * Agrega a taxa de prontidão de **todas as lojas em planeamento e abertura ativa** no ecossistema Fnac Darty.
-   * **Percentagem e Barra de Progresso Global**: Rácio consolidado de tarefas concluídas face ao total de marcos registados em todas as checklists ativas.
-   * **Sub-Métricas de Rodapé**:
-     * Tarefas Concluídas (ex.: `2 Concluídas`).
-     * Tarefas Totais do Portfólio (ex.: `7 Totais`).
-     * Lojas em Acompanhamento (ex.: `3 Lojas`).
+2. **Card 2 • Planeamento Lojas (Progresso Individual por Loja)**:
+   * **Visualização Global por Loja**: Apresenta a lista organizada de todas as lojas em fase de planeamento e abertura ativa.
+   * **Nome e Barra de Progresso**: Para cada loja, exibe:
+     * Badge oficial da marca (**FNAC** em dourado / **DARTY** em vermelho).
+     * Nome da Loja com tooltip detalhado.
+     * Barra de progresso horizontal colorida com a identidade da marca ou gradiente ouro/verde.
+     * Percentagem de prontidão (`%`) calculada a partir dos seus marcos técnicos concluídos.
+   * **Interação Direta**: Ao clicar em qualquer linha de loja na lista, abre-se de imediato a gaveta de detalhe técnico dessa obra específica (`openProjectDetails`).
+   * **Sub-Métricas**: Rodapé com o número de lojas ativas em curso e a média consolidada de progresso.
 
-3. **Card 3: Tarefas em Checklist (Novo na Fase 10 • Interativo / Clicável)**:
-   * Contabiliza o número total de tarefas técnicas pendentes (`status != 'concluido'`) nas checklists de todas as lojas.
-   * **Chips de Prioridade**: Discrimina o volume de tarefas por gravidade:
-     * `X Críticas` (vermelho)
-     * `Y Altas` (laranja/âmbar)
-   * **Interação Direta**: Ao clicar neste cartão (ou no atalho *"Gerir Tarefas por Loja ↗"*), o sistema abre instantaneamente o **Modal de Checklist Global de Aberturas** pré-filtrado para tarefas pendentes!
+3. **Card 3 • Checklists & Prazos (Cartão Unificado de Alta Densidade)**:
+   * Reúne o controlo de tarefas e a gestão de urgência temporal num único painel de alta densidade operacional, dividido em **duas colunas lado a lado**:
+     * **Coluna Esquerda • Tarefas em Checklist (Clicável)**:
+       * Número em destaque de tarefas pendentes em todo o ecossistema (`totalPending`).
+       * Chips de gravidade: `X Críticas` (vermelho) e `Y Altas` (âmbar).
+       * *Ação de Clique*: Abre instantaneamente o **Modal de Checklist Global de Aberturas** filtrado em *"Pendentes"*.
+     * **Coluna Direita • Due Soon • Esta Semana (Clicável)**:
+       * Número em destaque de tarefas com prazo na semana corrente (`due_date <= hoje + 7 dias`).
+       * Pílulas de alerta: `⚠️ X Atrasadas` (com destaque pulsante se houver atrasos) e `Y Esta Semana`.
+       * *Ação de Clique*: Abre instantaneamente o modal filtrado em *"⚡ Due Soon"*.
+     * **Atalho Inferior**: Link *"Abrir Gestão Global de Tarefas"* para visão geral de todas as tarefas.
 
-4. **Card 4: Due Soon • Esta Semana (Novo na Fase 10 • Interativo / Clicável)**:
-   * Radar de alertas operacionais para tarefas com data limite (*Due Date*) no horizonte imediato:
-     * Tarefas com prazo a vencer nos **próximos 7 dias**.
-     * Tarefas em **atraso** (`due_date < hoje`).
-   * **Pílulas de Alerta**:
-     * `⚠️ X Atrasadas` (vermelho pulsante em caso de atraso crítico).
-     * `Y Esta Semana` (dourado Fnac).
-   * **Interação Direta**: Ao clicar neste cartão (ou no atalho *"Ver Alertas da Semana ↗"*), o sistema abre o modal diretamente com o filtro de prazos iminentes!
-
-5. **Resumo Operacional de Aberturas (Cabeçalho da Tabela)**:
+4. **Resumo Operacional de Aberturas (Cabeçalho da Tabela)**:
    * Posicionado no topo da secção *"Aberturas em Curso"*, sintetiza o volume global de lojas em 5 indicadores integrados:
      * **Em Curso**: Lojas com trabalhos técnicos e montagem de telas em execução ativa.
      * **Planeamento**: Lojas em fase de provisionamento, licenciamento e agendamento.
      * **Concluído**: Lojas com inauguração realizada e entregues à operação.
      * **Total**: Número global de lojas piloto no portfólio.
      * **Signage**: Síntese de prontidão de telas em lote (`Pronto`, `Configuração`, `Pendente`).
-   * **Cálculo Rigoroso de Progresso (%)**: O progresso exibido nas barras e percentagens tanto no cartão de *Próxima Abertura* como na tabela de *Aberturas em Curso* reflete com precisão matemática a proporção de tarefas técnicas concluídas na base de dados (`(concluídas / total) * 100`). Se uma nova loja tiver 0 tarefas concluídas de 3, exibirá 0% em todos os componentes, subindo em tempo real conforme as tarefas forem validadas no modal.
-
-*(Nota: Na secção inferior do Dashboard, o cartão **"Atividade Recente • Gabinete Multimédia"** passa a ocupar a largura total do ecrã, tendo o antigo resumo estático sido unificado na central superior de Infraestrutura Multimédia).*
 
 ---
 
@@ -488,9 +483,10 @@ Na barra lateral de navegação, na secção **"Configurações"**, clica em **"
 ## 12. Modal: Checklist Global de Aberturas & Gestão de Tarefas (Fase 10)
 
 ### 12.1. Como Aceder
-O operador pode aceder ao modal de duas formas diretas e imediatas a partir da grelha de topo:
-1. **Clique no Cartão "Tarefas em Checklist"**: Abre o modal com o filtro pré-selecionado para **"Pendentes"**.
-2. **Clique no Cartão "Due Soon • Esta Semana"**: Abre o modal com o filtro pré-selecionado para **"⚡ Due Soon"** (prazos nos próximos 7 dias).
+O operador pode aceder ao modal de três formas diretas a partir do cartão **"Checklists & Prazos"**:
+1. **Clique no Bloco "Checklist / Tarefas Pendentes"**: Abre o modal pré-filtrado para **"Pendentes"**.
+2. **Clique no Bloco "⚡ Due Soon"**: Abre o modal pré-filtrado para **"⚡ Due Soon"** (prazos nos próximos 7 dias).
+3. **Clique no Atalho "Abrir Gestão Global de Tarefas"**: Abre o modal com a visão de todas as tarefas de abertura.
 
 ### 12.2. Barra de Ferramentas & Filtros Dinâmicos
 No topo do modal, o operador dispõe de filtros em pílula (*chips*) com contadores automáticos sincronizados com a base de dados:
