@@ -28,6 +28,7 @@ Este manual destina-se aos utilizadores e operadores do **Gabinete Multimédia**
 9. [Motor Multi-Tema & Paleta Oficial (Fase 6)](#9-motor-multi-tema-claro-escuro-e-automático-fase-6)
 10. [Módulo: Gestão de Utilizadores (Fase 7)](#10-módulo-gestão-de-utilizadores-utilizadores-gabinete-fase-7)
 11. [Modal: Telas & Players • Catálogo Global de Hardware (Fase 8)](#11-modal-telas--players--catálogo-global-de-hardware-fase-8)
+12. [Modal: Checklist Global de Aberturas & Gestão de Tarefas (Fase 10)](#12-modal-checklist-global-de-aberturas--gestão-de-tarefas-fase-10)
 
 ---
 
@@ -307,37 +308,44 @@ O sistema utiliza 6 cores secundárias normalizadas para identificação de peri
 5. **Turquesa Conetividade (`#28E4AB`)**: Aplicado em gradientes de prontidão de rede audiovisual e testes de broadcast.
 6. **Rosa Neon (`#FF7BF9`)**: Utilizado em custos e rubricas orçamentais diversas.
 
----
+## 7. Painel de KPIs & Contagem Decrescente (Fase 10: Gestão e Operações de Abertura)
 
-## 7. Painel de KPIs & Contagem Decrescente
+O painel superior do Dashboard é composto por **4 cartões estratégicos em tempo real**, especificamente reestruturados na **Fase 10** para apoiar, orientar e alertar os gestores e técnicos nas operações de abertura e refit de lojas:
 
-O painel superior do Dashboard atualiza-se em tempo real com os indicadores chave operacionais adaptados especificamente para o piloto do Gabinete Multimédia:
-
-1. **Próxima Abertura (Hero Card)**:
+1. **Card 1: Próxima Abertura (Hero Card)**:
    * Deteta automaticamente a loja com data de go-live mais iminente.
-   * Apresenta um relógio com contagem decrescente ativa ao segundo: `[Dias : Horas : Minutos : Segundos]`.
-   * **Progresso da Loja (%)**: Barra de progresso visual com cálculo automático baseado na percentagem de marcos e tarefas técnicas concluídas para esta loja.
+   * Apresenta relógio com contagem decrescente ativa ao segundo: `[Dias : Horas : Minutos : Segundos]`.
+   * **Progresso da Loja (%)**: Barra de progresso calculada matematicamente a partir dos marcos concluídos da loja (`(concluídas / total) * 100`).
    * **Displays**: Quantidade total de ecrãs/players alocados a esta abertura específica.
-   * **Formatos**: Contagem de resoluções de saída distintas utilizadas nesta loja (ex.: *4K*, *FHD*, *LED Wall*).
-   * **Playlists**: Estado de vinculação de campanhas para as telas desta loja (`100% OK`, `X a Associar` ou `0 Telas`).
-2. **Infraestrutura Multimédia**:
-   * Central de comando operacional em formato alargado, concentrando a monitorização técnica do parque audiovisual em **3 micro-painéis temáticos em tempo real**:
-     * **A. Hardware**:
-       * Total de ecrãs e players físicos instalados ou em stock.
-       * Chips desagregados com as marcas e modelos (ex.: *BrightSign XT*, *Samsung Tizen*, *LG webOS*).
-       * Linha de estado operacional imediato com micro-indicadores luminosos: `Online` (verde), `Em Teste` (âmbar), `Syncing` (azul) e `Offline` (vermelho).
-       * *Interação*: Clicar neste bloco abre diretamente o **Catálogo Global de Telas & Players** em "Configurações".
-     * **B. Resoluções**:
-       * Contagem de formatos de saída distintos presentes no ecossistema (ex.: `4K UHD`, `1080p FHD`, `Video Wall LED`).
-       * Chips com as resoluções e o número de displays mapeados com cada resolução.
-     * **C. Playlists**:
-       * Rácio de ecrãs do parque que ainda se encontram sem campanha atribuída (`playlist_id IS NULL`).
-       * Badge de validação (`✓ 100% Telas Vinculadas` quando todas as telas têm conteúdo atribuído, ou aviso dourado com o número de telas pendentes).
-       * Total de campanhas ativas e publicadas no catálogo prontas para broadcast.
-       * *Interação*: Clicar neste bloco abre diretamente o **Catálogo de Playlists**.
+   * **Formatos**: Contagem de formatos de saída distintos (ex.: *4K*, *FHD*, *LED Wall*).
+   * **Playlists**: Estado de vinculação de campanhas para as telas da loja (`100% OK`, `X a Associar` ou `0 Telas`).
 
-3. **Resumo Operacional de Aberturas (Cabeçalho da Tabela)**:
-   * Posicionado no topo da secção *"Aberturas em Curso"*, diretamente abaixo do texto descritivo, sintetiza o volume global de projetos em 5 indicadores integrados:
+2. **Card 2: Progresso do Planeamento (Novo na Fase 10)**:
+   * Agrega a taxa de prontidão de **todas as lojas em planeamento e abertura ativa** no ecossistema Fnac Darty.
+   * **Percentagem e Barra de Progresso Global**: Rácio consolidado de tarefas concluídas face ao total de marcos registados em todas as checklists ativas.
+   * **Sub-Métricas de Rodapé**:
+     * Tarefas Concluídas (ex.: `2 Concluídas`).
+     * Tarefas Totais do Portfólio (ex.: `7 Totais`).
+     * Lojas em Acompanhamento (ex.: `3 Lojas`).
+
+3. **Card 3: Tarefas em Checklist (Novo na Fase 10 • Interativo / Clicável)**:
+   * Contabiliza o número total de tarefas técnicas pendentes (`status != 'concluido'`) nas checklists de todas as lojas.
+   * **Chips de Prioridade**: Discrimina o volume de tarefas por gravidade:
+     * `X Críticas` (vermelho)
+     * `Y Altas` (laranja/âmbar)
+   * **Interação Direta**: Ao clicar neste cartão (ou no atalho *"Gerir Tarefas por Loja ↗"*), o sistema abre instantaneamente o **Modal de Checklist Global de Aberturas** pré-filtrado para tarefas pendentes!
+
+4. **Card 4: Due Soon • Esta Semana (Novo na Fase 10 • Interativo / Clicável)**:
+   * Radar de alertas operacionais para tarefas com data limite (*Due Date*) no horizonte imediato:
+     * Tarefas com prazo a vencer nos **próximos 7 dias**.
+     * Tarefas em **atraso** (`due_date < hoje`).
+   * **Pílulas de Alerta**:
+     * `⚠️ X Atrasadas` (vermelho pulsante em caso de atraso crítico).
+     * `Y Esta Semana` (dourado Fnac).
+   * **Interação Direta**: Ao clicar neste cartão (ou no atalho *"Ver Alertas da Semana ↗"*), o sistema abre o modal diretamente com o filtro de prazos iminentes!
+
+5. **Resumo Operacional de Aberturas (Cabeçalho da Tabela)**:
+   * Posicionado no topo da secção *"Aberturas em Curso"*, sintetiza o volume global de lojas em 5 indicadores integrados:
      * **Em Curso**: Lojas com trabalhos técnicos e montagem de telas em execução ativa.
      * **Planeamento**: Lojas em fase de provisionamento, licenciamento e agendamento.
      * **Concluído**: Lojas com inauguração realizada e entregues à operação.
@@ -475,4 +483,52 @@ Na barra lateral de navegação, na secção **"Configurações"**, clica em **"
 * **Filtro de Estado**: Permite filtrar por *Online*, *Syncing*, *Testing* ou *Offline*.
 * **Campo de Pesquisa**: Filtra instantaneamente conforme o operador digita nome, modelo, IP, MAC, zona ou loja.
 
+---
 
+## 12. Modal: Checklist Global de Aberturas & Gestão de Tarefas (Fase 10)
+
+### 12.1. Como Aceder
+O operador pode aceder ao modal de duas formas diretas e imediatas a partir da grelha de topo:
+1. **Clique no Cartão "Tarefas em Checklist"**: Abre o modal com o filtro pré-selecionado para **"Pendentes"**.
+2. **Clique no Cartão "Due Soon • Esta Semana"**: Abre o modal com o filtro pré-selecionado para **"⚡ Due Soon"** (prazos nos próximos 7 dias).
+
+### 12.2. Barra de Ferramentas & Filtros Dinâmicos
+No topo do modal, o operador dispõe de filtros em pílula (*chips*) com contadores automáticos sincronizados com a base de dados:
+* **Pendentes (`gtBadgePending`)**: Exibe apenas tarefas por concluir (`status != 'concluido'`).
+* **⚡ Due Soon (`gtBadgeDueSoon`)**: Tarefas cujo prazo vence na semana em curso (próximos 7 dias).
+* **⚠️ Em Atraso (`gtBadgeOverdue`)**: Tarefas não concluídas cuja data limite já foi ultrapassada (`due_date < hoje`).
+* **✓ Concluídas**: Tarefas finalizadas com sucesso para consulta e histórico.
+* **Ver Todas**: Mostra o panorama global de tarefas de todas as lojas.
+
+### 12.3. Filtragem por Loja Específica
+À direita da barra de ferramentas, o seletor **"Loja:"** permite filtrar a checklist para:
+* **Todas as Lojas Ativas** (visão consolidada agrupada por loja).
+* **Loja Individual** (ex: `🟡 Fnac Cascais`, `🟡 Fnac Famalicão`, `🔴 Darty Alfragide`).
+
+### 12.4. Criação Rápida de Tarefas ("＋ Nova Tarefa")
+1. Clica no botão **"＋ Nova Tarefa"**. O painel superior expande-se suavemente.
+2. Preenche os campos do formulário rápido:
+   * **Título da Tarefa \***: Ex.: *Calibração de som e áudio zoneado*, *Montagem de suporte de teto*.
+   * **Loja de Destino \***: Dropdown com as lojas em planeamento e abertura.
+   * **Departamento**: `Multimédia & Telas`, `Redes & IT`, `Operações de Loja` ou `Marketing & Conteúdos`.
+   * **Prioridade**: `Crítica`, `Alta`, `Média` ou `Baixa`.
+   * **Descrição / Observações Técnicas**: Requisitos de fornecedores, cabos, conetores.
+   * **Data Limite (Due Date)**: Pré-preenchida com data a 7 dias para conveniência.
+3. Clica em **"💾 Gravar Tarefa"**.
+4. O modal recarrega a lista instantaneamente e **todo o Dashboard** (cartões de topo e tabela de aberturas) atualiza o seu progresso e contadores no mesmo milissegundo!
+
+### 12.5. Alteração Imediata de Estado (Checkboxes Interativas)
+* Cada tarefa apresenta uma **checkbox interativa** à esquerda.
+* Ao marcar/desmarcar a checkbox:
+  1. É enviado um pedido `PATCH /api/v1/tasks/:id/toggle`.
+  2. O título da tarefa é tachado e recebe estilo visual de conclusão.
+  3. A **mini barra de progresso da loja** no cabeçalho do cartão atualiza a percentagem e a contagem (ex.: `2/4 concluídas (50%)`).
+  4. O cartão **"Progresso do Planeamento"** do Dashboard recalcula a percentagem consolidada de todas as lojas.
+  5. Os cartões de **"Tarefas em Checklist"** e **"Due Soon"** diminuem imediatamente as contagens de pendentes.
+  6. A tabela de **"Aberturas em Curso"** reflete a subida de progresso da loja em questão.
+
+### 12.6. Agrupamento por Loja e Atalho "Ver Loja ↗"
+* As tarefas são agrupadas num cartão individual por loja (`.gt-store-card`) com o badge oficial da marca (**Fnac** em dourado / **Darty** em vermelho).
+* No canto superior direito de cada loja, o botão **"Ver Loja ↗"** abre instantaneamente a gaveta de detalhe completo daquela loja específica (com as abas de Marcos, Custos e Telas).
+
+---

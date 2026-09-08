@@ -6,6 +6,107 @@
 const db = require('../database/db');
 
 class Task {
+  // Lista todas as tarefas em escala global (com dados da loja associada)
+  static async findAllGlobal(filters = {}) {
+    let sql = `
+      SELECT 
+        t.*,
+        u.name as assigned_to_name,
+        p.name as project_name,
+        p.code as project_code,
+        p.brand as project_brand,
+        p.status as project_status,
+        p.go_live_date as project_go_live_date,
+        p.store_format as project_store_format
+      FROM tasks t
+      INNER JOIN projects p ON t.project_id = p.id
+      LEFT JOIN users u ON t.assigned_to = u.id
+      WHERE 1=1
+    `;
+    const params = [];
+
+    // Por defeito, considerar apenas lojas em planeamento ou em curso
+    if (filters.includeCompletedStores !== 'true' && filters.includeCompletedStores !== true) {
+      sql += ` AND p.status IN ('planeamento', 'em_curso')`;
+    }
+
+    // Filtro por projeto específico
+    if (filters.project_id) {
+      sql += ` AND t.project_id = ?`;
+      params.push(parseInt(filters.project_id, 10));
+    }
+
+    // Filtro por estado da tarefa: 'pending', 'concluido', 'em_progresso', 'all'
+    if (filters.status === 'pending') {
+      sql += ` AND t.status != 'concluido'`;
+    } else if (filters.status && filters.status !== 'all') {
+      sql += ` AND t.status = ?`;
+      params.push(filters.status);
+    }
+
+    // Filtro por âmbito temporal: 'due_soon', 'overdue', 'this_week'
+    if (filters.scope === 'due_soon') {
+      sql += ` AND t.status != 'concluido' AND t.due_date IS NOT NULL AND t.due_date <= DATE('now', '+7 days')`;
+    } else if (filters.scope === 'overdue') {
+      sql += ` AND t.status != 'concluido' AND t.due_date IS NOT NULL AND t.due_date < DATE('now')`;
+    } else if (filters.scope === 'this_week') {
+      sql += ` AND t.status != 'concluido' AND t.due_date IS NOT NULL AND t.due_date >= DATE('now') AND t.due_date <= DATE('now', '+7 days')`;
+    }
+
+    if (filters.department) {
+      sql += ` AND t.department = ?`;
+      params.push(filters.department);
+    }
+
+    sql += `
+      ORDER BY 
+        CASE 
+          WHEN t.status != 'concluido' AND t.due_date IS NOT NULL AND t.due_date < DATE('now') THEN 1 
+          ELSE 2 
+        END,
+        CASE t.priority 
+          WHEN 'critical' THEN 1 
+          WHEN 'high' THEN 2 
+          WHEN 'medium' THEN 3 
+          ELSE 4 
+        END,
+        t.due_date ASC,
+        p.go_live_date ASC,
+        t.id ASC
+    `;
+
+    const tasks = db.query(sql, params);
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    return tasks.map(t => {
+      let isOverdue = false;
+      let isDueSoon = false;
+      let daysRemaining = null;
+
+      if (t.due_date && t.status !== 'concluido') {
+        const dueDate = new Date(t.due_date);
+        dueDate.setHours(0, 0, 0, 0);
+        const diffTime = dueDate.getTime() - today.getTime();
+        daysRemaining = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+        if (daysRemaining < 0) {
+          isOverdue = true;
+        } else if (daysRemaining <= 7) {
+          isDueSoon = true;
+        }
+      }
+
+      return {
+        ...t,
+        is_overdue: isOverdue,
+        is_due_soon: isDueSoon,
+        days_remaining: daysRemaining
+      };
+    });
+  }
+
   // Lista todas as tarefas de um determinado projeto
   static async findByProject(projectId) {
     const sql = `

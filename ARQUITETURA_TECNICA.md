@@ -202,13 +202,21 @@ Os modelos encapsulam a lógica de negócio e queries SQL parametrizadas (evitan
     * `formatsCount`: Contagem de formatos/resoluções distintas utilizadas na loja.
     * `playlistsState` & `playlistsStateClass`: Estado de associação de playlists (`100% OK`, `X a Associar` ou `0 Telas`).
   * Agrega em tempo real o rácio global de prontidão das telas (`signageReadiness`) e contadores operacionais (`signageStats`) diretamente a partir da tabela `signage_players`.
-  * **Fase 9 (Piloto Multimédia)**: Compila o objeto consolidado `infraMultimedia`:
-    * `hardware`: Total de displays físicos, desagregação por modelo (`byModel`) e contadores por estado operacional (`online`, `testing`, `syncing`, `offline`).
-    * `resolutions`: Número de formatos de saída distintos (`distinctCount`) e lista de resoluções mapeadas (`list`).
-    * `playlists`: Quantidade de ecrãs sem campanha atribuída (`unassignedPlayersCount`), total de telas vinculadas e status do catálogo de playlists.
-    * `openings`: Total de aberturas de loja no piloto com desagregação por status de obra e status técnico de signage (`pronto`, `configuracao`, `pendente`).
+  * **Fase 10 (Gestão e Operações de Abertura)**:
+    * `planningProgress`: Agrega o progresso de planeamento de todas as lojas ativas (`percentage`, `totalTasks`, `completedTasks`, `pendingTasks`, `activeStoresCount`).
+    * `checklistTasks`: Contabiliza tarefas pendentes globais com desagregação por prioridade (`critical`, `high`, `medium`, `low`).
+    * `dueSoonTasks`: Calcula tarefas com prazo de entrega na semana corrente (próximos 7 dias) e tarefas em atraso (`overdue`, `thisWeek`, `total`).
+    * `Project.create(data)`: Atualizado para auto-inicializar automaticamente 4 tarefas técnicas padrão essenciais para qualquer nova abertura criada.
 
-### 3.2. Modelo `Task.js` (Fase 2)
+### 3.2. Modelo `Task.js` (Fases 2 & 10)
+* **`Task.findAllGlobal(filters)` (Novo na Fase 10)**:
+  * Lista tarefas de todas as lojas do sistema com `LEFT JOIN` a `projects` (nome da loja, código, insígnia, estado) e `users` (nome do técnico atribuído).
+  * Suporta filtros dinâmicos: `status` (`pending`, `concluido`), `scope` (`due_soon`, `overdue`) e `projectId`.
+  * Calcula em tempo de execução SQLite os campos derivados de urgência:
+    * `is_overdue`: `due_date < hoje AND status != 'concluido'`.
+    * `is_due_soon`: `due_date >= hoje AND due_date <= hoje + 7 dias AND status != 'concluido'`.
+    * `days_remaining`: Dias inteiros restantes até à data limite.
+  * Ordenação hierárquica de urgência: prioridades críticas primeiro, seguida da proximidade do prazo de entrega.
 * **`Task.findByProject(projectId)`**:
   * Lista todas as tarefas associadas a uma loja, ordenadas por prioridade (`critical`, `high`, `medium`, `low`) e prazo de entrega.
   * Realiza `LEFT JOIN` com `users` para obter o nome do responsável.
@@ -301,10 +309,11 @@ A API segue os padrões RESTful com payloads JSON e códigos de resposta HTTP se
 
 ### 4.2. Endpoints de Tarefas e Marcos (`/api/v1/projects/:id/tasks` & `/api/v1/tasks`)
 | Método | Endpoint | Parâmetros | Permissões | Descrição |
-| :--- | :--- | :--- | :---: | :--- |
+| :--- | :--- | :--- | :--- | :--- |
+| **GET** | `/api/v1/tasks` | `?status=pending&scope=due_soon&project_id=1` | Todos | **(Fase 10)** Lista tarefas globais de todas as lojas, com join de projetos/utilizadores, cálculo de atraso e due soon |
 | **GET** | `/api/v1/projects/:id/tasks` | `:id` (Project ID) | Todos | Lista tarefas e estatísticas de progresso da loja |
 | **POST** | `/api/v1/projects/:id/tasks` | Body JSON com dados do marco | `admin`, `multimedia_user`, `store_manager` | Adiciona um novo marco técnico à loja |
-| **PATCH**| `/api/v1/tasks/:id/toggle` | `:id` (Task ID) | `admin`, `multimedia_user`, `store_manager` | Alterna estado de conclusão com 1 clique |
+| **PATCH**| `/api/v1/tasks/:id/toggle` | `:id` (Task ID) | `admin`, `multimedia_user`, `store_manager` | Alterna estado de conclusão com 1 clique e recalcula progresso |
 | **PUT** | `/api/v1/tasks/:id` | Body JSON com alterações | `admin`, `multimedia_user`, `store_manager` | Atualiza detalhes de uma tarefa específica |
 | **DELETE**| `/api/v1/tasks/:id` | `:id` (Task ID) | `admin`, `multimedia_user` | Elimina um marco técnico da base de dados |
 

@@ -462,6 +462,13 @@ const server = http.createServer(async (req, res) => {
 
   // --- API ROUTES: /api/v1/tasks ---
   if (pathname.startsWith('/api/v1/tasks')) {
+    // 0. GET /api/v1/tasks (listagem global com filtros: status, scope, project_id)
+    if ((pathname === '/api/v1/tasks' || pathname === '/api/v1/tasks/') && method === 'GET') {
+      req.query = parsedUrl.query;
+      const mockRes = { status: (code) => ({ json: (data) => sendJson(res, code, data) }) };
+      return taskController.getAllGlobal(req, mockRes);
+    }
+
     // 1. PATCH /api/v1/tasks/:id/toggle
     const toggleMatch = pathname.match(/^\/api\/v1\/tasks\/([^\/]+)\/toggle$/);
     if (toggleMatch && (method === 'PATCH' || method === 'POST')) {

@@ -309,72 +309,88 @@
           </div>
         </div>
 
-        <!-- KPI 2 (Fase 9): Infraestrutura Multimédia (Piloto Gabinete Multimédia) -->
-        <div class="kpi-card infra-multimedia-card" id="kpiInfraMultimedia">
+        <!-- KPI 2 (Fase 10): Progresso Global das Lojas em Planeamento -->
+        <div class="kpi-card kpi-planning-card" id="kpiPlanningCard">
           <div class="kpi-header">
-            <div class="infra-title-block">
-              <span class="kpi-label">Infraestrutura Multimédia</span>
-            </div>
-            <div class="kpi-icon-wrap" style="background: rgba(56, 189, 248, 0.12); color: #38BDF8;">
+            <span class="kpi-label">Progresso do Planeamento</span>
+            <div class="kpi-icon-wrap" style="background: rgba(245, 176, 39, 0.12); color: var(--fnac-gold);">
               <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
               </svg>
             </div>
           </div>
+          
+          <div class="kpi-val" id="kpiPlanningProgressPercent">0%</div>
+          <div class="kpi-subtitle" id="kpiPlanningProgressSub">Tarefas concluídas em lojas ativas</div>
 
-          <div class="infra-metrics-grid">
-            <!-- Sub-painel 1: Hardware & Estado -->
-            <div class="infra-sub-block" id="infraHwBlock" title="Clique para abrir Catálogo Global de Hardware" onclick="if(typeof openPlayersCatalog === 'function') openPlayersCatalog();" style="cursor: pointer;">
-              <div class="infra-sub-header">
-                <span class="infra-sub-title">Hardware</span>
-                <span class="infra-total-pill" id="infraHwTotal">0 Displays</span>
-              </div>
-              <div class="infra-hardware-models" id="infraHwModelsList">
-                <span class="hw-model-chip">A carregar hardware...</span>
-              </div>
-              <div class="infra-status-breakdown" id="infraHwStatusBreakdown">
-                <span class="status-indicator-chip online"><span class="dot"></span> <span id="infraStatOnline">0</span> Online</span>
-                <span class="status-indicator-chip testing"><span class="dot"></span> <span id="infraStatTesting">0</span> Teste</span>
-                <span class="status-indicator-chip syncing"><span class="dot"></span> <span id="infraStatSyncing">0</span> Sync</span>
-                <span class="status-indicator-chip offline"><span class="dot"></span> <span id="infraStatOffline">0</span> Off</span>
-              </div>
+          <div class="signage-meter-wrap" style="margin-top: 14px;">
+            <div class="signage-progress-bar">
+              <div class="signage-progress-fill" id="kpiPlanningProgressFill" style="width: 0%;"></div>
             </div>
+          </div>
 
-            <!-- Sub-painel 2: Resoluções -->
-            <div class="infra-sub-block" id="infraResBlock" title="Clique para ver Catálogo de Hardware" onclick="if(typeof openPlayersCatalog === 'function') openPlayersCatalog();" style="cursor: pointer;">
-              <div class="infra-sub-header">
-                <span class="infra-sub-title">Resoluções</span>
-                <span class="infra-total-pill" id="infraResDistinctCount">0 Formatos</span>
-              </div>
-              <div class="infra-resolution-chips" id="infraResChipsList">
-                <span class="res-chip">A carregar resoluções...</span>
-              </div>
-              <div class="infra-sub-footer">
-                Configurações ativas no parque de ecrãs
-              </div>
+          <div class="planning-sub-stats" id="kpiPlanningSubStats">
+            <span><strong id="kpiPlanningTasksDone">0</strong> Concluídas</span>
+            <span><strong id="kpiPlanningTasksTotal">0</strong> Totais</span>
+            <span><strong id="kpiPlanningStoresCount">0</strong> Lojas</span>
+          </div>
+        </div>
+
+        <!-- KPI 3 (Fase 10): Tarefas Pendentes de Checklist (Clicável) -->
+        <div class="kpi-card kpi-interactive kpi-checklist-card" id="kpiPendingTasksCard" onclick="openGlobalTasksModal('pending')" title="Clique para abrir e gerir a Checklist Global de Tarefas">
+          <div class="kpi-header">
+            <span class="kpi-label">Tarefas em Checklist</span>
+            <div class="kpi-icon-wrap" style="background: rgba(56, 189, 248, 0.12); color: #38BDF8;">
+              <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path>
+              </svg>
             </div>
+          </div>
+          
+          <div class="kpi-val" id="kpiPendingTasksCount">0</div>
+          <div class="kpi-subtitle" id="kpiPendingTasksSub">Tarefas por concluir nas checklists</div>
 
-            <!-- Sub-painel 3: Playlists -->
-            <div class="infra-sub-block" id="infraPlaylistsBlock" title="Clique para gerir Playlists" onclick="if(typeof openPlaylistCatalog === 'function') openPlaylistCatalog();" style="cursor: pointer;">
-              <div class="infra-sub-header">
-                <span class="infra-sub-title">Playlists</span>
-                <span class="infra-total-pill" id="infraPlaylistsBadge">0 Pendentes</span>
-              </div>
-              <div class="infra-playlist-stats">
-                <div class="infra-stat-row">
-                  <span class="infra-stat-label">Telas sem playlist:</span>
-                  <strong class="infra-stat-value" id="infraUnassignedCount">0 telas</strong>
-                </div>
-                <div class="infra-stat-row">
-                  <span class="infra-stat-label">Campanhas no catálogo:</span>
-                  <strong class="infra-stat-value" id="infraCatalogPlaylistsCount">0 prontas</strong>
-                </div>
-              </div>
-              <div class="infra-playlist-status-bar" id="infraPlaylistStatusBar">
-                <span class="infra-status-chip ready" id="infraPlaylistStatusText">✓ 100% Telas Vinculadas</span>
-              </div>
+          <div class="kpi-action-strip">
+            <span class="kpi-interactive-link">
+              <span>Gerir Tarefas por Loja</span>
+              <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
+              </svg>
+            </span>
+          </div>
+
+          <div class="checklist-priority-chips" id="kpiChecklistPriorityChips">
+            <span class="p-chip p-critical" id="chipCritCount">0 Críticas</span>
+            <span class="p-chip p-high" id="chipHighCount">0 Altas</span>
+          </div>
+        </div>
+
+        <!-- KPI 4 (Fase 10): Tarefas Due Soon (Esta Semana / Alertas) (Clicável) -->
+        <div class="kpi-card kpi-interactive kpi-duesoon-card" id="kpiDueSoonCard" onclick="openGlobalTasksModal('due_soon')" title="Clique para ver alertas de tarefas com prazo na semana">
+          <div class="kpi-header">
+            <span class="kpi-label">Due Soon • Esta Semana</span>
+            <div class="kpi-icon-wrap" style="background: rgba(239, 68, 68, 0.12); color: #EF4444;">
+              <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
             </div>
+          </div>
+          
+          <div class="kpi-val" id="kpiDueSoonCount" style="color: #F59E0B;">0</div>
+          <div class="kpi-subtitle" id="kpiDueSoonSub">Prazos a vencer nos próximos 7 dias</div>
 
+          <div class="kpi-action-strip">
+            <span class="kpi-interactive-link" style="color: #F59E0B;">
+              <span>Ver Alertas da Semana</span>
+              <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
+              </svg>
+            </span>
+          </div>
+
+          <div class="duesoon-alert-pills" id="kpiDueSoonAlertPills">
+            <span class="alert-pill overdue" id="pillOverdueCount" style="display: none;">0 Atrasadas</span>
+            <span class="alert-pill this-week" id="pillThisWeekCount">0 Esta Semana</span>
           </div>
         </div>
 
@@ -1041,6 +1057,138 @@
             <button type="submit" class="btn-primary" id="btnSubmitLogin">Entrar no RetailLaunchOS</button>
           </div>
         </form>
+      </div>
+    </div>
+  <!-- =========================================================================
+       MODAL: CHECKLIST GLOBAL DE ABERTURAS & GESTÃO DE TAREFAS (FASE 10)
+       ========================================================================= -->
+  <div class="modal-backdrop" id="modalGlobalTasks">
+    <div class="modal-card modal-extra-large">
+      <div class="modal-header">
+        <div class="modal-title">
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <svg width="22" height="22" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="color: var(--fnac-gold);">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path>
+            </svg>
+            <div>
+              <span>Checklist Global de Aberturas & Gestão de Tarefas</span>
+              <div style="font-size: 11.5px; font-weight: 400; color: var(--text-muted); margin-top: 2px;">
+                Monitorização e controlo operacional de marcos técnicos de todas as lojas em planeamento e abertura
+              </div>
+            </div>
+          </div>
+        </div>
+        <button class="modal-close-btn" id="btnCloseGlobalTasks" onclick="closeGlobalTasksModal()" aria-label="Fechar">
+          <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+          </svg>
+        </button>
+      </div>
+
+      <div class="modal-body" style="padding: 20px 24px;">
+        <!-- Barra de Ferramentas & Filtros -->
+        <div class="global-tasks-toolbar">
+          <div class="filter-chip-group" id="globalTasksFilterGroup">
+            <button class="filter-chip active" data-task-filter="pending" onclick="setGlobalTaskFilter('pending')">
+              Pendentes (<span id="gtBadgePending">0</span>)
+            </button>
+            <button class="filter-chip" data-task-filter="due_soon" onclick="setGlobalTaskFilter('due_soon')">
+              ⚡ Due Soon (<span id="gtBadgeDueSoon">0</span>)
+            </button>
+            <button class="filter-chip" data-task-filter="overdue" onclick="setGlobalTaskFilter('overdue')">
+              ⚠️ Em Atraso (<span id="gtBadgeOverdue">0</span>)
+            </button>
+            <button class="filter-chip" data-task-filter="concluido" onclick="setGlobalTaskFilter('concluido')">
+              ✓ Concluídas
+            </button>
+            <button class="filter-chip" data-task-filter="all" onclick="setGlobalTaskFilter('all')">
+              Ver Todas
+            </button>
+          </div>
+
+          <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+            <!-- Seletor de Loja -->
+            <div style="display: flex; align-items: center; gap: 6px;">
+              <label for="gtStoreSelect" style="font-size: 12px; color: var(--text-muted); white-space: nowrap;">Loja:</label>
+              <select id="gtStoreSelect" class="form-input" style="padding: 6px 12px; font-size: 12.5px; width: auto; min-width: 180px;" onchange="onGlobalTasksStoreChange()">
+                <option value="all">Todas as Lojas Ativas</option>
+              </select>
+            </div>
+
+            <!-- Botão Adicionar Tarefa Rápida -->
+            <button type="button" class="btn-primary" id="btnOpenQuickAddTask" onclick="toggleQuickAddTaskForm()" style="padding: 6px 14px; font-size: 12.5px; white-space: nowrap;">
+              ＋ Nova Tarefa
+            </button>
+          </div>
+        </div>
+
+        <!-- Formulário Rápido de Criação de Tarefa (Oculto por defeito) -->
+        <div id="quickAddTaskContainer" style="display: none; background: rgba(255, 255, 255, 0.03); border: 1px solid var(--border-glass); border-radius: var(--radius-md); padding: 16px; margin-bottom: 20px;">
+          <form id="formQuickAddTask" onsubmit="handleQuickAddTaskSubmit(event)">
+            <div style="font-size: 13px; font-weight: 700; color: var(--text-white); margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between;">
+              <span>Criar Nova Tarefa para Loja</span>
+              <button type="button" class="btn-secondary" onclick="toggleQuickAddTaskForm()" style="padding: 2px 8px; font-size: 11px;">✕ Cancelar</button>
+            </div>
+            <div style="display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 12px;">
+              <div class="form-group" style="margin-bottom: 0;">
+                <label class="form-label">Título da Tarefa *</label>
+                <input type="text" id="quickTaskTitle" class="form-input" placeholder="ex: Calibração de som e áudio zoneado" required>
+              </div>
+              <div class="form-group" style="margin-bottom: 0;">
+                <label class="form-label">Loja de Destino *</label>
+                <select id="quickTaskProject" class="form-input" required>
+                  <option value="">— Selecionar Loja —</option>
+                </select>
+              </div>
+              <div class="form-group" style="margin-bottom: 0;">
+                <label class="form-label">Departamento</label>
+                <select id="quickTaskDept" class="form-input">
+                  <option value="Multimédia & Telas">Multimédia & Telas</option>
+                  <option value="Redes & IT">Redes & IT</option>
+                  <option value="Operações de Loja">Operações de Loja</option>
+                  <option value="Marketing & Conteúdos">Marketing & Conteúdos</option>
+                </select>
+              </div>
+              <div class="form-group" style="margin-bottom: 0;">
+                <label class="form-label">Prioridade</label>
+                <select id="quickTaskPriority" class="form-input">
+                  <option value="medium">Média</option>
+                  <option value="high">Alta</option>
+                  <option value="critical">Crítica</option>
+                  <option value="low">Baixa</option>
+                </select>
+              </div>
+            </div>
+            <div style="display: grid; grid-template-columns: 2fr 1fr auto; gap: 12px; margin-top: 12px; align-items: flex-end;">
+              <div class="form-group" style="margin-bottom: 0;">
+                <label class="form-label">Descrição / Observações Técnicas</label>
+                <input type="text" id="quickTaskDesc" class="form-input" placeholder="Detalhes de fornecedor, cabos, requisitos...">
+              </div>
+              <div class="form-group" style="margin-bottom: 0;">
+                <label class="form-label">Data Limite (Due Date)</label>
+                <input type="date" id="quickTaskDueDate" class="form-input">
+              </div>
+              <button type="submit" class="btn-primary" id="btnSubmitQuickTask" style="height: 38px; padding: 0 18px; white-space: nowrap;">
+                💾 Gravar Tarefa
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <!-- Área de Listagem Agrupada por Loja -->
+        <div id="globalTasksContent" class="global-tasks-content">
+          <div style="text-align: center; padding: 40px; color: var(--text-dim);">
+            <span class="loading-spinner" style="display: inline-block; width: 24px; height: 24px; border: 2px solid var(--border-subtle); border-top-color: var(--fnac-gold); border-radius: 50%; animation: spin 0.8s linear infinite;"></span>
+            <div style="margin-top: 12px;">A carregar checklist das lojas...</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <div style="font-size: 12px; color: var(--text-muted);" id="globalTasksSummaryFooter">
+          0 tarefas apresentadas
+        </div>
+        <button type="button" class="btn-secondary" onclick="closeGlobalTasksModal()">Fechar</button>
       </div>
     </div>
   </div>
@@ -2106,6 +2254,7 @@
           if (badgeCount) badgeCount.innerText = allProjects.length;
 
           applyFilter(currentFilter);
+          populateGlobalTasksStoreDropdowns();
           loadKpis();
         }
       } catch (err) {
@@ -2169,123 +2318,88 @@
           }
 
           // =================================================================
-          // FASE 9: Cartão Infraestrutura Multimédia (Piloto Gabinete Multimédia)
+          // FASE 10: Novos KPIs de Planeamento, Checklist e Alertas Due Soon
           // =================================================================
-          if (kpis.infraMultimedia) {
-            const infra = kpis.infraMultimedia;
 
-            // 1. Modelos de Hardware e Estados
-            if (infra.hardware) {
-              const hwTotalEl = document.getElementById('infraHwTotal');
-              if (hwTotalEl) hwTotalEl.innerText = `${infra.hardware.total || 0} Displays`;
+          // 1. Progresso Global do Planeamento
+          if (kpis.planningProgress) {
+            const pp = kpis.planningProgress;
+            const pct = (pp.percentage !== undefined && pp.percentage !== null) ? pp.percentage : 0;
+            const pctEl = document.getElementById('kpiPlanningProgressPercent');
+            const fillEl = document.getElementById('kpiPlanningProgressFill');
+            const doneEl = document.getElementById('kpiPlanningTasksDone');
+            const totalEl = document.getElementById('kpiPlanningTasksTotal');
+            const storesEl = document.getElementById('kpiPlanningStoresCount');
+            const subEl = document.getElementById('kpiPlanningProgressSub');
 
-              const hwModelsList = document.getElementById('infraHwModelsList');
-              if (hwModelsList && Array.isArray(infra.hardware.byModel)) {
-                if (infra.hardware.byModel.length === 0) {
-                  hwModelsList.innerHTML = '<span class="hw-model-chip">Sem modelos</span>';
-                } else {
-                  hwModelsList.innerHTML = infra.hardware.byModel.slice(0, 3).map(m => {
-                    let shortName = m.model || 'Display';
-                    if (shortName.includes('BrightSign XT')) shortName = 'BrightSign XT';
-                    else if (shortName.includes('BrightSign HD')) shortName = 'BrightSign HD';
-                    else if (shortName.includes('Samsung SSP')) shortName = 'Samsung Tizen';
-                    else if (shortName.includes('LG webOS')) shortName = 'LG webOS';
-                    const safeName = String(shortName).replace(/</g, '&lt;').replace(/>/g, '&gt;');
-                    const safeFull = String(m.model).replace(/"/g, '&quot;');
-                    return `<span class="hw-model-chip" title="${safeFull}">${safeName}: <strong>${m.count}</strong></span>`;
-                  }).join('');
-                  if (infra.hardware.byModel.length > 3) {
-                    const extra = infra.hardware.byModel.slice(3).reduce((acc, cur) => acc + cur.count, 0);
-                    hwModelsList.innerHTML += `<span class="hw-model-chip">+${extra} outros</span>`;
-                  }
-                }
-              }
+            if (pctEl) pctEl.innerText = `${pct}%`;
+            if (fillEl) fillEl.style.width = `${pct}%`;
+            if (doneEl) doneEl.innerText = pp.completedTasks || 0;
+            if (totalEl) totalEl.innerText = pp.totalTasks || 0;
+            if (storesEl) storesEl.innerText = pp.activeStores || 0;
+            if (subEl) {
+              subEl.innerText = `${pp.completedTasks || 0} de ${pp.totalTasks || 0} tarefas concluídas (${pp.activeStores || 0} lojas)`;
+            }
+          }
 
-              if (infra.hardware.status) {
-                const s = infra.hardware.status;
-                const onEl = document.getElementById('infraStatOnline');
-                const testEl = document.getElementById('infraStatTesting');
-                const syncEl = document.getElementById('infraStatSyncing');
-                const offEl = document.getElementById('infraStatOffline');
-                if (onEl) onEl.innerText = s.online || 0;
-                if (testEl) testEl.innerText = s.testing || 0;
-                if (syncEl) syncEl.innerText = s.syncing || 0;
-                if (offEl) {
-                  offEl.innerText = s.offline || 0;
-                  const offChip = offEl.closest('.status-indicator-chip');
-                  if (offChip) offChip.style.color = (s.offline > 0) ? 'var(--darty-red)' : 'var(--text-muted)';
-                }
+          // 2. Tarefas em Checklist (Pendentes)
+          if (kpis.checklistTasks) {
+            const ct = kpis.checklistTasks;
+            const countEl = document.getElementById('kpiPendingTasksCount');
+            const critEl = document.getElementById('chipCritCount');
+            const highEl = document.getElementById('chipHighCount');
+            const badgePendingEl = document.getElementById('gtBadgePending');
+
+            if (countEl) countEl.innerText = ct.totalPending || 0;
+            if (critEl) critEl.innerText = `${ct.byPriority?.critical || 0} Críticas`;
+            if (highEl) highEl.innerText = `${ct.byPriority?.high || 0} Altas`;
+            if (badgePendingEl) badgePendingEl.innerText = ct.totalPending || 0;
+          }
+
+          // 3. Due Soon • Esta Semana (Alertas)
+          if (kpis.dueSoonTasks) {
+            const ds = kpis.dueSoonTasks;
+            const countEl = document.getElementById('kpiDueSoonCount');
+            const overdueEl = document.getElementById('pillOverdueCount');
+            const thisWeekEl = document.getElementById('pillThisWeekCount');
+            const badgeDueSoonEl = document.getElementById('gtBadgeDueSoon');
+            const badgeOverdueEl = document.getElementById('gtBadgeOverdue');
+
+            if (countEl) countEl.innerText = ds.total || 0;
+            if (badgeDueSoonEl) badgeDueSoonEl.innerText = ds.total || 0;
+            if (badgeOverdueEl) badgeOverdueEl.innerText = ds.overdue || 0;
+
+            if (overdueEl) {
+              if (ds.overdue > 0) {
+                overdueEl.style.display = 'inline-flex';
+                overdueEl.innerText = `⚠️ ${ds.overdue} Atrasada${ds.overdue > 1 ? 's' : ''}`;
+              } else {
+                overdueEl.style.display = 'none';
               }
             }
 
-            // 2. Resoluções de Saída
-            if (infra.resolutions) {
-              const resCountEl = document.getElementById('infraResDistinctCount');
-              if (resCountEl) resCountEl.innerText = `${infra.resolutions.distinctCount || 0} Formatos`;
-
-              const resChipsList = document.getElementById('infraResChipsList');
-              if (resChipsList && Array.isArray(infra.resolutions.list)) {
-                if (infra.resolutions.list.length === 0) {
-                  resChipsList.innerHTML = '<span class="res-chip">Sem resoluções</span>';
-                } else {
-                  resChipsList.innerHTML = infra.resolutions.list.map(r => {
-                    let shortRes = r.resolution || 'Standard';
-                    if (shortRes.includes('3840x2160')) shortRes = '4K UHD';
-                    else if (shortRes.includes('1920x1080')) shortRes = '1080p FHD';
-                    const safeRes = String(shortRes).replace(/</g, '&lt;').replace(/>/g, '&gt;');
-                    const safeFull = String(r.resolution).replace(/"/g, '&quot;');
-                    return `<span class="res-chip" title="${safeFull}">${safeRes} (<strong>${r.count}</strong>)</span>`;
-                  }).join('');
-                }
-              }
+            if (thisWeekEl) {
+              thisWeekEl.innerText = `${ds.thisWeek || 0} Esta Semana`;
             }
+          }
 
-            // 3. Playlists a Associar
-            if (infra.playlists) {
-              const unassigned = infra.playlists.unassignedPlayersCount || 0;
-              const available = (infra.playlists.publishedPlaylists || 0) + (infra.playlists.validatingPlaylists || 0);
+          // 4. Resumo de Aberturas e Estado (Exibido no Cabeçalho da Tabela)
+          if (kpis.infraMultimedia && kpis.infraMultimedia.openings) {
+            const openings = kpis.infraMultimedia.openings;
+            const totalOpeningsEl = document.getElementById('openingsTotal') || document.getElementById('infraOpeningsTotal');
+            if (totalOpeningsEl) totalOpeningsEl.innerText = `${openings.total || 0} Lojas`;
 
-              const badgeEl = document.getElementById('infraPlaylistsBadge');
-              if (badgeEl) {
-                badgeEl.innerText = unassigned > 0 ? `${unassigned} Pendentes` : '0 Pendentes';
-                badgeEl.style.color = unassigned > 0 ? 'var(--fnac-gold)' : '#10B981';
-              }
+            const emCursoEl = document.getElementById('openingsEmCurso') || document.getElementById('infraOpeningsEmCurso');
+            const planeamentoEl = document.getElementById('openingsPlaneamento') || document.getElementById('infraOpeningsPlaneamento');
+            const concluidoEl = document.getElementById('openingsConcluido') || document.getElementById('infraOpeningsConcluido');
+            if (emCursoEl) emCursoEl.innerText = openings.byStatus?.em_curso || 0;
+            if (planeamentoEl) planeamentoEl.innerText = openings.byStatus?.planeamento || 0;
+            if (concluidoEl) concluidoEl.innerText = openings.byStatus?.concluido || 0;
 
-              const unassignedEl = document.getElementById('infraUnassignedCount');
-              if (unassignedEl) unassignedEl.innerText = `${unassigned} telas`;
-
-              const catalogCountEl = document.getElementById('infraCatalogPlaylistsCount');
-              if (catalogCountEl) catalogCountEl.innerText = `${available} disponíveis (${infra.playlists.totalPlaylists || 0} total)`;
-
-              const statusTextEl = document.getElementById('infraPlaylistStatusText');
-              if (statusTextEl) {
-                if (unassigned > 0) {
-                  statusTextEl.className = 'infra-status-chip warning';
-                  statusTextEl.innerHTML = `⚠️ ${unassigned} ecrã(s) a aguardar playlist`;
-                } else {
-                  statusTextEl.className = 'infra-status-chip ready';
-                  statusTextEl.innerHTML = `✓ 100% Telas Vinculadas`;
-                }
-              }
-            }
-
-            // 4. Resumo de Aberturas e Estado (Exibido no Cabeçalho da Tabela)
-            if (infra.openings) {
-              const totalOpeningsEl = document.getElementById('openingsTotal') || document.getElementById('infraOpeningsTotal');
-              if (totalOpeningsEl) totalOpeningsEl.innerText = `${infra.openings.total || 0} Lojas`;
-
-              const emCursoEl = document.getElementById('openingsEmCurso') || document.getElementById('infraOpeningsEmCurso');
-              const planeamentoEl = document.getElementById('openingsPlaneamento') || document.getElementById('infraOpeningsPlaneamento');
-              const concluidoEl = document.getElementById('openingsConcluido') || document.getElementById('infraOpeningsConcluido');
-              if (emCursoEl) emCursoEl.innerText = infra.openings.byStatus?.em_curso || 0;
-              if (planeamentoEl) planeamentoEl.innerText = infra.openings.byStatus?.planeamento || 0;
-              if (concluidoEl) concluidoEl.innerText = infra.openings.byStatus?.concluido || 0;
-
-              const signageValEl = document.getElementById('openingsSignageValues') || document.getElementById('infraSignageOpeningsFooter');
-              if (signageValEl && infra.openings.bySignageStatus) {
-                const ss = infra.openings.bySignageStatus;
-                signageValEl.innerText = `${ss.pronto || 0} Pronto • ${ss.configuracao || 0} Config • ${ss.pendente || 0} Pendente`;
-              }
+            const signageValEl = document.getElementById('openingsSignageValues') || document.getElementById('infraSignageOpeningsFooter');
+            if (signageValEl && openings.bySignageStatus) {
+              const ss = openings.bySignageStatus;
+              signageValEl.innerText = `${ss.pronto || 0} Pronto • ${ss.configuracao || 0} Config • ${ss.pendente || 0} Pendente`;
             }
           }
         }
@@ -3053,6 +3167,24 @@
       }
     }
 
+    // Ação: Alternar Estado da Tarefa (Checkbox)
+    async function toggleTask(taskId, projectId) {
+      try {
+        const res = await fetch(`/api/v1/tasks/${taskId}/toggle`, { method: 'PATCH' });
+        const json = await res.json();
+        if (json.success) {
+          showToast(json.message, 'success');
+          await openProjectDetails(projectId);
+          await loadProjects();
+          await loadKpis();
+        } else {
+          showToast(json.message || 'Erro ao alterar marco', 'error');
+        }
+      } catch (err) {
+        showToast('Erro de comunicação: ' + err.message, 'error');
+      }
+    }
+
     // Ação: Eliminar Tarefa
     async function deleteTask(taskId, projectId) {
       if (!confirm('Tens a certeza que desejas remover este marco técnico?')) return;
@@ -3063,6 +3195,7 @@
           showToast(json.message, 'success');
           await openProjectDetails(projectId);
           await loadProjects();
+          await loadKpis();
         } else {
           showToast(json.message || 'Erro ao remover marco', 'error');
         }
@@ -3092,12 +3225,340 @@
           showToast('Novo marco técnico adicionado!', 'success');
           await openProjectDetails(projectId);
           await loadProjects();
+          await loadKpis();
         } else {
           showToast(json.message || 'Erro ao criar marco', 'error');
         }
       } catch (err) {
         showToast('Erro de comunicação: ' + err.message, 'error');
       }
+    }
+
+    // =========================================================================
+    // FASE 10: CHECKLIST GLOBAL DE ABERTURAS & GESTÃO DE TAREFAS
+    // =========================================================================
+    let currentGtFilter = 'pending'; // 'pending', 'due_soon', 'overdue', 'concluido', 'all'
+    let currentGtStore = 'all';
+
+    function escapeHtml(str) {
+      if (str === null || str === undefined) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+
+    function populateGlobalTasksStoreDropdowns() {
+      const storeSelect = document.getElementById('gtStoreSelect');
+      const quickTaskProjSelect = document.getElementById('quickTaskProject');
+      if (!allProjects || allProjects.length === 0) return;
+
+      if (storeSelect) {
+        const currentVal = storeSelect.value || 'all';
+        let html = '<option value="all">Todas as Lojas Ativas</option>';
+        allProjects.forEach(p => {
+          const brandIcon = (p.brand && p.brand.toLowerCase() === 'darty') ? '🔴' : '🟡';
+          html += `<option value="${p.id}">${brandIcon} ${escapeHtml(p.name)} (${p.brand || 'Geral'})</option>`;
+        });
+        storeSelect.innerHTML = html;
+        if (currentVal) storeSelect.value = currentVal;
+      }
+
+      if (quickTaskProjSelect) {
+        let html = '<option value="">— Selecionar Loja —</option>';
+        allProjects.forEach(p => {
+          const brandIcon = (p.brand && p.brand.toLowerCase() === 'darty') ? '🔴' : '🟡';
+          html += `<option value="${p.id}">${brandIcon} ${escapeHtml(p.name)} (${p.location || p.brand})</option>`;
+        });
+        quickTaskProjSelect.innerHTML = html;
+      }
+    }
+
+    function openGlobalTasksModal(initialFilter = 'pending') {
+      const modal = document.getElementById('modalGlobalTasks');
+      if (!modal) return;
+
+      populateGlobalTasksStoreDropdowns();
+
+      // Pré-definir data limite para daqui a 7 dias no formulário rápido
+      const d = new Date();
+      d.setDate(d.getDate() + 7);
+      const dueDateInput = document.getElementById('quickTaskDueDate');
+      if (dueDateInput) dueDateInput.value = d.toISOString().split('T')[0];
+
+      setGlobalTaskFilter(initialFilter);
+      modal.classList.add('active');
+    }
+
+    function closeGlobalTasksModal() {
+      const modal = document.getElementById('modalGlobalTasks');
+      if (modal) modal.classList.remove('active');
+      const quickAdd = document.getElementById('quickAddTaskContainer');
+      if (quickAdd) quickAdd.style.display = 'none';
+    }
+
+    function setGlobalTaskFilter(filterType) {
+      currentGtFilter = filterType;
+
+      // Atualizar chips ativos
+      const chips = document.querySelectorAll('#globalTasksFilterGroup .filter-chip');
+      chips.forEach(c => {
+        if (c.getAttribute('data-task-filter') === filterType) {
+          c.classList.add('active');
+        } else {
+          c.classList.remove('active');
+        }
+      });
+
+      loadGlobalTasks();
+    }
+
+    function onGlobalTasksStoreChange() {
+      const select = document.getElementById('gtStoreSelect');
+      currentGtStore = select ? select.value : 'all';
+      loadGlobalTasks();
+    }
+
+    function toggleQuickAddTaskForm() {
+      const container = document.getElementById('quickAddTaskContainer');
+      if (!container) return;
+      const isHidden = container.style.display === 'none' || !container.style.display;
+      container.style.display = isHidden ? 'block' : 'none';
+      if (isHidden) {
+        document.getElementById('quickTaskTitle')?.focus();
+      }
+    }
+
+    async function handleQuickAddTaskSubmit(e) {
+      e.preventDefault();
+      const projectId = document.getElementById('quickTaskProject').value;
+      if (!projectId) {
+        showToast('Por favor seleciona uma loja de destino.', 'error');
+        return;
+      }
+
+      const title = document.getElementById('quickTaskTitle').value;
+      const department = document.getElementById('quickTaskDept').value;
+      const priority = document.getElementById('quickTaskPriority').value;
+      const due_date = document.getElementById('quickTaskDueDate').value;
+      const description = document.getElementById('quickTaskDesc').value;
+
+      try {
+        const res = await fetch(`/api/v1/projects/${projectId}/tasks`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ title, department, priority, due_date, description })
+        });
+
+        const json = await res.json();
+        if (json.success) {
+          showToast('Nova tarefa adicionada com sucesso!', 'success');
+          document.getElementById('formQuickAddTask').reset();
+          toggleQuickAddTaskForm();
+          await loadGlobalTasks();
+          await loadKpis();
+          await loadProjects();
+        } else {
+          showToast(json.message || 'Erro ao criar tarefa', 'error');
+        }
+      } catch (err) {
+        showToast('Erro de comunicação: ' + err.message, 'error');
+      }
+    }
+
+    async function toggleGlobalTask(taskId) {
+      try {
+        const res = await fetch(`/api/v1/tasks/${taskId}/toggle`, { method: 'PATCH' });
+        const json = await res.json();
+        if (json.success) {
+          showToast(json.message, 'success');
+          await loadGlobalTasks();
+          await loadKpis();
+          await loadProjects();
+        } else {
+          showToast(json.message || 'Erro ao alternar tarefa', 'error');
+        }
+      } catch (err) {
+        showToast('Erro de comunicação: ' + err.message, 'error');
+      }
+    }
+
+    async function loadGlobalTasks() {
+      const container = document.getElementById('globalTasksContent');
+      if (!container) return;
+
+      container.innerHTML = `
+        <div style="text-align: center; padding: 40px; color: var(--text-dim);">
+          <div class="loading-spinner" style="margin: 0 auto 12px auto;"></div>
+          <span>A carregar tarefas das aberturas...</span>
+        </div>
+      `;
+
+      try {
+        let url = '/api/v1/tasks?';
+        const params = [];
+
+        if (currentGtFilter === 'pending') {
+          params.push('status=pending');
+        } else if (currentGtFilter === 'due_soon') {
+          params.push('scope=due_soon');
+        } else if (currentGtFilter === 'overdue') {
+          params.push('scope=overdue');
+        } else if (currentGtFilter === 'concluido') {
+          params.push('status=concluido');
+        }
+
+        const storeSelect = document.getElementById('gtStoreSelect');
+        const selectedStore = storeSelect ? storeSelect.value : 'all';
+        if (selectedStore && selectedStore !== 'all') {
+          params.push(`project_id=${selectedStore}`);
+        }
+
+        url += params.join('&');
+
+        const res = await fetch(url);
+        const json = await res.json();
+
+        if (json.success && Array.isArray(json.data)) {
+          renderGlobalTasks(json.data);
+        } else {
+          container.innerHTML = `
+            <div style="text-align: center; padding: 40px; color: var(--text-dim);">
+              <span>Não foi possível carregar as tarefas.</span>
+            </div>
+          `;
+        }
+      } catch (err) {
+        console.error('Erro ao carregar tarefas globais:', err);
+        container.innerHTML = `
+          <div style="text-align: center; padding: 40px; color: var(--darty-red);">
+            <span>Erro de rede ao carregar tarefas.</span>
+          </div>
+        `;
+      }
+    }
+
+    function renderGlobalTasks(tasks) {
+      const container = document.getElementById('globalTasksContent');
+      if (!container) return;
+
+      if (!tasks || tasks.length === 0) {
+        container.innerHTML = `
+          <div style="text-align: center; padding: 48px 24px; color: var(--text-dim);">
+            <div style="font-size: 38px; margin-bottom: 12px; opacity: 0.7;">✨</div>
+            <div style="font-size: 15px; font-weight: 600; color: var(--text-white); margin-bottom: 6px;">Nenhuma tarefa encontrada</div>
+            <div style="font-size: 13px; color: var(--text-muted);">Não existem tarefas correspondentes aos filtros selecionados.</div>
+          </div>
+        `;
+        return;
+      }
+
+      // Agrupar tarefas por project_id
+      const grouped = {};
+      tasks.forEach(t => {
+        const pId = t.project_id || 'sem_loja';
+        if (!grouped[pId]) {
+          grouped[pId] = {
+            projectId: t.project_id,
+            projectName: t.project_name || 'Loja Desconhecida',
+            projectBrand: t.project_brand || 'Fnac',
+            projectLocation: t.project_location || '',
+            projectStatus: t.project_status || 'em_curso',
+            tasks: []
+          };
+        }
+        grouped[pId].tasks.push(t);
+      });
+
+      let html = '';
+      Object.values(grouped).forEach(group => {
+        const brandLower = (group.projectBrand || 'fnac').toLowerCase();
+        const brandBadgeClass = brandLower === 'darty' ? 'badge-darty' : 'badge-fnac';
+        const brandLabel = brandLower === 'darty' ? 'Darty' : 'Fnac';
+
+        const completedInGroup = group.tasks.filter(t => t.status === 'concluido').length;
+        const totalInGroup = group.tasks.length;
+        const groupPct = totalInGroup > 0 ? Math.round((completedInGroup / totalInGroup) * 100) : 0;
+
+        html += `
+          <div class="gt-store-card">
+            <div class="gt-store-header">
+              <div class="gt-store-info">
+                <span class="store-badge ${brandBadgeClass}">${brandLabel}</span>
+                <div class="gt-store-titles">
+                  <span class="gt-store-name">${escapeHtml(group.projectName)}</span>
+                  ${group.projectLocation ? `<span class="gt-store-location">• ${escapeHtml(group.projectLocation)}</span>` : ''}
+                </div>
+              </div>
+              <div class="gt-store-meta">
+                <div class="gt-store-progress">
+                  <span class="gt-progress-text">${completedInGroup}/${totalInGroup} concluídas (${groupPct}%)</span>
+                  <div class="gt-mini-bar-wrap">
+                    <div class="gt-mini-bar-fill" style="width: ${groupPct}%;"></div>
+                  </div>
+                </div>
+                <button type="button" class="btn-secondary" onclick="openProjectDetails(${group.projectId})" style="padding: 4px 10px; font-size: 11.5px;">
+                  Ver Loja ↗
+                </button>
+              </div>
+            </div>
+
+            <div class="gt-tasks-list">
+              ${group.tasks.map(t => {
+                const isDone = t.status === 'concluido';
+                let urgencyHtml = '';
+
+                if (t.is_overdue && !isDone) {
+                  urgencyHtml = `<span class="gt-urgency-badge overdue" title="Data limite ultrapassada!">⚠️ Atrasada (${Math.abs(t.days_remaining || 0)}d)</span>`;
+                } else if (t.is_due_soon && !isDone) {
+                  const daysText = t.days_remaining === 0 ? 'Hoje' : (t.days_remaining === 1 ? 'Amanhã' : `Em ${t.days_remaining}d`);
+                  urgencyHtml = `<span class="gt-urgency-badge duesoon" title="Prazo a expirar na semana">⚡ Vence ${daysText}</span>`;
+                } else if (t.due_date) {
+                  urgencyHtml = `<span class="gt-date-tag">${t.due_date}</span>`;
+                }
+
+                const prioClass = `prio-${t.priority || 'medium'}`;
+                const prioMap = {
+                  critical: 'Crítica',
+                  high: 'Alta',
+                  medium: 'Média',
+                  low: 'Baixa'
+                };
+                const prioLabel = prioMap[t.priority] || t.priority;
+
+                return `
+                  <div class="gt-task-item ${isDone ? 'done' : ''} ${t.is_overdue && !isDone ? 'overdue' : ''}">
+                    <div class="gt-task-left">
+                      <input type="checkbox" 
+                             class="gt-task-checkbox" 
+                             id="chk_gt_${t.id}"
+                             ${isDone ? 'checked' : ''} 
+                             onchange="toggleGlobalTask(${t.id})"
+                             title="Clique para alternar estado">
+                      <div class="gt-task-body">
+                        <label for="chk_gt_${t.id}" class="gt-task-title ${isDone ? 'strike' : ''}">${escapeHtml(t.title)}</label>
+                        ${t.description ? `<div class="gt-task-desc">${escapeHtml(t.description)}</div>` : ''}
+                        <div class="gt-task-tags">
+                          ${t.department ? `<span class="gt-tag-dept">${escapeHtml(t.department)}</span>` : ''}
+                          <span class="gt-prio-badge ${prioClass}">${prioLabel}</span>
+                          ${t.assigned_user_name ? `<span class="gt-user-tag">👤 ${escapeHtml(t.assigned_user_name)}</span>` : ''}
+                        </div>
+                      </div>
+                    </div>
+                    <div class="gt-task-right">
+                      ${urgencyHtml}
+                    </div>
+                  </div>
+                `;
+              }).join('')}
+            </div>
+          </div>
+        `;
+      });
+
+      container.innerHTML = html;
     }
 
     // Ação: Criar Novo Custo para a Loja
@@ -3789,12 +4250,21 @@
       });
     }
 
+    // Modal Checklist Global — fechar ao clicar no backdrop
+    const modalGlobalTasksEl = document.getElementById('modalGlobalTasks');
+    if (modalGlobalTasksEl) {
+      modalGlobalTasksEl.addEventListener('click', (e) => {
+        if (e.target === modalGlobalTasksEl) closeGlobalTasksModal();
+      });
+    }
+
     // Fechar modais com tecla ESC
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Escape') {
         closeAuthModal();
         closeUsersManagement();
         closePlayersCatalog();
+        closeGlobalTasksModal();
         if (modalDetalhe) modalDetalhe.classList.remove('active');
         if (modalHubSignage) modalHubSignage.classList.remove('active');
         const modalNova = document.getElementById('modalNovaAbertura');

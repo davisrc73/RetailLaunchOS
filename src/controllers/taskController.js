@@ -7,6 +7,22 @@ const Task = require('../models/Task');
 const Project = require('../models/Project');
 
 const taskController = {
+  // Lista todas as tarefas em escala global com filtros (Fase 10)
+  getAllGlobal: async (req, res) => {
+    try {
+      const filters = req.query || {};
+      const tasks = await Task.findAllGlobal(filters);
+      return res.status(200).json({
+        success: true,
+        count: tasks.length,
+        data: tasks
+      });
+    } catch (error) {
+      console.error('[taskController.getAllGlobal]', error);
+      return res.status(500).json({ success: false, message: error.message });
+    }
+  },
+
   // Lista todas as tarefas de um projeto
   getByProject: async (req, res) => {
     try {

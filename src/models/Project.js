@@ -119,6 +119,58 @@ class Project {
     ]);
 
     const newId = result.lastInsertRowid;
+
+    // Inicializar checklist padrão de abertura para a nova loja (Fase 10)
+    try {
+      const goLive = new Date(goLiveDate || Date.now());
+      const formatIso = (d) => d.toISOString().split('T')[0];
+
+      const d1 = new Date(goLive); d1.setDate(d1.getDate() - 15);
+      const d2 = new Date(goLive); d2.setDate(d2.getDate() - 10);
+      const d3 = new Date(goLive); d3.setDate(d3.getDate() - 7);
+      const d4 = new Date(goLive); d4.setDate(d4.getDate() - 3);
+
+      const defaultTasks = [
+        {
+          title: 'Vistoria Técnica & Passagem de Cablagem',
+          dept: 'Multimédia & Telas',
+          priority: 'high',
+          due: formatIso(d1),
+          desc: 'Validação de pontos de rede, calhas e infraestrutura elétrica para os displays'
+        },
+        {
+          title: 'Fixação Física de Suportes e Ecrãs LED / 4K',
+          dept: 'Multimédia & Telas',
+          priority: 'critical',
+          due: formatIso(d2),
+          desc: 'Montagem mecânica de suportes de parede e colocação de displays e players'
+        },
+        {
+          title: 'Configuração de Rede, VLAN e IPs dos Players',
+          dept: 'Redes & IT',
+          priority: 'high',
+          due: formatIso(d3),
+          desc: 'Provisionamento de switch PoE e atribuição de endereçamento IP estático aos players'
+        },
+        {
+          title: 'Deploy de Playlists e Testes de Stress 24h',
+          dept: 'Multimédia & Telas',
+          priority: 'critical',
+          due: formatIso(d4),
+          desc: 'Carga de conteúdos de inauguração, validação de áudio e monitorização de reprodução contínua'
+        }
+      ];
+
+      for (const t of defaultTasks) {
+        db.run(
+          `INSERT INTO tasks (project_id, department, title, description, priority, status, due_date, assigned_to) VALUES (?, ?, ?, ?, ?, 'pendente', ?, 1)`,
+          [newId, t.dept, t.title, t.desc, t.priority, t.due]
+        );
+      }
+    } catch (e) {
+      console.warn('[Project.create] Aviso ao gerar tarefas padrão:', e.message);
+    }
+
     return this.findById(newId);
   }
 
@@ -285,6 +337,59 @@ class Project {
       WHERE status != 'concluido'
     `);
 
+    // =========================================================================
+    // FASE 10: KPIs OPERACIONAIS DE PLANEAMENTO & CHECKLIST DE TAREFAS
+    // =========================================================================
+
+    // 1. Progresso Global das Lojas em Planeamento
+    const planningStats = db.get(`
+      SELECT 
+        COUNT(DISTINCT p.id) as active_stores_count,
+        COUNT(t.id) as total_tasks,
+        SUM(CASE WHEN t.status = 'concluido' THEN 1 ELSE 0 END) as completed_tasks,
+        SUM(CASE WHEN t.status != 'concluido' THEN 1 ELSE 0 END) as pending_tasks
+      FROM projects p
+      LEFT JOIN tasks t ON t.project_id = p.id
+      WHERE p.status IN ('planeamento', 'em_curso')
+    `);
+
+    const activeStoresCount = planningStats?.active_stores_count || 0;
+    const totalPlanningTasks = planningStats?.total_tasks || 0;
+    const completedPlanningTasks = planningStats?.completed_tasks || 0;
+    const pendingPlanningTasks = planningStats?.pending_tasks || 0;
+
+    const globalPlanningProgress = totalPlanningTasks > 0 
+      ? Math.round((completedPlanningTasks / totalPlanningTasks) * 100)
+      : 0;
+
+    // 2. Tarefas Pendentes de Checklist (por Prioridade)
+    const priorityBreakdown = db.get(`
+      SELECT 
+        SUM(CASE WHEN t.priority = 'critical' THEN 1 ELSE 0 END) as critical_count,
+        SUM(CASE WHEN t.priority = 'high' THEN 1 ELSE 0 END) as high_count,
+        SUM(CASE WHEN t.priority = 'medium' THEN 1 ELSE 0 END) as medium_count,
+        SUM(CASE WHEN t.priority = 'low' THEN 1 ELSE 0 END) as low_count
+      FROM tasks t
+      INNER JOIN projects p ON t.project_id = p.id
+      WHERE p.status IN ('planeamento', 'em_curso')
+        AND t.status != 'concluido'
+    `);
+
+    // 3. Tarefas "Due Soon" (Esta Semana ou em Atraso)
+    const dueSoonStats = db.get(`
+      SELECT 
+        COUNT(t.id) as total_due_soon,
+        SUM(CASE WHEN t.due_date < DATE('now') THEN 1 ELSE 0 END) as overdue_count,
+        SUM(CASE WHEN t.due_date >= DATE('now') AND t.due_date <= DATE('now', '+7 days') THEN 1 ELSE 0 END) as this_week_count,
+        COUNT(DISTINCT p.id) as impacted_stores_count
+      FROM tasks t
+      INNER JOIN projects p ON t.project_id = p.id
+      WHERE p.status IN ('planeamento', 'em_curso')
+        AND t.status != 'concluido'
+        AND t.due_date IS NOT NULL
+        AND t.due_date <= DATE('now', '+7 days')
+    `);
+
     const monthlyCosts = db.get(`
       SELECT SUM(amount) as month_total 
       FROM project_costs 
@@ -300,6 +405,29 @@ class Project {
         testing: playerMetrics?.testing_players || 0,
         syncing: playerMetrics?.syncing_players || 0,
         offline: playerMetrics?.offline_players || 0
+      },
+      // FASE 10: KPIs Operacionais de Planeamento
+      planningProgress: {
+        percentage: globalPlanningProgress,
+        totalTasks: totalPlanningTasks,
+        completedTasks: completedPlanningTasks,
+        pendingTasks: pendingPlanningTasks,
+        activeStoresCount
+      },
+      checklistTasks: {
+        totalPending: pendingPlanningTasks,
+        totalTasks: totalPlanningTasks,
+        critical: priorityBreakdown?.critical_count || 0,
+        high: priorityBreakdown?.high_count || 0,
+        medium: priorityBreakdown?.medium_count || 0,
+        low: priorityBreakdown?.low_count || 0,
+        activeStoresCount
+      },
+      dueSoonTasks: {
+        total: dueSoonStats?.total_due_soon || 0,
+        overdue: dueSoonStats?.overdue_count || 0,
+        thisWeek: dueSoonStats?.this_week_count || 0,
+        impactedStoresCount: dueSoonStats?.impacted_stores_count || 0
       },
       // Dados dedicados para o cartão "Infraestrutura Multimédia" (Fase 9 Piloto)
       infraMultimedia: {
