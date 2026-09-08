@@ -13,6 +13,7 @@ const taskController = require('./src/controllers/taskController');
 const costController = require('./src/controllers/costController');
 const signageController = require('./src/controllers/signageController');
 const authController = require('./src/controllers/authController');
+const configController = require('./src/controllers/configController');
 const authMiddleware = require('./src/middleware/authMiddleware');
 
 // Helper para responder JSON em servidor HTTP nativo
@@ -509,6 +510,63 @@ const server = http.createServer(async (req, res) => {
     }
   }
 
+  // --- API ROUTES: /api/v1/config/parameters ---
+  if (pathname.startsWith('/api/v1/config')) {
+    const singleParamMatch = pathname.match(/^\/api\/v1\/config\/parameters\/([^\/]+)$/);
+
+    // 1. GET /api/v1/config/parameters (obter parâmetros agrupados ou por categoria)
+    if ((pathname === '/api/v1/config/parameters' || pathname === '/api/v1/config/parameters/') && method === 'GET') {
+      req.query = parsedUrl.query;
+      const mockRes = { status: (code) => ({ json: (data) => sendJson(res, code, data) }) };
+      return configController.getParameters(req, mockRes);
+    }
+
+    // 2. POST /api/v1/config/parameters (criar novo parâmetro)
+    if ((pathname === '/api/v1/config/parameters' || pathname === '/api/v1/config/parameters/') && method === 'POST') {
+      if (!checkAuth(req, res, 'admin', 'multimedia_user')) return;
+
+      let body = '';
+      req.on('data', chunk => { body += chunk.toString(); });
+      req.on('end', async () => {
+        try {
+          req.body = body ? JSON.parse(body) : {};
+          const mockRes = { status: (code) => ({ json: (data) => sendJson(res, code, data) }) };
+          await configController.createParameter(req, mockRes);
+        } catch (err) {
+          sendJson(res, 400, { success: false, message: 'JSON Inválido: ' + err.message });
+        }
+      });
+      return;
+    }
+
+    // 3. PUT ou PATCH /api/v1/config/parameters/:id (atualizar parâmetro)
+    if (singleParamMatch && (method === 'PUT' || method === 'PATCH')) {
+      if (!checkAuth(req, res, 'admin', 'multimedia_user')) return;
+
+      req.params = { id: singleParamMatch[1] };
+      let body = '';
+      req.on('data', chunk => { body += chunk.toString(); });
+      req.on('end', async () => {
+        try {
+          req.body = body ? JSON.parse(body) : {};
+          const mockRes = { status: (code) => ({ json: (data) => sendJson(res, code, data) }) };
+          await configController.updateParameter(req, mockRes);
+        } catch (err) {
+          sendJson(res, 400, { success: false, message: 'JSON Inválido: ' + err.message });
+        }
+      });
+      return;
+    }
+
+    // 4. DELETE /api/v1/config/parameters/:id (eliminar parâmetro)
+    if (singleParamMatch && method === 'DELETE') {
+      if (!checkAuth(req, res, 'admin', 'multimedia_user')) return;
+
+      req.params = { id: singleParamMatch[1] };
+      const mockRes = { status: (code) => ({ json: (data) => sendJson(res, code, data) }) };
+      return configController.deleteParameter(req, mockRes);
+    }
+  }
 
   // --- STATIC ASSETS ---
   if (pathname.startsWith('/css/') || pathname.startsWith('/public/css/')) {

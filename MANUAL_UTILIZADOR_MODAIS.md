@@ -29,6 +29,12 @@ Este manual destina-se aos utilizadores e operadores do **Gabinete Multimédia**
 10. [Módulo: Gestão de Utilizadores (Fase 7)](#10-módulo-gestão-de-utilizadores-utilizadores-gabinete-fase-7)
 11. [Modal: Telas & Players • Catálogo Global de Hardware (Fase 8)](#11-modal-telas--players--catálogo-global-de-hardware-fase-8)
 12. [Modal: Checklist Global de Aberturas & Gestão de Tarefas (Fase 10)](#12-modal-checklist-global-de-aberturas--gestão-de-tarefas-fase-10)
+13. [Módulo: Parâmetros Multimédia & Normalização de Cores Operacionais (Fase 11)](#13-módulo-parâmetros-multimédia--normalização-de-cores-operacionais-fase-11)
+    - [13.1. Como Aceder ao Módulo](#131-como-aceder-ao-módulo)
+    - [13.2. Categorias de Parâmetros Geridas](#132-categorias-de-parâmetros-geridas)
+    - [13.3. Adicionar, Editar e Remover Parâmetros](#133-adicionar-editar-e-remover-parâmetros)
+    - [13.4. Propagação Automática nos Seletores (Dropdowns) de Telas & Players](#134-propagação-automática-nos-seletores-dropdowns-de-telas--players)
+    - [13.5. Padrão Cromático Oficial de Estado Operacional](#135-padrão-cromático-oficial-de-estado-operacional)
 
 ---
 
@@ -528,3 +534,70 @@ No topo do modal, o operador dispõe de filtros em pílula (*chips*) com contado
 * No canto superior direito de cada loja, o botão **"Ver Loja ↗"** abre instantaneamente a gaveta de detalhe completo daquela loja específica (com as abas de Marcos, Custos e Telas).
 
 ---
+
+## 13. Módulo: Parâmetros Multimédia & Normalização de Cores Operacionais (Fase 11)
+
+O módulo de **Parâmetros Multimédia** centraliza a gestão dos catálogos técnicos do Gabinete Multimédia, eliminando campos de texto livre sujeitos a gralhas e alimentando diretamente as caixas de seleção (*dropbox* / dropdowns `<select>`) em todos os formulários da aplicação.
+
+---
+
+### 13.1. Como Aceder ao Módulo
+
+Existem dois caminhos rápidos para abrir o modal de Parâmetros Multimédia (`#modalConfigParameters`):
+1. **Via Sidebar Principal**: No menu lateral esquerdo, sob o agrupamento **Configurações**, clica na opção **"Modelos, Zonas & Formatos"** (`#nav-config-parameters`).
+2. **Via Catálogo de Telas & Players**: No modal global de telas (`#modalPlayersCatalog`), clica no botão com ícone de engrenagem **"⚙️ Gerir Parâmetros"** situado na barra de topo.
+
+> [!NOTE]
+> O acesso a este módulo requer privilégios de **Administrador** (`admin`) ou **Utilizador Multimédia** (`multimedia_user`). Utilizadores com perfil de Loja ou Consulta (*Viewer*) têm o formulário de adição/edição protegido por RBAC (`HTTP 403`).
+
+---
+
+### 13.2. Categorias de Parâmetros Geridas
+
+O modal organiza os parâmetros técnicos em três abas com contadores em tempo real:
+
+1. **🖥️ Modelos de Hardware (`hardware_model`)**:
+   - Catálogo de players e ecrãs profissionais homologados pela Fnac e Darty (ex.: *BrightSign XT1144 4K*, *BrightSign HD224*, *Samsung SSP Tizen 6.5*, *LG webOS Signage 6.0*, *Philips D-Line Android*, etc.).
+2. **📍 Zonas / Localizações (`zone_location`)**:
+   - Áreas padrão dentro do layout das lojas para posicionamento dos pontos de exibição (ex.: *Entrada Principal*, *Montra Lateral*, *Fachada Principal*, *Linha de Caixas*, *Balcão de Apoio / Serviços*, *Fórum Cultural / Bilheteira*, *Zona Café / Lounge*, etc.).
+3. **📐 Resoluções / Formatos (`resolution`)**:
+   - Especificações de resolução de vídeo e orientações suportadas pelos sistemas (ex.: *4K UHD (3840x2160)*, *FHD 1080p (1920x1080)*, *HD 720p (1280x720)*, *Video Wall LED*, *Formato Vertical 9:16 (1080x1920)*, *Ultra-Stretch (3840x600)*, etc.).
+
+---
+
+### 13.3. Adicionar, Editar e Remover Parâmetros
+
+* **Adicionar Novo Parâmetro**:
+  1. Clica na aba correspondente (Hardware, Zonas ou Resoluções).
+  2. No painel **"＋ Adicionar Novo Parâmetro"**, preenche o **Nome / Designação \*** e a **Descrição / Notas Técnicas**.
+  3. Clica em **"Adicionar à Categoria"**.
+  4. O item é gravado na tabela `system_parameters` via `POST /api/v1/config/parameters` e surge imediatamente na lista com animação suave.
+* **Editar Parâmetro Existente**:
+  - Clica no botão de edição (**✏️**) na linha do parâmetro. Uma caixa de diálogo interativa solicita o novo nome e descrição, enviando as alterações via `PUT /api/v1/config/parameters/:id`.
+* **Remover Parâmetro**:
+  - Clica no botão de eliminação (**🗑️**). O sistema solicita confirmação de segurança e remove o parâmetro via `DELETE /api/v1/config/parameters/:id`.
+
+---
+
+### 13.4. Propagação Automática nos Seletores (Dropdowns) de Telas & Players
+
+Sempre que um parâmetro é criado, editado ou removido no módulo de configurações:
+* **Catálogo Global de Telas (`#modalPlayersCatalog`)**: Os dropdowns de *Modelo de Hardware*, *Zona / Localização* e *Resolução de Saída* são atualizados instantaneamente sem necessidade de recarregar a página (`F5`). O campo de Zona deixou de ser texto livre e passou a ser uma caixa de seleção obrigatória.
+* **Ficha de Loja (`openProjectDetails` -> Aba "Telas & Players")**: O formulário desdobrável **"+ Associar Novo Ecrã / Player"** consome automaticamente a lista dinâmica de parâmetros, garantindo consistência e integridade em todo o sistema.
+
+---
+
+### 13.5. Padrão Cromático Oficial de Estado Operacional
+
+Para garantir leitura operacional imediata e evitar ambiguidades de monitorização em sala de controlo, os estados operacionais das telas e players foram rigorosamente padronizados em todo o sistema:
+
+| Estado Operacional | Cor Indicadora | Código Hexadecimal | Ícone / Ping Dot | Significado Operacional |
+| :--- | :--- | :--- | :--- | :--- |
+| **Online (Ativo)** | **Verde** | `#10B981` | 🟢 Ponto pulsante verde | O ecrã está operacional, com heartbeat ativo e a emitir broadcast normal. |
+| **Em Testes** | **Laranja** | `#F59E0B` | 🟠 Ponto pulsante laranja | O dispositivo está em montagem física, comissionamento ou homologação de sinal. |
+| **A Sincronizar** | **Azul** | `#3B82F6` | 🔵 Ponto pulsante azul | O player está a transferir pacotes de vídeo, layouts HTML5 ou atualização de firmware. |
+| **Offline (Inativo)** | **Vermelho** | `#EF4444` | 🔴 Ponto pulsante vermelho | Sem sinal de rede, alimentador desligado ou anomalia de comunicação. |
+
+> [!TIP]
+> Esta paleta aplica-se tanto às opções das caixas de seleção `<select>`, como aos chips e badges da tabela de catálogo e aos pontos luminosos (*status-dot-ping*) na ficha técnica de cada loja.
+

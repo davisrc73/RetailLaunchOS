@@ -189,4 +189,51 @@ INSERT OR IGNORE INTO signage_players (id, project_id, name, device_model, zone_
 (4, 1, 'Telas Menu Linha de Caixas (3 Displays)', 'Samsung SSP (Tizen 6.5)', 'Linha de Caixas', '1920x1080 (FHD)', '192.168.142.18', '00:10:18:D1:45:90', 'testing', 1, 'v6.5.210', CURRENT_TIMESTAMP),
 (5, 2, 'Painel LED Montra Exterior', 'BrightSign XT1144 4K', 'Fachada Principal', 'Video Wall LED', '192.168.150.10', '00:10:18:E7:22:19', 'online', 2, 'v9.0.145', CURRENT_TIMESTAMP),
 (6, 2, 'Display Balcão Apoio ao Cliente', 'LG webOS Signage 6.0', 'Balcão de Serviços', '1920x1080 (FHD)', '192.168.150.14', '00:10:18:F3:11:44', 'offline', 2, 'v6.0.102', CURRENT_TIMESTAMP);
+-- ==============================================================================
+-- FASE 11: GESTÃO DE PARÂMETROS MULTIMÉDIA (MODELOS, ZONAS & RESOLUÇÕES)
+-- ==============================================================================
 
+-- 8. TABELA: SYSTEM_PARAMETERS (Catálogos Centrais para Dropdowns de Telas & Players)
+CREATE TABLE IF NOT EXISTS system_parameters (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    category VARCHAR(50) NOT NULL, -- 'hardware_model', 'zone_location', 'resolution'
+    name VARCHAR(150) NOT NULL,
+    description VARCHAR(255),
+    display_order INTEGER DEFAULT 0,
+    is_active INTEGER DEFAULT 1,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE(category, name)
+);
+
+CREATE INDEX IF NOT EXISTS idx_sys_params_cat ON system_parameters(category);
+CREATE INDEX IF NOT EXISTS idx_sys_params_active ON system_parameters(is_active);
+
+-- Sementes Iniciais: Modelos de Hardware
+INSERT OR IGNORE INTO system_parameters (category, name, description, display_order) VALUES
+('hardware_model', 'BrightSign XT1144 4K', 'Player Industrial UHD com suporte a dual video decoding e HTML5 avançado', 1),
+('hardware_model', 'BrightSign HD224', 'Player Full HD de entrada para totens e displays pontuais', 2),
+('hardware_model', 'Samsung SSP (Tizen 6.5)', 'SoC Integrado em telas profissionais Samsung SMART Signage', 3),
+('hardware_model', 'LG webOS Signage 6.0', 'SoC Integrado em painéis e monitores comerciais LG', 4),
+('hardware_model', 'Philips D-Line Android', 'Display profissional com Android OS integrado', 5),
+('hardware_model', 'Display Android Genérico', 'Player ou TV Box Android para projetos pilotos e sinalética auxiliar', 6),
+('hardware_model', 'Mini PC Windows / Linux', 'Computador compacto dedicado para renderização de aplicações interativas', 7);
+
+-- Sementes Iniciais: Zonas / Localizações de Loja
+INSERT OR IGNORE INTO system_parameters (category, name, description, display_order) VALUES
+('zone_location', 'Entrada Principal', 'Área nobre de acesso e impacto visual imediato do cliente', 1),
+('zone_location', 'Montra Lateral', 'Exposição para o exterior ou corredor do centro comercial', 2),
+('zone_location', 'Fachada Principal', 'Painel ou ecrã de grande formato visível no exterior', 3),
+('zone_location', 'Linha de Caixas', 'Telas de comunicação de campanhas, fidelização e Clube Fnac', 4),
+('zone_location', 'Balcão de Apoio / Serviços', 'Atendimento pós-venda, entregas e suporte técnico', 5),
+('zone_location', 'Fórum Cultural / Bilheteira', 'Divulgação de eventos, lançamentos de livros e bilheteira', 6),
+('zone_location', 'Zona Café / Lounge', 'Área de permanência e degustação dentro do espaço de loja', 7);
+
+-- Sementes Iniciais: Resoluções / Formatos de Saída
+INSERT OR IGNORE INTO system_parameters (category, name, description, display_order) VALUES
+('resolution', '4K UHD (3840x2160)', 'Ultra Alta Definição 16:9 para video walls e telas principais', 1),
+('resolution', 'FHD 1080p (1920x1080)', 'Full HD Horizontal padrão para montras e displays interativos', 2),
+('resolution', 'HD 720p (1280x720)', 'Alta Definição para displays compactos de balcão', 3),
+('resolution', 'Video Wall LED', 'Painel modular LED com resolução e proporção personalizadas', 4),
+('resolution', 'Formato Vertical 9:16 (1080x1920)', 'Orientação Portrait para totens e colunas de loja', 5),
+('resolution', 'Ultra-Stretch (3840x600)', 'Display panorâmico esticado para topos de gôndola e caixas', 6);

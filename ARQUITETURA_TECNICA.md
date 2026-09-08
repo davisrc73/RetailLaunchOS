@@ -176,6 +176,17 @@ erDiagram
         timestamp last_ping_at
         text notes
     }
+
+    SYSTEM_PARAMETERS {
+        int id PK
+        string category
+        string name
+        string description
+        int display_order
+        int is_active
+        timestamp created_at
+        timestamp updated_at
+    }
 ```
 
 ---
@@ -292,7 +303,23 @@ Os modelos encapsulam a lógica de negócio e queries SQL parametrizadas (evitan
 * **`Role.findAll()`**:
   * Lista os 4 papéis do sistema e as suas descrições funcionais.
 * **`Role.getPermissionsMatrix(roleName)`**:
-  * Retorna o mapa booleano de privilégios (`canCreateProject`, `canDeleteProject`, `canManageTasks`, `canDeleteTasks`, `canManageCosts`, `canManageSignage`, `canPingPlayers`, `canManageUsers`).
+  * Retorna o mapa booleano de privilégios (`canCreateProject`, `canDeleteProject`, `canManageTasks`, `canDeleteTasks`, `canManageCosts`, `canManageSignage`, `canPingPlayers`, `canManageUsers`, `canManageConfig`).
+
+### 3.8. Modelo `SystemParameter.js` (Fase 11)
+* **`SystemParameter.findAll(category)`**:
+  * Retorna os parâmetros ativos filtrados por categoria ou todos ordenados por `display_order, name`.
+* **`SystemParameter.findGrouped()`**:
+  * Retorna os parâmetros particionados num único objeto com as chaves `hardware_models`, `zones` e `resolutions`.
+* **`SystemParameter.findById(id)`**:
+  * Localiza um parâmetro individual pelo seu identificador primário.
+* **`SystemParameter.findByCategoryAndName(category, name)`**:
+  * Verifica duplicados antes da inserção.
+* **`SystemParameter.create(data)`**:
+  * Insere um novo parâmetro com `category`, `name`, `description`, `display_order` e `is_active`.
+* **`SystemParameter.update(id, data)`**:
+  * Atualiza o nome, descrição, ordem ou estado de ativação de um parâmetro existente.
+* **`SystemParameter.delete(id)`**:
+  * Remove fisicamente o parâmetro da base de dados.
 
 ---
 
@@ -356,6 +383,14 @@ A API segue os padrões RESTful com payloads JSON e códigos de resposta HTTP se
 | **PATCH** | `/api/v1/users/:id` | `:id` (User ID) + Body JSON com campos a atualizar | `admin` | Atualiza dados de um utilizador (nome, email, perfil, departamento, password, estado) |
 | **DELETE** | `/api/v1/users/:id` | `:id` (User ID) | `admin` | Desativa um utilizador (*soft delete* — status `inactive`, dados históricos preservados) |
 | **GET** | `/api/v1/roles` | Bearer Token no cabeçalho | Autenticado | Retorna a matriz de permissões dos 4 perfis do sistema |
+
+### 4.6. Endpoints de Parâmetros Multimédia (`/api/v1/config/parameters`) (Fase 11)
+| Método | Endpoint | Parâmetros | Permissões | Descrição |
+| :--- | :--- | :--- | :---: | :--- |
+| **GET** | `/api/v1/config/parameters` | `?category=zone_location` | Todos | Retorna os parâmetros técnicos (agrupados por padrão em `hardware_models`, `zones` e `resolutions`) |
+| **POST** | `/api/v1/config/parameters` | Body JSON: `{ category, name, description, display_order }` | `admin`, `multimedia_user` | Regista um novo parâmetro no catálogo |
+| **PUT** | `/api/v1/config/parameters/:id` | `:id` (Param ID) + Body JSON com campos a atualizar | `admin`, `multimedia_user` | Atualiza designação, descrição ou ordem de apresentação |
+| **DELETE** | `/api/v1/config/parameters/:id` | `:id` (Param ID) | `admin`, `multimedia_user` | Remove permanentemente um parâmetro da base de dados |
 
 
 ---

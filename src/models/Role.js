@@ -16,6 +16,7 @@ const ROLE_PERMISSIONS = {
     canManageTasks: true,
     canManageCosts: true,
     canManageUsers: true,
+    canManageConfig: true,
     canViewFinancials: true
   },
   multimedia_user: {
@@ -27,6 +28,7 @@ const ROLE_PERMISSIONS = {
     canManageTasks: true,
     canManageCosts: true,
     canManageUsers: false,
+    canManageConfig: true,
     canViewFinancials: true
   },
   store_manager: {
@@ -38,6 +40,7 @@ const ROLE_PERMISSIONS = {
     canManageTasks: true,
     canManageCosts: false,
     canManageUsers: false,
+    canManageConfig: false,
     canViewFinancials: true
   },
   viewer: {
@@ -49,6 +52,7 @@ const ROLE_PERMISSIONS = {
     canManageTasks: false,
     canManageCosts: false,
     canManageUsers: false,
+    canManageConfig: false,
     canViewFinancials: true
   }
 };

@@ -1,14 +1,16 @@
 <!DOCTYPE html>
 <html lang="pt">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>RetailLaunchOS • Painel de Aberturas de Lojas | Fnac Darty</title>
-  <meta name="description" content="Sistema de gestão de aberturas de lojas Fnac e Darty para o Gabinete Multimédia. Acompanhamento de infraestrutura, digital signage e custos diários.">
+  <meta name="description"
+    content="Sistema de gestão de aberturas de lojas Fnac e Darty para o Gabinete Multimédia. Acompanhamento de infraestrutura, digital signage e custos diários.">
   <meta name="color-scheme" content="light dark">
   <!-- Anti-FOUC Theme Script (Sincronização imediata antes da renderização) -->
   <script>
-    (function() {
+    (function () {
       try {
         var saved = localStorage.getItem('retaillaunch_theme') || 'auto';
         var effective = saved;
@@ -19,17 +21,20 @@
         document.documentElement.setAttribute('data-theme-setting', saved);
         var meta = document.querySelector('meta[name="color-scheme"]');
         if (meta) meta.content = effective;
-      } catch (e) {}
+      } catch (e) { }
     })();
   </script>
   <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap"
+    rel="stylesheet">
   <!-- Stylesheets -->
   <link rel="stylesheet" href="../../../public/css/dashboard.css">
   <link rel="stylesheet" href="/css/dashboard.css">
 </head>
+
 <body>
 
   <!-- Efeitos de iluminação ambiente -->
@@ -65,7 +70,9 @@
         <li>
           <a href="#" class="nav-link active" id="nav-dashboard">
             <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6A2.25 2.25 0 016 3.75h2.25A2.25 2.25 0 0110.5 6v2.25a2.25 2.25 0 01-2.25 2.25H6a2.25 2.25 0 01-2.25-2.25V6zM3.75 15.75A2.25 2.25 0 016 13.5h2.25a2.25 2.25 0 012.25 2.25V18a2.25 2.25 0 01-2.25 2.25H6A2.25 2.25 0 013.75 18v-2.25zM13.5 6a2.25 2.25 0 012.25-2.25H18A2.25 2.25 0 0120.25 6v2.25A2.25 2.25 0 0118 10.5h-2.25a2.25 2.25 0 01-2.25-2.25V6zM13.5 15.75a2.25 2.25 0 012.25-2.25H18a2.25 2.25 0 012.25 2.25V18A2.25 2.25 0 0118 20.25h-2.25A2.25 2.25 0 0113.5 18v-2.25z"></path>
+              <path stroke-linecap="round" stroke-linejoin="round"
+                d="M3.75 6A2.25 2.25 0 016 3.75h2.25A2.25 2.25 0 0110.5 6v2.25a2.25 2.25 0 01-2.25 2.25H6a2.25 2.25 0 01-2.25-2.25V6zM3.75 15.75A2.25 2.25 0 016 13.5h2.25a2.25 2.25 0 012.25 2.25V18a2.25 2.25 0 01-2.25 2.25H6A2.25 2.25 0 013.75 18v-2.25zM13.5 6a2.25 2.25 0 012.25-2.25H18A2.25 2.25 0 0120.25 6v2.25A2.25 2.25 0 0118 10.5h-2.25a2.25 2.25 0 01-2.25-2.25V6zM13.5 15.75a2.25 2.25 0 012.25-2.25H18a2.25 2.25 0 012.25 2.25V18A2.25 2.25 0 0118 20.25h-2.25A2.25 2.25 0 0113.5 18v-2.25z">
+              </path>
             </svg>
             <span>Dashboard Geral</span>
           </a>
@@ -73,7 +80,9 @@
         <li>
           <a href="#aberturas-section" class="nav-link" id="nav-projetos">
             <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 21v-7.5a.75.75 0 01.75-.75h3a.75.75 0 01.75.75V21m-4.5 0H2.36m11.14 0H18m0 0h3.64m-1.39 0V9.349m-16.5 11.65V9.35m0 0a3.001 3.001 0 003.75-.614A2.993 2.993 0 009 9.35c.801 0 1.554-.316 2.12-.876a3.004 3.004 0 004.24 0c.567.56 1.32.876 2.12.876 1.042 0 2.012-.534 2.58-1.401"></path>
+              <path stroke-linecap="round" stroke-linejoin="round"
+                d="M13.5 21v-7.5a.75.75 0 01.75-.75h3a.75.75 0 01.75.75V21m-4.5 0H2.36m11.14 0H18m0 0h3.64m-1.39 0V9.349m-16.5 11.65V9.35m0 0a3.001 3.001 0 003.75-.614A2.993 2.993 0 009 9.35c.801 0 1.554-.316 2.12-.876a3.004 3.004 0 004.24 0c.567.56 1.32.876 2.12.876 1.042 0 2.012-.534 2.58-1.401">
+              </path>
             </svg>
             <span>Lojas & Aberturas</span>
             <span class="badge-count" id="sidebarBadgeCount">3</span>
@@ -82,7 +91,9 @@
         <li>
           <a href="#" class="nav-link" id="nav-signage">
             <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M6 20.25h12m-7.5-3v3m3-3v3m-10.125-3h17.25c.621 0 1.125-.504 1.125-1.125V4.875c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125z"></path>
+              <path stroke-linecap="round" stroke-linejoin="round"
+                d="M6 20.25h12m-7.5-3v3m3-3v3m-10.125-3h17.25c.621 0 1.125-.504 1.125-1.125V4.875c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125z">
+              </path>
             </svg>
             <span>Digital Signage / Telas</span>
           </a>
@@ -90,7 +101,9 @@
         <li>
           <a href="#" class="nav-link" id="nav-playlists">
             <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 12h16.5m-16.5 3.75h16.5M3.75 19.5h16.5M5.625 4.5h12.75a1.875 1.875 0 010 3.75H5.625a1.875 1.875 0 010-3.75z"></path>
+              <path stroke-linecap="round" stroke-linejoin="round"
+                d="M3.75 12h16.5m-16.5 3.75h16.5M3.75 19.5h16.5M5.625 4.5h12.75a1.875 1.875 0 010 3.75H5.625a1.875 1.875 0 010-3.75z">
+              </path>
             </svg>
             <span>Playlists & Conteúdos</span>
           </a>
@@ -98,7 +111,9 @@
         <li>
           <a href="#" class="nav-link" id="nav-custos">
             <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 18.75a60.07 60.07 0 0115.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 013 6h-.75m0 0v-.375c0-.621.504-1.125 1.125-1.125H20.25M2.25 6v9m18-10.5v.75c0 .414.336.75.75.75h.75m-1.5-1.5h.375c.621 0 1.125.504 1.125 1.125v9.75c0 .621-.504 1.125-1.125 1.125h-.375m1.5-1.5H21a.75.75 0 00-.75.75v.75m0 0H3.75m0 0h-.375a1.125 1.125 0 01-1.125-1.125V15m1.5 1.5v-.75A.75.75 0 003 15h-.75"></path>
+              <path stroke-linecap="round" stroke-linejoin="round"
+                d="M2.25 18.75a60.07 60.07 0 0115.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 013 6h-.75m0 0v-.375c0-.621.504-1.125 1.125-1.125H20.25M2.25 6v9m18-10.5v.75c0 .414.336.75.75.75h.75m-1.5-1.5h.375c.621 0 1.125.504 1.125 1.125v9.75c0 .621-.504 1.125-1.125 1.125h-.375m1.5-1.5H21a.75.75 0 00-.75.75v.75m0 0H3.75m0 0h-.375a1.125 1.125 0 01-1.125-1.125V15m1.5 1.5v-.75A.75.75 0 003 15h-.75">
+              </path>
             </svg>
             <span>Custos & Diárias</span>
           </a>
@@ -113,7 +128,9 @@
         <li>
           <a href="#" class="nav-link" id="nav-roles">
             <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z"></path>
+              <path stroke-linecap="round" stroke-linejoin="round"
+                d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z">
+              </path>
             </svg>
             <span>Perfis & Permissões</span>
           </a>
@@ -121,7 +138,9 @@
         <li>
           <a href="#" class="nav-link" id="nav-users">
             <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z"></path>
+              <path stroke-linecap="round" stroke-linejoin="round"
+                d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z">
+              </path>
             </svg>
             <span>Utilizadores</span>
           </a>
@@ -136,9 +155,21 @@
         <li>
           <a href="#" class="nav-link" id="nav-config-players">
             <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M9 17.25v1.007a3 3 0 01-.879 2.122L7.5 21h9l-.621-.621A3 3 0 0115 18.257V17.25m6-12V15a2.25 2.25 0 01-2.25 2.25H5.25A2.25 2.25 0 013 15V5.25m18 0A2.25 2.25 0 0018.75 3H5.25A2.25 2.25 0 003 5.25m18 0H3"></path>
+              <path stroke-linecap="round" stroke-linejoin="round"
+                d="M9 17.25v1.007a3 3 0 01-.879 2.122L7.5 21h9l-.621-.621A3 3 0 0115 18.257V17.25m6-12V15a2.25 2.25 0 01-2.25 2.25H5.25A2.25 2.25 0 013 15V5.25m18 0A2.25 2.25 0 0018.75 3H5.25A2.25 2.25 0 003 5.25m18 0H3">
+              </path>
             </svg>
             <span>Telas &amp; Players</span>
+          </a>
+        </li>
+        <li>
+          <a href="#" class="nav-link" id="nav-config-parameters">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round"
+                d="M10.5 6h9.75M10.5 6a1.5 1.5 0 11-3 0m3 0a1.5 1.5 0 10-3 0M3.75 6H7.5m3 12h9.75m-9.75 0a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m-3.75 0H7.5m9-6h3.75m-3.75 0a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m-9.75 0h9.75">
+              </path>
+            </svg>
+            <span>Modelos, Zonas &amp; Formatos</span>
           </a>
         </li>
       </ul>
@@ -158,13 +189,17 @@
         <div class="user-widget-actions">
           <button class="btn-switch-role" id="btnOpenAuthModal" title="Alternar Perfil ou Iniciar Sessão">
             <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99"></path>
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99">
+              </path>
             </svg>
             <span>Alternar Perfil</span>
           </button>
           <button class="btn-logout" id="btnLogout" title="Terminar Sessão">
             <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15m3 0l3-3m0 0l-3-3m3 3H9"></path>
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15m3 0l3-3m0 0l-3-3m3 3H9">
+              </path>
             </svg>
           </button>
         </div>
@@ -190,7 +225,8 @@
         <!-- Barra de Pesquisa Rápida -->
         <div class="search-box">
           <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
           </svg>
           <input type="text" id="projectSearch" placeholder="Pesquisar loja, insígnia...">
           <span class="kbd-shortcut">⌘K</span>
@@ -198,21 +234,29 @@
 
         <!-- Seletor Tri-Estado de Tema (Dia / Noite / Auto) -->
         <div class="theme-switcher-group" id="themeSwitcherGroup" role="radiogroup" aria-label="Modo de Visualização">
-          <button type="button" class="theme-switch-btn" data-theme-mode="light" id="themeBtnLight" title="Modo Claro (Day)" aria-label="Modo Claro (Day)">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <button type="button" class="theme-switch-btn" data-theme-mode="light" id="themeBtnLight"
+            title="Modo Claro (Day)" aria-label="Modo Claro (Day)">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
               <circle cx="12" cy="12" r="4"></circle>
-              <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"></path>
+              <path
+                d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41">
+              </path>
             </svg>
             <span class="theme-switch-label">Dia</span>
           </button>
-          <button type="button" class="theme-switch-btn" data-theme-mode="dark" id="themeBtnDark" title="Modo Escuro (Night)" aria-label="Modo Escuro (Night)">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <button type="button" class="theme-switch-btn" data-theme-mode="dark" id="themeBtnDark"
+            title="Modo Escuro (Night)" aria-label="Modo Escuro (Night)">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
               <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"></path>
             </svg>
             <span class="theme-switch-label">Noite</span>
           </button>
-          <button type="button" class="theme-switch-btn" data-theme-mode="auto" id="themeBtnAuto" title="Automático (Segue o Sistema Operativo)" aria-label="Automático (Segue o Sistema Operativo)">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <button type="button" class="theme-switch-btn" data-theme-mode="auto" id="themeBtnAuto"
+            title="Automático (Segue o Sistema Operativo)" aria-label="Automático (Segue o Sistema Operativo)">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
               <rect x="2" y="3" width="20" height="14" rx="2"></rect>
               <line x1="8" y1="21" x2="16" y2="21"></line>
               <line x1="12" y1="17" x2="12" y2="21"></line>
@@ -224,7 +268,9 @@
         <!-- Botão de Notificações -->
         <button class="btn-icon" aria-label="Notificações" title="Alertas de Abertura">
           <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0"></path>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0">
+            </path>
           </svg>
         </button>
 
@@ -245,14 +291,14 @@
            PAINEL DE KPIS PRINCIPAIS
            ===================================================================== -->
       <section class="kpi-grid" aria-label="Indicadores Chave de Desempenho">
-        
+
         <!-- KPI 1: Próxima Abertura com Contagem Decrescente -->
         <div class="kpi-card hero-countdown" id="kpiHeroCard">
           <div class="kpi-header">
             <span class="kpi-label">Próxima Abertura</span>
             <span class="brand-badge fnac" id="kpiHeroBadge">Fnac Flagship</span>
           </div>
-          
+
           <div class="store-title" id="kpiHeroStoreName" style="font-size: 16px; margin-bottom: 4px;">Fnac Cascais</div>
           <div class="kpi-subtitle" id="kpiHeroLocation">CascaiShopping • Inauguração Oficial</div>
 
@@ -283,7 +329,8 @@
               <strong id="kpiHeroProgressVal">0%</strong>
             </div>
             <div class="signage-progress-bar" style="height: 6px;">
-              <div class="signage-progress-fill" id="kpiHeroProgressFill" style="width: 0%; background: linear-gradient(90deg, var(--fnac-gold), #FFDB00);"></div>
+              <div class="signage-progress-fill" id="kpiHeroProgressFill"
+                style="width: 0%; background: linear-gradient(90deg, var(--fnac-gold), #FFDB00);"></div>
             </div>
           </div>
 
@@ -318,11 +365,13 @@
             </div>
             <div class="kpi-icon-wrap" style="background: rgba(245, 176, 39, 0.12); color: var(--fnac-gold);">
               <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4">
+                </path>
               </svg>
             </div>
           </div>
-          
+
           <!-- Lista de Lojas com Nome e Barra de Progresso individual -->
           <div class="stores-planning-list" id="storesPlanningList">
             <div style="text-align: center; padding: 24px; color: var(--text-dim); font-size: 12px;">
@@ -341,25 +390,29 @@
           <div class="kpi-header" style="margin-bottom: 10px;">
             <div style="display: flex; flex-direction: column;">
               <span class="kpi-label">Checklists & Prazos</span>
-              <span style="font-size: 11px; color: var(--text-dim); margin-top: 2px;">Tarefas pendentes e alertas operacionais</span>
+              <span style="font-size: 11px; color: var(--text-dim); margin-top: 2px;">Tarefas pendentes e alertas
+                operacionais</span>
             </div>
             <div class="kpi-icon-wrap" style="background: rgba(56, 189, 248, 0.12); color: #38BDF8;">
               <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4">
+                </path>
               </svg>
             </div>
           </div>
 
           <div class="tasks-deadlines-grid">
             <!-- Coluna 1: Tarefas em Checklist (Clicável) -->
-            <div class="td-column td-pending-block" id="blockPendingTasks" onclick="openGlobalTasksModal('pending')" title="Clique para abrir tarefas pendentes">
+            <div class="td-column td-pending-block" id="blockPendingTasks" onclick="openGlobalTasksModal('pending')"
+              title="Clique para abrir tarefas pendentes">
               <div class="td-block-header">
                 <span class="td-block-tag pending">Checklist</span>
                 <span class="td-arrow-icon">↗</span>
               </div>
               <div class="td-val" id="kpiPendingTasksCount">0</div>
               <div class="td-label">Tarefas Pendentes</div>
-              
+
               <div class="td-chips-wrap">
                 <span class="p-chip p-critical" id="chipCritCount">0 Críticas</span>
                 <span class="p-chip p-high" id="chipHighCount">0 Altas</span>
@@ -370,7 +423,8 @@
             <div class="td-divider"></div>
 
             <!-- Coluna 2: Due Soon • Esta Semana (Clicável) -->
-            <div class="td-column td-duesoon-block" id="blockDueSoonTasks" onclick="openGlobalTasksModal('due_soon')" title="Clique para ver alertas de prazos na semana">
+            <div class="td-column td-duesoon-block" id="blockDueSoonTasks" onclick="openGlobalTasksModal('due_soon')"
+              title="Clique para ver alertas de prazos na semana">
               <div class="td-block-header">
                 <span class="td-block-tag duesoon">⚡ Due Soon</span>
                 <span class="td-arrow-icon">↗</span>
@@ -385,11 +439,14 @@
             </div>
           </div>
 
-          <div class="kpi-action-strip" style="margin-top: 10px; justify-content: center; border-top: 1px solid rgba(255, 255, 255, 0.05); padding-top: 8px;">
-            <span class="kpi-interactive-link" onclick="openGlobalTasksModal('all')" style="cursor: pointer; color: var(--text-muted); font-size: 11.5px;">
+          <div class="kpi-action-strip"
+            style="margin-top: 10px; justify-content: center; border-top: 1px solid rgba(255, 255, 255, 0.05); padding-top: 8px;">
+            <span class="kpi-interactive-link" onclick="openGlobalTasksModal('all')"
+              style="cursor: pointer; color: var(--text-muted); font-size: 11.5px;">
               <span>Abrir Gestão Global de Tarefas</span>
               <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3">
+                </path>
               </svg>
             </span>
           </div>
@@ -405,7 +462,7 @@
           <div class="section-title-wrap">
             <h2>Aberturas em Curso</h2>
             <p>Monitorização de marcos de inauguração e prontidão audiovisual das lojas</p>
-            
+
             <!-- Resumo Operacional de Aberturas (Fase 9) -->
             <div class="openings-summary-strip" id="openingsSummaryStrip">
               <div class="summary-status-pill pill-em-curso" title="Lojas com trabalhos em execução">
@@ -427,10 +484,12 @@
                 <span class="summary-pill-label">Total:</span>
                 <strong class="summary-pill-val" id="openingsTotal">0 Lojas</strong>
               </div>
+              <!--
               <div class="summary-signage-status" id="openingsSignageStatus">
                 <span class="signage-sub-label">Signage:</span>
                 <span class="signage-sub-values" id="openingsSignageValues">0 Pronto • 0 Config • 0 Pendente</span>
               </div>
+              -->
             </div>
           </div>
 
@@ -442,8 +501,11 @@
               <button class="filter-chip" data-filter="Darty" id="filterDarty">Darty</button>
             </div>
             <button class="btn-secondary" id="btnExport">
-              <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="vertical-align: -2px; margin-right: 4px;">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3"></path>
+              <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                style="vertical-align: -2px; margin-right: 4px;">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3">
+                </path>
               </svg>
               Exportar CSV
             </button>
@@ -474,12 +536,14 @@
            ATIVIDADE EM TEMPO REAL & GABINETE MULTIMÉDIA
            ===================================================================== -->
       <section class="bottom-grid">
-        
+
         <!-- Feed de Operações Recentes -->
         <div class="feed-card">
           <div class="section-title-wrap">
-            <h2 style="font-size: 15px; font-weight: 700; color: var(--text-white);">Atividade Recente • Gabinete Multimédia</h2>
-            <p style="font-size: 12px; color: var(--text-muted);">Sincronização de equipamentos, testes de som e validação de players</p>
+            <h2 style="font-size: 15px; font-weight: 700; color: var(--text-white);">Atividade Recente • Gabinete
+              Multimédia</h2>
+            <p style="font-size: 12px; color: var(--text-muted);">Sincronização de equipamentos, testes de som e
+              validação de players</p>
           </div>
 
           <div class="feed-item-list">
@@ -490,7 +554,8 @@
                 </svg>
               </div>
               <div class="feed-item-text">
-                <div><strong>Video Wall de Entrada (4x4)</strong> validado com sucesso em <strong>Fnac Cascais</strong>.</div>
+                <div><strong>Video Wall de Entrada (4x4)</strong> validado com sucesso em <strong>Fnac Cascais</strong>.
+                </div>
                 <div class="feed-timestamp">Há 25 minutos • BrightSign UHD Player #01</div>
               </div>
             </div>
@@ -498,11 +563,13 @@
             <div class="feed-item">
               <div class="feed-item-icon" style="background: rgba(245, 158, 11, 0.12); color: var(--fnac-gold);">
                 <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                 </svg>
               </div>
               <div class="feed-item-text">
-                <div>Diária técnica registada em SQLite: <strong>€ 485,50</strong> atribuídos a <strong>Fnac Cascais</strong>.</div>
+                <div>Diária técnica registada em SQLite: <strong>€ 485,50</strong> atribuídos a <strong>Fnac
+                    Cascais</strong>.</div>
                 <div class="feed-timestamp">Há 2 horas • Lançado por Admin Multimédia</div>
               </div>
             </div>
@@ -510,7 +577,9 @@
             <div class="feed-item">
               <div class="feed-item-icon" style="background: rgba(59, 130, 246, 0.12); color: #60A5FA;">
                 <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.19 8.688a4.5 4.5 0 011.242 7.244l-4.5 4.5a4.5 4.5 0 01-6.364-6.364l1.757-1.757m13.35-.622l1.757-1.757a4.5 4.5 0 00-6.364-6.364l-4.5 4.5a4.5 4.5 0 001.242 7.244"></path>
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M13.19 8.688a4.5 4.5 0 011.242 7.244l-4.5 4.5a4.5 4.5 0 01-6.364-6.364l1.757-1.757m13.35-.622l1.757-1.757a4.5 4.5 0 00-6.364-6.364l-4.5 4.5a4.5 4.5 0 001.242 7.244">
+                  </path>
                 </svg>
               </div>
               <div class="feed-item-text">
@@ -565,7 +634,8 @@
           <div class="form-grid-2">
             <div class="form-group">
               <label class="form-label" for="inputName">Nome da Loja *</label>
-              <input type="text" id="inputName" name="name" class="form-input" placeholder="Ex: Fnac Leiria Shopping" required>
+              <input type="text" id="inputName" name="name" class="form-input" placeholder="Ex: Fnac Leiria Shopping"
+                required>
             </div>
             <div class="form-group">
               <label class="form-label" for="inputFormat">Formato da Loja</label>
@@ -581,7 +651,8 @@
           <!-- Localização / Morada -->
           <div class="form-group">
             <label class="form-label" for="inputLocation">Localização / Centro Comercial *</label>
-            <input type="text" id="inputLocation" name="location" class="form-input" placeholder="Ex: LeiriaShopping, Piso 0, Loja 45" required>
+            <input type="text" id="inputLocation" name="location" class="form-input"
+              placeholder="Ex: LeiriaShopping, Piso 0, Loja 45" required>
           </div>
 
           <!-- Datas: Go-Live e Entrega Técnica -->
@@ -600,11 +671,13 @@
           <div class="form-grid-2">
             <div class="form-group">
               <label class="form-label" for="inputDailyCost">Custo Diário Estimado (€)</label>
-              <input type="number" step="0.50" id="inputDailyCost" name="daily_cost" class="form-input" placeholder="380.00" value="380.00">
+              <input type="number" step="0.50" id="inputDailyCost" name="daily_cost" class="form-input"
+                placeholder="380.00" value="380.00">
             </div>
             <div class="form-group">
               <label class="form-label" for="inputTotalBudget">Orçamento Total (€)</label>
-              <input type="number" step="100" id="inputTotalBudget" name="total_budget" class="form-input" placeholder="35000.00" value="35000.00">
+              <input type="number" step="100" id="inputTotalBudget" name="total_budget" class="form-input"
+                placeholder="35000.00" value="35000.00">
             </div>
           </div>
 
@@ -612,7 +685,8 @@
           <div class="form-grid-2">
             <div class="form-group">
               <label class="form-label" for="inputPlaylist">Versão da Playlist Signage</label>
-              <input type="text" id="inputPlaylist" name="playlist_version" class="form-input" placeholder="v1.0-inauguracao" value="v1.0-inauguracao">
+              <input type="text" id="inputPlaylist" name="playlist_version" class="form-input"
+                placeholder="v1.0-inauguracao" value="v1.0-inauguracao">
             </div>
             <div class="form-group">
               <label class="form-label" for="inputSignageStatus">Estado Inicial de Signage</label>
@@ -672,8 +746,11 @@
       <div class="modal-header">
         <div class="modal-title">
           <div style="display: flex; align-items: center; gap: 10px;">
-            <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="color: var(--fnac-gold);">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 20.25h12m-7.5-3v3m3-3v3m-10.125-3h17.25c.621 0 1.125-.504 1.125-1.125V4.875c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125z"></path>
+            <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+              style="color: var(--fnac-gold);">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M6 20.25h12m-7.5-3v3m3-3v3m-10.125-3h17.25c.621 0 1.125-.504 1.125-1.125V4.875c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125z">
+              </path>
             </svg>
             <span>Hub Central • Digital Signage & Playlists Fnac / Darty</span>
           </div>
@@ -701,8 +778,11 @@
       <div class="modal-header">
         <div class="modal-title">
           <div style="display: flex; align-items: center; gap: 10px;">
-            <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="color: var(--fnac-gold);">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 18.72a9.094 9.094 0 003.741-.479 3 3 0 00-4.682-2.72m.94 3.198l.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0112 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 016 18.719m12 0a5.971 5.971 0 00-.941-3.197m0 0A5.995 5.995 0 0012 12.75a5.995 5.995 0 00-5.058 2.772m0 0a3 3 0 00-4.681 2.72 8.986 8.986 0 003.74.477m.94-3.197a5.971 5.971 0 00-.94 3.197M15 6.75a3 3 0 11-6 0 3 3 0 016 0zm6 3a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0zm-13.5 0a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0z"></path>
+            <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+              style="color: var(--fnac-gold);">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M18 18.72a9.094 9.094 0 003.741-.479 3 3 0 00-4.682-2.72m.94 3.198l.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0112 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 016 18.719m12 0a5.971 5.971 0 00-.941-3.197m0 0A5.995 5.995 0 0012 12.75a5.995 5.995 0 00-5.058 2.772m0 0a3 3 0 00-4.681 2.72 8.986 8.986 0 003.74.477m.94-3.197a5.971 5.971 0 00-.94 3.197M15 6.75a3 3 0 11-6 0 3 3 0 016 0zm6 3a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0zm-13.5 0a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0z">
+              </path>
             </svg>
             <span>Utilizadores • Gestão de Equipa</span>
           </div>
@@ -719,7 +799,8 @@
         <div id="userFormPanel" class="user-form-panel" style="display: none;">
           <div class="user-form-panel-header">
             <div class="user-form-panel-title" id="userFormPanelTitle">➕ Novo Utilizador</div>
-            <button type="button" class="btn-secondary" onclick="cancelUserForm()" style="font-size: 12px; padding: 5px 12px;">✕ Cancelar</button>
+            <button type="button" class="btn-secondary" onclick="cancelUserForm()"
+              style="font-size: 12px; padding: 5px 12px;">✕ Cancelar</button>
           </div>
           <form id="formUserCrud" onsubmit="saveUserForm(event)">
             <input type="hidden" id="editUserId" value="">
@@ -730,15 +811,19 @@
               </div>
               <div class="form-group">
                 <label class="form-label" for="userFormEmail">Email Corporativo *</label>
-                <input type="email" id="userFormEmail" class="form-input" placeholder="ex: ana.costa@fnacdarty.pt" required>
+                <input type="email" id="userFormEmail" class="form-input" placeholder="ex: ana.costa@fnacdarty.pt"
+                  required>
               </div>
               <div class="form-group">
-                <label class="form-label" for="userFormPassword">Password <span style="color: var(--text-muted); font-weight: 400;">(deixar vazio para manter)</span></label>
-                <input type="password" id="userFormPassword" class="form-input" placeholder="Mínimo 6 caracteres" autocomplete="new-password">
+                <label class="form-label" for="userFormPassword">Password <span
+                    style="color: var(--text-muted); font-weight: 400;">(deixar vazio para manter)</span></label>
+                <input type="password" id="userFormPassword" class="form-input" placeholder="Mínimo 6 caracteres"
+                  autocomplete="new-password">
               </div>
               <div class="form-group">
                 <label class="form-label" for="userFormDept">Departamento</label>
-                <input type="text" id="userFormDept" class="form-input" placeholder="ex: Gabinete Multimédia" value="Gabinete Multimédia">
+                <input type="text" id="userFormDept" class="form-input" placeholder="ex: Gabinete Multimédia"
+                  value="Gabinete Multimédia">
               </div>
               <div class="form-group">
                 <label class="form-label" for="userFormRole">Perfil de Acesso *</label>
@@ -769,8 +854,10 @@
         <div class="users-toolbar">
           <div style="font-size: 13px; color: var(--text-muted);" id="usersCountLabel">A carregar...</div>
           <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
-            <input type="search" id="usersSearchInput" class="users-search-input" placeholder="Pesquisar por nome ou email..." oninput="filterUsersTable(this.value)">
-            <button type="button" class="btn-primary perm-hidden" id="btnNewUser" onclick="openCreateUserForm()" style="font-size: 13px; padding: 8px 16px; white-space: nowrap;">
+            <input type="search" id="usersSearchInput" class="users-search-input"
+              placeholder="Pesquisar por nome ou email..." oninput="filterUsersTable(this.value)">
+            <button type="button" class="btn-primary perm-hidden" id="btnNewUser" onclick="openCreateUserForm()"
+              style="font-size: 13px; padding: 8px 16px; white-space: nowrap;">
               ＋ Novo Utilizador
             </button>
           </div>
@@ -790,7 +877,11 @@
               </tr>
             </thead>
             <tbody id="usersTableBody">
-              <tr><td colspan="6" class="users-empty-state"><div class="empty-icon">⏳</div>A carregar utilizadores...</td></tr>
+              <tr>
+                <td colspan="6" class="users-empty-state">
+                  <div class="empty-icon">⏳</div>A carregar utilizadores...
+                </td>
+              </tr>
             </tbody>
           </table>
         </div>
@@ -806,8 +897,11 @@
       <div class="modal-header">
         <div class="modal-title">
           <div style="display: flex; align-items: center; gap: 10px;">
-            <svg width="22" height="22" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="color: var(--fnac-gold);">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17.25v1.007a3 3 0 01-.879 2.122L7.5 21h9l-.621-.621A3 3 0 0115 18.257V17.25m6-12V15a2.25 2.25 0 01-2.25 2.25H5.25A2.25 2.25 0 013 15V5.25m18 0A2.25 2.25 0 0018.75 3H5.25A2.25 2.25 0 003 5.25m18 0H3"></path>
+            <svg width="22" height="22" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+              style="color: var(--fnac-gold);">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M9 17.25v1.007a3 3 0 01-.879 2.122L7.5 21h9l-.621-.621A3 3 0 0115 18.257V17.25m6-12V15a2.25 2.25 0 01-2.25 2.25H5.25A2.25 2.25 0 013 15V5.25m18 0A2.25 2.25 0 0018.75 3H5.25A2.25 2.25 0 003 5.25m18 0H3">
+              </path>
             </svg>
             <span>Telas &amp; Players • Catálogo Global de Hardware</span>
           </div>
@@ -824,37 +918,36 @@
         <div id="catalogPlayerFormPanel" class="player-form-panel" style="display: none;">
           <div class="player-form-panel-header">
             <div class="player-form-panel-title" id="catalogPlayerFormTitle">➕ Registar Novo Ecrã / Player</div>
-            <button type="button" class="btn-secondary" onclick="cancelCatalogPlayerForm()" style="font-size: 12px; padding: 5px 12px;">✕ Cancelar</button>
+            <button type="button" class="btn-secondary" onclick="cancelCatalogPlayerForm()"
+              style="font-size: 12px; padding: 5px 12px;">✕ Cancelar</button>
           </div>
           <form id="formCatalogPlayerCrud" onsubmit="saveCatalogPlayerForm(event)">
             <input type="hidden" id="editCatalogPlayerId" value="">
             <div class="player-form-grid">
               <div class="form-group">
                 <label class="form-label" for="playerCatalogName">Nome do Ecrã / Display *</label>
-                <input type="text" id="playerCatalogName" class="form-input" placeholder="ex: Video Wall Entrada 4x4" required>
+                <input type="text" id="playerCatalogName" class="form-input" placeholder="ex: Video Wall Entrada 4x4"
+                  required>
               </div>
               <div class="form-group">
                 <label class="form-label" for="playerCatalogModel">Modelo de Hardware</label>
                 <select id="playerCatalogModel" class="form-input">
-                  <option value="BrightSign XT1144 4K">BrightSign XT1144 4K</option>
-                  <option value="Samsung SSP Tizen">Samsung SSP Tizen</option>
-                  <option value="LG webOS Signage">LG webOS Signage</option>
-                  <option value="Display Android Genérico">Display Android Genérico</option>
-                  <option value="Mini PC Windows / Linux">Mini PC Windows / Linux</option>
+                  <option value="">-- Selecione o Modelo --</option>
+                  <!-- Alimentado dinamicamente via API -->
                 </select>
               </div>
               <div class="form-group">
                 <label class="form-label" for="playerCatalogZone">Zona / Localização *</label>
-                <input type="text" id="playerCatalogZone" class="form-input" placeholder="ex: Entrada Principal, Montra, Caixas" required>
+                <select id="playerCatalogZone" class="form-input" required>
+                  <option value="">-- Selecione a Zona --</option>
+                  <!-- Alimentado dinamicamente via API -->
+                </select>
               </div>
               <div class="form-group">
                 <label class="form-label" for="playerCatalogResolution">Resolução / Formato</label>
                 <select id="playerCatalogResolution" class="form-input">
-                  <option value="4K UHD">4K UHD (3840x2160)</option>
-                  <option value="FHD 1080p">FHD 1080p (1920x1080)</option>
-                  <option value="HD 720p">HD 720p (1280x720)</option>
-                  <option value="Video Wall LED">Video Wall LED</option>
-                  <option value="Formato Vertical 9:16">Formato Vertical 9:16</option>
+                  <option value="">-- Selecione a Resolução --</option>
+                  <!-- Alimentado dinamicamente via API -->
                 </select>
               </div>
               <div class="form-group">
@@ -868,15 +961,16 @@
               <div class="form-group">
                 <label class="form-label" for="playerCatalogStatus">Estado Operacional</label>
                 <select id="playerCatalogStatus" class="form-input">
-                  <option value="online">● Online (Ativo)</option>
-                  <option value="testing">● Em Testes</option>
-                  <option value="syncing">● A Sincronizar</option>
-                  <option value="offline">● Offline (Inativo)</option>
+                  <option value="online">🟢 Online (Ativo)</option>
+                  <option value="testing">🟠 Em Testes</option>
+                  <option value="syncing">🔵 A Sincronizar</option>
+                  <option value="offline">🔴 Offline (Inativo)</option>
                 </select>
               </div>
               <div class="form-group">
                 <label class="form-label" for="playerCatalogFirmware">Versão de Firmware</label>
-                <input type="text" id="playerCatalogFirmware" class="form-input" placeholder="ex: v9.0.145" value="v9.0.145">
+                <input type="text" id="playerCatalogFirmware" class="form-input" placeholder="ex: v9.0.145"
+                  value="v9.0.145">
               </div>
               <div class="form-group">
                 <label class="form-label" for="playerCatalogProject">Loja / Projeto Associado</label>
@@ -902,23 +996,32 @@
 
         <!-- Toolbar: filtros + pesquisa + botão novo -->
         <div class="players-toolbar">
-          <div style="font-size: 13px; color: var(--text-muted);" id="playersCatalogCountLabel">A carregar catálogo...</div>
+          <div style="font-size: 13px; color: var(--text-muted);" id="playersCatalogCountLabel">A carregar catálogo...
+          </div>
           <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
-            <select id="playersCatalogStoreFilter" class="form-input" style="font-size: 12px; padding: 6px 10px; width: auto;" onchange="filterPlayersCatalog()">
+            <select id="playersCatalogStoreFilter" class="form-input"
+              style="font-size: 12px; padding: 6px 10px; width: auto;" onchange="filterPlayersCatalog()">
               <option value="all">Todas as Associações</option>
               <option value="unassigned">📦 Em Stock / Sem Loja</option>
               <option value="Fnac">🟡 Fnac</option>
               <option value="Darty">🔴 Darty</option>
             </select>
-            <select id="playersCatalogStatusFilter" class="form-input" style="font-size: 12px; padding: 6px 10px; width: auto;" onchange="filterPlayersCatalog()">
+            <select id="playersCatalogStatusFilter" class="form-input"
+              style="font-size: 12px; padding: 6px 10px; width: auto;" onchange="filterPlayersCatalog()">
               <option value="all">Todos os Estados</option>
-              <option value="online">● Online</option>
-              <option value="syncing">● Syncing</option>
-              <option value="testing">● Testing</option>
-              <option value="offline">● Offline</option>
+              <option value="online">🟢 Online (Ativo)</option>
+              <option value="testing">🟠 Em Testes</option>
+              <option value="syncing">🔵 A Sincronizar</option>
+              <option value="offline">🔴 Offline (Inativo)</option>
             </select>
-            <input type="search" id="playersCatalogSearchInput" class="players-search-input" placeholder="Pesquisar por nome, zona, IP..." oninput="filterPlayersCatalog()">
-            <button type="button" class="btn-primary" id="btnNewCatalogPlayer" onclick="openCreateCatalogPlayerForm()" style="font-size: 13px; padding: 8px 16px; white-space: nowrap;">
+            <input type="search" id="playersCatalogSearchInput" class="players-search-input"
+              placeholder="Pesquisar por nome, zona, IP..." oninput="filterPlayersCatalog()">
+            <button type="button" class="btn-secondary" id="btnOpenParamsFromCatalog" onclick="openConfigParametersModal()"
+              style="font-size: 13px; padding: 8px 14px; white-space: nowrap;">
+              ⚙️ Gerir Parâmetros
+            </button>
+            <button type="button" class="btn-primary" id="btnNewCatalogPlayer" onclick="openCreateCatalogPlayerForm()"
+              style="font-size: 13px; padding: 8px 16px; white-space: nowrap;">
               ＋ Novo Ecrã / Player
             </button>
           </div>
@@ -939,9 +1042,90 @@
               </tr>
             </thead>
             <tbody id="playersCatalogTableBody">
-              <tr><td colspan="7" class="users-empty-state"><div class="empty-icon">⏳</div>A carregar catálogo de hardware...</td></tr>
+              <tr>
+                <td colspan="7" class="users-empty-state">
+                  <div class="empty-icon">⏳</div>A carregar catálogo de hardware...
+                </td>
+              </tr>
             </tbody>
           </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================================================
+       MODAL: GESTÃO DE PARÂMETROS MULTIMÉDIA (CONFIGURAÇÕES FASE 11)
+       Modelos de Hardware, Zonas / Localizações, Resoluções / Formatos
+       ========================================================================= -->
+  <div class="modal-backdrop" id="modalConfigParameters">
+    <div class="modal-card" style="max-width: 960px; width: 95%;">
+      <div class="modal-header">
+        <div class="modal-title">
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <svg width="22" height="22" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+              style="color: var(--fnac-gold);">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M10.5 6h9.75M10.5 6a1.5 1.5 0 11-3 0m3 0a1.5 1.5 0 10-3 0M3.75 6H7.5m3 12h9.75m-9.75 0a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m-3.75 0H7.5m9-6h3.75m-3.75 0a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m-9.75 0h9.75">
+              </path>
+            </svg>
+            <div>
+              <span>Configurações • Modelos, Zonas &amp; Formatos</span>
+              <div style="font-size: 11.5px; color: var(--text-dim); font-weight: 400; margin-top: 2px;">
+                Gestão central de listas de seleção (dropdowns) para o parque de Telas &amp; Players
+              </div>
+            </div>
+          </div>
+        </div>
+        <button class="modal-close-btn" id="btnCloseConfigParamsModal" aria-label="Fechar">
+          <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+          </svg>
+        </button>
+      </div>
+
+      <div class="modal-body" style="padding: 20px 24px;">
+        <!-- Abas de Navegação de Categoria -->
+        <div class="config-nav-tabs">
+          <button type="button" class="config-tab-btn active" id="tabBtnHardware" onclick="switchConfigTab('hardware_model')">
+            <span>🖥️ Modelos de Hardware</span>
+            <span class="badge-count" id="countBadgeHardware">0</span>
+          </button>
+          <button type="button" class="config-tab-btn" id="tabBtnZones" onclick="switchConfigTab('zone_location')">
+            <span>📍 Zonas / Localizações</span>
+            <span class="badge-count" id="countBadgeZones">0</span>
+          </button>
+          <button type="button" class="config-tab-btn" id="tabBtnResolutions" onclick="switchConfigTab('resolution')">
+            <span>📐 Resoluções / Formatos</span>
+            <span class="badge-count" id="countBadgeResolutions">0</span>
+          </button>
+        </div>
+
+        <!-- Formulário Superior de Criação Rápida -->
+        <div class="config-add-card" id="configAddCard">
+          <form id="formAddParameter" onsubmit="handleCreateParameter(event)">
+            <input type="hidden" id="paramAddCategory" value="hardware_model">
+            <div class="config-add-grid">
+              <div class="form-group" style="margin-bottom: 0;">
+                <label class="form-label" id="lblParamName" for="inputParamName">Nome do Modelo *</label>
+                <input type="text" id="inputParamName" class="form-input" placeholder="ex: Samsung QM55B 4K" required>
+              </div>
+              <div class="form-group" style="margin-bottom: 0;">
+                <label class="form-label" id="lblParamDesc" for="inputParamDesc">Descrição / Detalhe Técnico</label>
+                <input type="text" id="inputParamDesc" class="form-input" placeholder="ex: Display Profissional SoC Tizen 7.0">
+              </div>
+              <button type="submit" class="btn-primary" id="btnAddParamSubmit" style="height: 40px; padding: 0 18px; white-space: nowrap;">
+                ➕ Adicionar
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <!-- Contentor dos Itens da Categoria Ativa -->
+        <div class="config-items-container" id="configItemsContainer">
+          <div style="text-align: center; padding: 30px; color: var(--text-dim);">
+            A carregar parâmetros...
+          </div>
         </div>
       </div>
     </div>
@@ -955,8 +1139,11 @@
       <div class="modal-header">
         <div class="modal-title">
           <div style="display: flex; align-items: center; gap: 10px;">
-            <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="color: var(--fnac-gold);">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z"></path>
+            <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+              style="color: var(--fnac-gold);">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z">
+              </path>
             </svg>
             <span>Controlo de Acessos & Sessão de Operador • RetailLaunchOS</span>
           </div>
@@ -970,9 +1157,11 @@
 
       <div class="modal-body" style="padding: 24px;">
         <div style="margin-bottom: 16px;">
-          <h3 style="font-size: 15px; font-weight: 700; color: var(--text-white); margin-bottom: 4px;">Troca Rápida de Perfil (Ambiente Piloto)</h3>
+          <h3 style="font-size: 15px; font-weight: 700; color: var(--text-white); margin-bottom: 4px;">Troca Rápida de
+            Perfil (Ambiente Piloto)</h3>
           <p style="font-size: 12px; color: var(--text-muted);">
-            Selecione qualquer perfil abaixo para alternar a sessão instantaneamente com token JWT nativo e testar as permissões de acesso em tempo real:
+            Selecione qualquer perfil abaixo para alternar a sessão instantaneamente com token JWT nativo e testar as
+            permissões de acesso em tempo real:
           </p>
         </div>
 
@@ -1046,11 +1235,13 @@
           <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
             <div class="form-group">
               <label class="form-label" for="loginEmail">Email Corporativo</label>
-              <input type="email" id="loginEmail" class="form-input" placeholder="ex: admin.multimedia@fnacdarty.pt" required autocomplete="username">
+              <input type="email" id="loginEmail" class="form-input" placeholder="ex: admin.multimedia@fnacdarty.pt"
+                required autocomplete="username">
             </div>
             <div class="form-group">
               <label class="form-label" for="loginPassword">Password</label>
-              <input type="password" id="loginPassword" class="form-input" placeholder="Senha padrão: fnac2026" required autocomplete="current-password">
+              <input type="password" id="loginPassword" class="form-input" placeholder="Senha padrão: fnac2026" required
+                autocomplete="current-password">
             </div>
           </div>
           <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 14px;">
@@ -1070,8 +1261,11 @@
       <div class="modal-header">
         <div class="modal-title">
           <div style="display: flex; align-items: center; gap: 10px;">
-            <svg width="22" height="22" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="color: var(--fnac-gold);">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path>
+            <svg width="22" height="22" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+              style="color: var(--fnac-gold);">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4">
+              </path>
             </svg>
             <div>
               <span>Checklist Global de Aberturas & Gestão de Tarefas</span>
@@ -1112,30 +1306,38 @@
           <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
             <!-- Seletor de Loja -->
             <div style="display: flex; align-items: center; gap: 6px;">
-              <label for="gtStoreSelect" style="font-size: 12px; color: var(--text-muted); white-space: nowrap;">Loja:</label>
-              <select id="gtStoreSelect" class="form-input" style="padding: 6px 12px; font-size: 12.5px; width: auto; min-width: 180px;" onchange="onGlobalTasksStoreChange()">
+              <label for="gtStoreSelect"
+                style="font-size: 12px; color: var(--text-muted); white-space: nowrap;">Loja:</label>
+              <select id="gtStoreSelect" class="form-input"
+                style="padding: 6px 12px; font-size: 12.5px; width: auto; min-width: 180px;"
+                onchange="onGlobalTasksStoreChange()">
                 <option value="all">Todas as Lojas Ativas</option>
               </select>
             </div>
 
             <!-- Botão Adicionar Tarefa Rápida -->
-            <button type="button" class="btn-primary" id="btnOpenQuickAddTask" onclick="toggleQuickAddTaskForm()" style="padding: 6px 14px; font-size: 12.5px; white-space: nowrap;">
+            <button type="button" class="btn-primary" id="btnOpenQuickAddTask" onclick="toggleQuickAddTaskForm()"
+              style="padding: 6px 14px; font-size: 12.5px; white-space: nowrap;">
               ＋ Nova Tarefa
             </button>
           </div>
         </div>
 
         <!-- Formulário Rápido de Criação de Tarefa (Oculto por defeito) -->
-        <div id="quickAddTaskContainer" style="display: none; background: rgba(255, 255, 255, 0.03); border: 1px solid var(--border-glass); border-radius: var(--radius-md); padding: 16px; margin-bottom: 20px;">
+        <div id="quickAddTaskContainer"
+          style="display: none; background: rgba(255, 255, 255, 0.03); border: 1px solid var(--border-glass); border-radius: var(--radius-md); padding: 16px; margin-bottom: 20px;">
           <form id="formQuickAddTask" onsubmit="handleQuickAddTaskSubmit(event)">
-            <div style="font-size: 13px; font-weight: 700; color: var(--text-white); margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between;">
+            <div
+              style="font-size: 13px; font-weight: 700; color: var(--text-white); margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between;">
               <span>Criar Nova Tarefa para Loja</span>
-              <button type="button" class="btn-secondary" onclick="toggleQuickAddTaskForm()" style="padding: 2px 8px; font-size: 11px;">✕ Cancelar</button>
+              <button type="button" class="btn-secondary" onclick="toggleQuickAddTaskForm()"
+                style="padding: 2px 8px; font-size: 11px;">✕ Cancelar</button>
             </div>
             <div style="display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 12px;">
               <div class="form-group" style="margin-bottom: 0;">
                 <label class="form-label">Título da Tarefa *</label>
-                <input type="text" id="quickTaskTitle" class="form-input" placeholder="ex: Calibração de som e áudio zoneado" required>
+                <input type="text" id="quickTaskTitle" class="form-input"
+                  placeholder="ex: Calibração de som e áudio zoneado" required>
               </div>
               <div class="form-group" style="margin-bottom: 0;">
                 <label class="form-label">Loja de Destino *</label>
@@ -1162,16 +1364,19 @@
                 </select>
               </div>
             </div>
-            <div style="display: grid; grid-template-columns: 2fr 1fr auto; gap: 12px; margin-top: 12px; align-items: flex-end;">
+            <div
+              style="display: grid; grid-template-columns: 2fr 1fr auto; gap: 12px; margin-top: 12px; align-items: flex-end;">
               <div class="form-group" style="margin-bottom: 0;">
                 <label class="form-label">Descrição / Observações Técnicas</label>
-                <input type="text" id="quickTaskDesc" class="form-input" placeholder="Detalhes de fornecedor, cabos, requisitos...">
+                <input type="text" id="quickTaskDesc" class="form-input"
+                  placeholder="Detalhes de fornecedor, cabos, requisitos...">
               </div>
               <div class="form-group" style="margin-bottom: 0;">
                 <label class="form-label">Data Limite (Due Date)</label>
                 <input type="date" id="quickTaskDueDate" class="form-input">
               </div>
-              <button type="submit" class="btn-primary" id="btnSubmitQuickTask" style="height: 38px; padding: 0 18px; white-space: nowrap;">
+              <button type="submit" class="btn-primary" id="btnSubmitQuickTask"
+                style="height: 38px; padding: 0 18px; white-space: nowrap;">
                 💾 Gravar Tarefa
               </button>
             </div>
@@ -1181,7 +1386,8 @@
         <!-- Área de Listagem Agrupada por Loja -->
         <div id="globalTasksContent" class="global-tasks-content">
           <div style="text-align: center; padding: 40px; color: var(--text-dim);">
-            <span class="loading-spinner" style="display: inline-block; width: 24px; height: 24px; border: 2px solid var(--border-subtle); border-top-color: var(--fnac-gold); border-radius: 50%; animation: spin 0.8s linear infinite;"></span>
+            <span class="loading-spinner"
+              style="display: inline-block; width: 24px; height: 24px; border: 2px solid var(--border-subtle); border-top-color: var(--fnac-gold); border-radius: 50%; animation: spin 0.8s linear infinite;"></span>
             <div style="margin-top: 12px;">A carregar checklist das lojas...</div>
           </div>
         </div>
@@ -1220,7 +1426,7 @@
 
     // Intercetor global para anexar Authorization: Bearer <token> e gerir 401/403
     const _originalFetch = window.fetch;
-    window.fetch = async function(url, options = {}) {
+    window.fetch = async function (url, options = {}) {
       options.headers = options.headers || {};
       if (currentToken) {
         if (options.headers instanceof Headers) {
@@ -1336,10 +1542,10 @@
                  ✏️ Editar
                </button>
                ${isActive
-                 ? `<button type="button" class="btn-user-action deactivate" onclick="deactivateUserAction(${u.id}, '${u.name.replace(/'/g, "\\'")}')" title="Desativar utilizador">
+            ? `<button type="button" class="btn-user-action deactivate" onclick="deactivateUserAction(${u.id}, '${u.name.replace(/'/g, "\\'")}')" title="Desativar utilizador">
                       🔒 Desativar
                     </button>`
-                 : `<button type="button" class="btn-user-action reactivate" onclick="reactivateUserAction(${u.id}, '${u.name.replace(/'/g, "\\'")}')" title="Reativar utilizador">
+            : `<button type="button" class="btn-user-action reactivate" onclick="reactivateUserAction(${u.id}, '${u.name.replace(/'/g, "\\'")}')" title="Reativar utilizador">
                       🔓 Reativar
                     </button>`}
              </div>`
@@ -1574,9 +1780,246 @@
       }
     }
 
+    // ==============================================================================
+    // FASE 11: GESTÃO DE PARÂMETROS MULTIMÉDIA (MODELOS, ZONAS & RESOLUÇÕES)
+    // ==============================================================================
+    let _allConfigParams = {
+      hardware_models: [],
+      zones: [],
+      resolutions: []
+    };
+    let _activeConfigCategory = 'hardware_model';
+
+    function setSelectValueOrAppend(selectEl, value) {
+      if (!selectEl) return;
+      if (!value) {
+        selectEl.value = '';
+        return;
+      }
+      let exists = Array.from(selectEl.options).some(opt => opt.value === value);
+      if (!exists) {
+        const opt = document.createElement('option');
+        opt.value = value;
+        opt.textContent = value;
+        selectEl.appendChild(opt);
+      }
+      selectEl.value = value;
+    }
+
+    async function loadConfigParameters() {
+      try {
+        const res = await fetch('/api/v1/config/parameters');
+        const json = await res.json();
+        if (json.success && json.data) {
+          _allConfigParams = json.data;
+          
+          // Atualizar contadores nas abas do modal
+          const bHw = document.getElementById('countBadgeHardware');
+          const bZn = document.getElementById('countBadgeZones');
+          const bRes = document.getElementById('countBadgeResolutions');
+          if (bHw) bHw.textContent = _allConfigParams.hardware_models?.length || 0;
+          if (bZn) bZn.textContent = _allConfigParams.zones?.length || 0;
+          if (bRes) bRes.textContent = _allConfigParams.resolutions?.length || 0;
+
+          // Atualizar dropdowns nos formulários
+          populatePlayerDropdowns();
+
+          // Se o modal de configurações estiver aberto, re-renderizar
+          const modalConfig = document.getElementById('modalConfigParameters');
+          if (modalConfig && modalConfig.classList.contains('active')) {
+            renderConfigItems();
+          }
+        }
+      } catch (err) {
+        console.error('Erro ao carregar parâmetros de configuração:', err);
+      }
+    }
+
+    function openConfigParametersModal(initialCategory = 'hardware_model') {
+      const modal = document.getElementById('modalConfigParameters');
+      if (!modal) return;
+      modal.classList.add('active');
+      switchConfigTab(initialCategory);
+    }
+
+    function closeConfigParametersModal() {
+      const modal = document.getElementById('modalConfigParameters');
+      if (modal) modal.classList.remove('active');
+      const form = document.getElementById('formAddParameter');
+      if (form) form.reset();
+    }
+
+    function switchConfigTab(category) {
+      _activeConfigCategory = category;
+      const catInput = document.getElementById('paramAddCategory');
+      if (catInput) catInput.value = category;
+
+      // Atualizar abas visuais
+      document.getElementById('tabBtnHardware')?.classList.toggle('active', category === 'hardware_model');
+      document.getElementById('tabBtnZones')?.classList.toggle('active', category === 'zone_location');
+      document.getElementById('tabBtnResolutions')?.classList.toggle('active', category === 'resolution');
+
+      // Atualizar labels e placeholders
+      const lblName = document.getElementById('lblParamName');
+      const inputName = document.getElementById('inputParamName');
+      const lblDesc = document.getElementById('lblParamDesc');
+      const inputDesc = document.getElementById('inputParamDesc');
+
+      if (category === 'hardware_model') {
+        if (lblName) lblName.textContent = 'Nome do Modelo *';
+        if (inputName) inputName.placeholder = 'ex: Samsung QM55B 4K ou BrightSign XD234';
+        if (lblDesc) lblDesc.textContent = 'Descrição / Fabricante / SoC';
+        if (inputDesc) inputDesc.placeholder = 'ex: Display Profissional SoC Tizen 7.0';
+      } else if (category === 'zone_location') {
+        if (lblName) lblName.textContent = 'Nome da Zona / Localização *';
+        if (inputName) inputName.placeholder = 'ex: Zona Gaming ou Balcão Bilheteira';
+        if (lblDesc) lblDesc.textContent = 'Descrição / Localização na Loja';
+        if (inputDesc) inputDesc.placeholder = 'ex: Piso 0 junto à secção de tecnologia';
+      } else if (category === 'resolution') {
+        if (lblName) lblName.textContent = 'Resolução / Formato de Saída *';
+        if (inputName) inputName.placeholder = 'ex: Ultra-Stretch 32:9 (3840x1080)';
+        if (lblDesc) lblDesc.textContent = 'Especificação Técnica / Proporção';
+        if (inputDesc) inputDesc.placeholder = 'ex: Resolução panorâmica personalizada';
+      }
+
+      renderConfigItems();
+    }
+
+    function renderConfigItems() {
+      const container = document.getElementById('configItemsContainer');
+      if (!container) return;
+
+      let items = [];
+      let icon = '🖥️';
+      if (_activeConfigCategory === 'hardware_model') {
+        items = _allConfigParams.hardware_models || [];
+        icon = '🖥️';
+      } else if (_activeConfigCategory === 'zone_location') {
+        items = _allConfigParams.zones || [];
+        icon = '📍';
+      } else if (_activeConfigCategory === 'resolution') {
+        items = _allConfigParams.resolutions || [];
+        icon = '📐';
+      }
+
+      if (items.length === 0) {
+        container.innerHTML = `
+          <div style="text-align: center; padding: 40px; color: var(--text-dim); font-size: 13px;">
+            Nenhum item registado nesta categoria. Utilize o formulário acima para adicionar!
+          </div>`;
+        return;
+      }
+
+      const canManage = currentPermissions?.canManageConfig ?? (currentPermissions?.canManageSignagePlayers || true);
+
+      container.innerHTML = items.map(item => `
+        <div class="config-param-row" id="param-row-${item.id}">
+          <div class="config-param-left">
+            <div class="config-param-icon">${icon}</div>
+            <div class="config-param-info">
+              <div class="config-param-name">${item.name}</div>
+              <div class="config-param-desc">${item.description || '<span style="color: var(--text-dim); font-style: italic;">Sem descrição adicional</span>'}</div>
+            </div>
+          </div>
+          <div class="config-param-right">
+            ${canManage ? `
+            <button type="button" class="btn-param-action" onclick="editParameterPrompt(${item.id}, '${item.name.replace(/'/g, "\\'")}', '${(item.description || '').replace(/'/g, "\\'")}')" title="Editar Parâmetro">
+              ✏️ Editar
+            </button>
+            <button type="button" class="btn-param-action delete" onclick="deleteParameterPrompt(${item.id}, '${item.name.replace(/'/g, "\\'")}')" title="Eliminar Parâmetro">
+              🗑️
+            </button>` : ''}
+          </div>
+        </div>
+      `).join('');
+    }
+
+    async function handleCreateParameter(e) {
+      e.preventDefault();
+      const category = document.getElementById('paramAddCategory')?.value;
+      const name = document.getElementById('inputParamName')?.value?.trim();
+      const description = document.getElementById('inputParamDesc')?.value?.trim();
+
+      if (!name) return showToast('O nome do parâmetro é obrigatório.', 'error');
+
+      const btn = document.getElementById('btnAddParamSubmit');
+      if (btn) { btn.disabled = true; btn.textContent = 'A adicionar...'; }
+
+      try {
+        const res = await fetch('/api/v1/config/parameters', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ category, name, description })
+        });
+
+        const json = await res.json();
+        if (json.success) {
+          showToast(json.message || 'Parâmetro adicionado com sucesso!', 'success');
+          document.getElementById('inputParamName').value = '';
+          document.getElementById('inputParamDesc').value = '';
+          await loadConfigParameters();
+        } else {
+          showToast(json.message || 'Erro ao criar parâmetro.', 'error');
+        }
+      } catch (err) {
+        showToast('Erro de comunicação: ' + err.message, 'error');
+      } finally {
+        if (btn) { btn.disabled = false; btn.textContent = '➕ Adicionar'; }
+      }
+    }
+
+    async function editParameterPrompt(id, currentName, currentDesc) {
+      const newName = prompt('Editar Nome do Parâmetro:', currentName);
+      if (newName === null) return;
+      const trimmedName = newName.trim();
+      if (!trimmedName) return showToast('O nome não pode ficar vazio.', 'error');
+
+      const newDesc = prompt('Editar Descrição / Detalhe Técnico:', currentDesc);
+      if (newDesc === null) return;
+
+      try {
+        const res = await fetch(`/api/v1/config/parameters/${id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name: trimmedName, description: newDesc.trim() })
+        });
+        const json = await res.json();
+        if (json.success) {
+          showToast(json.message || 'Parâmetro atualizado com sucesso!', 'success');
+          await loadConfigParameters();
+        } else {
+          showToast(json.message || 'Erro ao atualizar parâmetro.', 'error');
+        }
+      } catch (err) {
+        showToast('Erro de comunicação: ' + err.message, 'error');
+      }
+    }
+
+    async function deleteParameterPrompt(id, name) {
+      if (!confirm(`Tem a certeza que deseja eliminar o parâmetro "${name}" do catálogo?\n\nOs ecrãs que já tenham este valor associado não serão alterados.`)) {
+        return;
+      }
+
+      try {
+        const res = await fetch(`/api/v1/config/parameters/${id}`, { method: 'DELETE' });
+        const json = await res.json();
+        if (json.success) {
+          showToast(json.message || 'Parâmetro eliminado com sucesso!', 'success');
+          await loadConfigParameters();
+        } else {
+          showToast(json.message || 'Erro ao eliminar parâmetro.', 'error');
+        }
+      } catch (err) {
+        showToast('Erro de comunicação: ' + err.message, 'error');
+      }
+    }
+
     function populatePlayerDropdowns() {
       const selectProj = document.getElementById('playerCatalogProject');
       const selectPl = document.getElementById('playerCatalogPlaylist');
+      const selectModel = document.getElementById('playerCatalogModel');
+      const selectZone = document.getElementById('playerCatalogZone');
+      const selectRes = document.getElementById('playerCatalogResolution');
 
       if (selectProj) {
         let opts = `<option value="">— Em Stock / Não Associado a Projeto —</option>`;
@@ -1593,6 +2036,39 @@
           opts += `<option value="${pl.id}">${pl.brand === 'Fnac' ? '🟡' : '🔴'} ${pl.name} [${pl.version || 'v1.0'}]</option>`;
         });
         selectPl.innerHTML = opts;
+      }
+
+      // Modelos de Hardware
+      if (selectModel) {
+        const currentVal = selectModel.value;
+        let opts = `<option value="">-- Selecione o Modelo --</option>`;
+        (_allConfigParams.hardware_models || []).forEach(m => {
+          opts += `<option value="${m.name}">${m.name}</option>`;
+        });
+        selectModel.innerHTML = opts;
+        if (currentVal) selectModel.value = currentVal;
+      }
+
+      // Zonas / Localizações
+      if (selectZone) {
+        const currentVal = selectZone.value;
+        let opts = `<option value="">-- Selecione a Zona --</option>`;
+        (_allConfigParams.zones || []).forEach(z => {
+          opts += `<option value="${z.name}">${z.name}</option>`;
+        });
+        selectZone.innerHTML = opts;
+        if (currentVal) selectZone.value = currentVal;
+      }
+
+      // Resoluções / Formatos
+      if (selectRes) {
+        const currentVal = selectRes.value;
+        let opts = `<option value="">-- Selecione a Resolução --</option>`;
+        (_allConfigParams.resolutions || []).forEach(r => {
+          opts += `<option value="${r.name}">${r.name}</option>`;
+        });
+        selectRes.innerHTML = opts;
+        if (currentVal) selectRes.value = currentVal;
       }
     }
 
@@ -1621,10 +2097,10 @@
 
         const statusCls = p.status || 'online';
         const statusLabels = {
-          online: '● Online',
-          syncing: '● Syncing',
-          testing: '● Em Teste',
-          offline: '● Offline'
+          online: 'Online (Ativo)',
+          testing: 'Em Testes',
+          syncing: 'A Sincronizar',
+          offline: 'Offline (Inativo)'
         };
         const statusLabel = statusLabels[statusCls] || p.status;
 
@@ -1667,13 +2143,13 @@
             </div>
           </td>
           <td>
-            <span class="player-status-badge ${statusCls}">${statusLabel}</span>
+            <span class="player-status-badge ${statusCls}"><span class="status-dot"></span><span>${statusLabel}</span></span>
           </td>
           <td>
             ${p.playlist_name
-              ? `<div style="font-size: 12px; font-weight: 500;">${p.playlist_name}</div>
+            ? `<div style="font-size: 12px; font-weight: 500;">${p.playlist_name}</div>
                  <div style="font-size: 10px; color: var(--text-muted);">${p.playlist_version_code || ''}</div>`
-              : `<span style="font-size: 12px; color: var(--text-muted);">— Nenhuma —</span>`}
+            : `<span style="font-size: 12px; color: var(--text-muted);">— Nenhuma —</span>`}
           </td>
           <td style="text-align: right;">${actionBtns}</td>
         </tr>`;
@@ -1737,9 +2213,9 @@
       if (title) title.textContent = `✏️ Editar Hardware: ${p.name}`;
 
       document.getElementById('playerCatalogName').value = p.name || '';
-      document.getElementById('playerCatalogModel').value = p.device_model || 'BrightSign XT1144 4K';
-      document.getElementById('playerCatalogZone').value = p.zone_location || '';
-      document.getElementById('playerCatalogResolution').value = p.resolution || '4K UHD';
+      setSelectValueOrAppend(document.getElementById('playerCatalogModel'), p.device_model || '');
+      setSelectValueOrAppend(document.getElementById('playerCatalogZone'), p.zone_location || '');
+      setSelectValueOrAppend(document.getElementById('playerCatalogResolution'), p.resolution || '');
       document.getElementById('playerCatalogIp').value = p.ip_address || '';
       document.getElementById('playerCatalogMac').value = p.mac_address || '';
       document.getElementById('playerCatalogStatus').value = p.status || 'online';
@@ -2169,7 +2645,7 @@
       projects.forEach(p => {
         const brandClass = p.brand?.toLowerCase().includes('darty') ? 'darty' : 'fnac';
         const daysLeft = getDaysRemaining(p.go_live_date);
-        
+
         let tagClass = 'tag-relaxed';
         if (daysLeft <= 20) tagClass = 'tag-urgent';
         else if (daysLeft <= 45) tagClass = 'tag-normal';
@@ -2308,7 +2784,7 @@
         const json = await res.json();
         if (json.success && Array.isArray(json.data)) {
           allProjects = json.data;
-          
+
           // Atualizar contadores
           const badgeCount = document.getElementById('sidebarBadgeCount');
           if (badgeCount) badgeCount.innerText = allProjects.length;
@@ -2476,7 +2952,7 @@
         const d = new Date();
         d.setDate(d.getDate() + 30);
         document.getElementById('inputGoLive').value = d.toISOString().split('T')[0];
-        
+
         const dTarget = new Date();
         dTarget.setDate(dTarget.getDate() + 24);
         document.getElementById('inputTargetDate').value = dTarget.toISOString().split('T')[0];
@@ -2566,7 +3042,7 @@
       currentActiveTab = tabId;
       document.querySelectorAll('.modal-tab-btn').forEach(b => b.classList.remove('active'));
       document.querySelectorAll('.tab-pane').forEach(pane => pane.classList.remove('active'));
-      
+
       if (btn) btn.classList.add('active');
       const activePane = document.getElementById(tabId);
       if (activePane) activePane.classList.add('active');
@@ -2581,7 +3057,7 @@
           fetch(`/api/v1/projects/${id}/players`),
           fetch(`/api/v1/signage/playlists`)
         ]);
-        
+
         const jsonProj = await resProj.json();
         const jsonCosts = await resCosts.json();
         const jsonPlayers = await resPlayers.json();
@@ -2599,8 +3075,19 @@
           const players = (jsonPlayers.success && Array.isArray(jsonPlayers.data)) ? jsonPlayers.data : [];
           const playlists = (jsonPlaylists.success && Array.isArray(jsonPlaylists.data)) ? jsonPlaylists.data : [];
 
+          if (!_allConfigParams || !_allConfigParams.hardware_models || _allConfigParams.hardware_models.length === 0) {
+            await loadConfigParameters();
+          }
+          const hwList = (_allConfigParams && _allConfigParams.hardware_models) || [];
+          const zoneList = (_allConfigParams && _allConfigParams.zones) || [];
+          const resList = (_allConfigParams && _allConfigParams.resolutions) || [];
+
+          const storeHwOptions = hwList.map(h => `<option value="${escapeHtml(h.name)}">${escapeHtml(h.name)}</option>`).join('');
+          const storeZoneOptions = zoneList.map(z => `<option value="${escapeHtml(z.name)}">${escapeHtml(z.name)}</option>`).join('');
+          const storeResOptions = resList.map(r => `<option value="${escapeHtml(r.name)}">${escapeHtml(r.name)}</option>`).join('');
+
           const brandClass = p.brand?.toLowerCase().includes('darty') ? 'darty' : 'fnac';
-          
+
           modalDetalheTitle.innerHTML = `
             <div style="display: flex; align-items: center; gap: 10px;">
               <span>${p.name}</span>
@@ -2731,6 +3218,14 @@
                 <option value="${pl.id}" ${sp.playlist_id === pl.id ? 'selected' : ''}>${pl.name} (${pl.version})</option>
               `).join('');
 
+              const storeStatusLabels = {
+                online: 'Online (Ativo)',
+                testing: 'Em Testes',
+                syncing: 'A Sincronizar',
+                offline: 'Offline (Inativo)'
+              };
+              const storeStatusLabel = storeStatusLabels[sp.status] || sp.status;
+
               return `
                 <div class="player-list-item" id="player-item-${sp.id}">
                   <div class="player-main-info">
@@ -2760,7 +3255,7 @@
                   <div style="display: flex; align-items: center; gap: 10px;">
                     <div class="player-status-badge ${sp.status}" id="player-badge-${sp.id}">
                       <span class="status-dot-ping"></span>
-                      <span>${sp.status}</span>
+                      <span>${storeStatusLabel}</span>
                     </div>
                     ${canPing ? `
                     <button class="btn-ping" onclick="pingPlayer(${sp.id}, ${p.id})" title="Enviar sinal de teste / ping">
@@ -3073,27 +3568,26 @@
                       </div>
                       <div class="form-group">
                         <label class="form-label">Zona / Localização na Loja *</label>
-                        <input type="text" id="newPlayerZone" class="form-input" placeholder="Ex: Montra Principal ou Linha de Caixas" required>
+                        <select id="newPlayerZone" class="form-select" required>
+                          <option value="">-- Selecione a Zona --</option>
+                          ${storeZoneOptions}
+                        </select>
                       </div>
                     </div>
 
                     <div class="form-grid-2" style="margin-top: 10px;">
                       <div class="form-group">
-                        <label class="form-label">Modelo de Hardware</label>
-                        <select id="newPlayerModel" class="form-select">
-                          <option value="BrightSign XT1144 4K" selected>BrightSign XT1144 4K (Ultra HD)</option>
-                          <option value="BrightSign HD224">BrightSign HD224 (Full HD)</option>
-                          <option value="Samsung SSP (Tizen 6.5)">Samsung SSP Tizen SoC</option>
-                          <option value="LG webOS Signage 6.0">LG webOS Signage Display</option>
-                          <option value="Philips D-Line Android">Philips D-Line Android</option>
+                        <label class="form-label">Modelo de Hardware *</label>
+                        <select id="newPlayerModel" class="form-select" required>
+                          <option value="">-- Selecione o Modelo --</option>
+                          ${storeHwOptions}
                         </select>
                       </div>
                       <div class="form-group">
-                        <label class="form-label">Resolução de Saída</label>
-                        <select id="newPlayerResolution" class="form-select">
-                          <option value="3840x2160 (4K)" selected>3840x2160 (4K UHD)</option>
-                          <option value="1920x1080 (FHD)">1920x1080 (Full HD)</option>
-                          <option value="Video Wall LED">Video Wall LED Personalizado</option>
+                        <label class="form-label">Resolução de Saída *</label>
+                        <select id="newPlayerResolution" class="form-select" required>
+                          <option value="">-- Selecione a Resolução --</option>
+                          ${storeResOptions}
                         </select>
                       </div>
                     </div>
@@ -3552,28 +4046,28 @@
 
             <div class="gt-tasks-list">
               ${group.tasks.map(t => {
-                const isDone = t.status === 'concluido';
-                let urgencyHtml = '';
+          const isDone = t.status === 'concluido';
+          let urgencyHtml = '';
 
-                if (t.is_overdue && !isDone) {
-                  urgencyHtml = `<span class="gt-urgency-badge overdue" title="Data limite ultrapassada!">⚠️ Atrasada (${Math.abs(t.days_remaining || 0)}d)</span>`;
-                } else if (t.is_due_soon && !isDone) {
-                  const daysText = t.days_remaining === 0 ? 'Hoje' : (t.days_remaining === 1 ? 'Amanhã' : `Em ${t.days_remaining}d`);
-                  urgencyHtml = `<span class="gt-urgency-badge duesoon" title="Prazo a expirar na semana">⚡ Vence ${daysText}</span>`;
-                } else if (t.due_date) {
-                  urgencyHtml = `<span class="gt-date-tag">${t.due_date}</span>`;
-                }
+          if (t.is_overdue && !isDone) {
+            urgencyHtml = `<span class="gt-urgency-badge overdue" title="Data limite ultrapassada!">⚠️ Atrasada (${Math.abs(t.days_remaining || 0)}d)</span>`;
+          } else if (t.is_due_soon && !isDone) {
+            const daysText = t.days_remaining === 0 ? 'Hoje' : (t.days_remaining === 1 ? 'Amanhã' : `Em ${t.days_remaining}d`);
+            urgencyHtml = `<span class="gt-urgency-badge duesoon" title="Prazo a expirar na semana">⚡ Vence ${daysText}</span>`;
+          } else if (t.due_date) {
+            urgencyHtml = `<span class="gt-date-tag">${t.due_date}</span>`;
+          }
 
-                const prioClass = `prio-${t.priority || 'medium'}`;
-                const prioMap = {
-                  critical: 'Crítica',
-                  high: 'Alta',
-                  medium: 'Média',
-                  low: 'Baixa'
-                };
-                const prioLabel = prioMap[t.priority] || t.priority;
+          const prioClass = `prio-${t.priority || 'medium'}`;
+          const prioMap = {
+            critical: 'Crítica',
+            high: 'Alta',
+            medium: 'Média',
+            low: 'Baixa'
+          };
+          const prioLabel = prioMap[t.priority] || t.priority;
 
-                return `
+          return `
                   <div class="gt-task-item ${isDone ? 'done' : ''} ${t.is_overdue && !isDone ? 'overdue' : ''}">
                     <div class="gt-task-left">
                       <input type="checkbox" 
@@ -3597,7 +4091,7 @@
                     </div>
                   </div>
                 `;
-              }).join('')}
+        }).join('')}
             </div>
           </div>
         `;
@@ -3810,7 +4304,7 @@
       currentHubTab = tabId;
       document.querySelectorAll('.hub-tab-btn').forEach(b => b.classList.remove('active'));
       document.querySelectorAll('.hub-pane').forEach(pane => pane.classList.remove('active'));
-      
+
       if (btn) btn.classList.add('active');
       const activePane = document.getElementById(tabId);
       if (activePane) activePane.classList.add('active');
@@ -4279,6 +4773,10 @@
     if (navUsers) navUsers.addEventListener('click', (e) => { e.preventDefault(); openUsersManagement(); });
     const navConfigPlayers = document.getElementById('nav-config-players');
     if (navConfigPlayers) navConfigPlayers.addEventListener('click', (e) => { e.preventDefault(); openPlayersCatalog(); });
+    const navConfigParams = document.getElementById('nav-config-parameters');
+    if (navConfigParams) navConfigParams.addEventListener('click', (e) => { e.preventDefault(); openConfigParametersModal(); });
+    const btnOpenParamsFromCatalog = document.getElementById('btnOpenParamsFromCatalog');
+    if (btnOpenParamsFromCatalog) btnOpenParamsFromCatalog.addEventListener('click', (e) => { e.preventDefault(); openConfigParametersModal(); });
     if (modalAuth) {
       modalAuth.addEventListener('click', (e) => {
         if (e.target === modalAuth) closeAuthModal();
@@ -4305,6 +4803,16 @@
       });
     }
 
+    // Modal Parâmetros Multimédia (Modelos, Zonas & Formatos) — fechar
+    const btnCloseConfigParamsModal = document.getElementById('btnCloseConfigParamsModal');
+    const modalConfigParamsEl = document.getElementById('modalConfigParameters');
+    if (btnCloseConfigParamsModal) btnCloseConfigParamsModal.addEventListener('click', closeConfigParametersModal);
+    if (modalConfigParamsEl) {
+      modalConfigParamsEl.addEventListener('click', (e) => {
+        if (e.target === modalConfigParamsEl) closeConfigParametersModal();
+      });
+    }
+
     // Modal Checklist Global — fechar ao clicar no backdrop
     const modalGlobalTasksEl = document.getElementById('modalGlobalTasks');
     if (modalGlobalTasksEl) {
@@ -4319,6 +4827,7 @@
         closeAuthModal();
         closeUsersManagement();
         closePlayersCatalog();
+        closeConfigParametersModal();
         closeGlobalTasksModal();
         if (modalDetalhe) modalDetalhe.classList.remove('active');
         if (modalHubSignage) modalHubSignage.classList.remove('active');
@@ -4352,10 +4861,13 @@
         applyRolePermissions();
       }
 
-      // 2. Carregar Projetos e KPIs
+      // 2. Carregar Parâmetros do Sistema (Modelos, Zonas, Resoluções)
+      await loadConfigParameters();
+
+      // 3. Carregar Projetos e KPIs
       loadProjects();
 
-      // 3. Vincular cliques nos blocos do Card Checklists & Prazos
+      // 4. Vincular cliques nos blocos do Card Checklists & Prazos
       const bPending = document.getElementById('blockPendingTasks');
       if (bPending) bPending.addEventListener('click', () => openGlobalTasksModal('pending'));
       const bDueSoon = document.getElementById('blockDueSoonTasks');
@@ -4363,4 +4875,5 @@
     });
   </script>
 </body>
+
 </html>
