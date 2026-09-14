@@ -14,5 +14,8 @@ router.get('/:id', authenticate, projectController.getById);
 
 // Rotas restritas para administradores e gestores multimédia
 router.post('/', authenticate, requireRole('admin', 'multimedia_user'), projectController.create);
+router.patch('/:id', authenticate, requireRole('admin', 'multimedia_user'), projectController.update);
+router.put('/:id', authenticate, requireRole('admin', 'multimedia_user'), projectController.update);
+router.delete('/:id', authenticate, requireRole('admin'), projectController.delete);
 
 module.exports = router;

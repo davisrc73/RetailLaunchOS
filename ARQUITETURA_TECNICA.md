@@ -334,7 +334,7 @@ A API segue os padrões RESTful com payloads JSON e códigos de resposta HTTP se
 | **GET** | `/api/v1/projects/kpis` | — | Todos | Retorna as métricas agregadas de contagem, signage e infraestrutura multimédia (hardware, resoluções, playlists pendentes, aberturas) |
 | **GET** | `/api/v1/projects/:id` | `:id` (ID ou Código) | Todos | Detalha a loja, marcos técnicos e histórico de custos |
 | **POST** | `/api/v1/projects` | Body JSON com dados da loja | `admin` | Cria uma nova abertura de loja na base de dados |
-| **PUT** | `/api/v1/projects/:id` | Body JSON com campos a alterar | `admin`, `multimedia_user` | Atualiza campos de uma abertura existente |
+| **PUT / PATCH** | `/api/v1/projects/:id` | Body JSON (`name`, `brand`, `store_format`, `location`, `go_live_date`, `status`, `daily_cost`, `total_budget`) | `admin`, `multimedia_user` | Atualiza dados estruturais ou parciais de uma abertura existente |
 | **PATCH**| `/api/v1/projects/:id/signage` | `{ signage_status, playlist_version }` | `admin`, `multimedia_user` | Atualiza parâmetros de Digital Signage e Playlist |
 | **DELETE**| `/api/v1/projects/:id` | `:id` | `admin` | Remove um projeto e dependências em cascata |
 
@@ -572,4 +572,56 @@ O método [`Project.getDashboardMetrics()`](file:///Users/daviscorreia/Antigravi
   * **Consistência de Progresso (%)**: Renderização precisa do progresso derivado das tarefas técnicas sem fallbacks forçados (exibindo 0% quando 0 tarefas foram concluídas).
   * Foco na monitorização do go-live, status de signage e progresso, sem a coluna de custos diários na visualização inicial (custos mantidos no detalhe individual da loja).
 * **Secção Inferior**: O cartão **"Atividade Recente • Gabinete Multimédia"** ocupa 100% da largura (`grid-template-columns: 1fr`).
+
+---
+
+## 10. Seleção da Próxima Abertura & Prevenção Estrita de Cache (Fase 12)
+
+### 10.1. Algoritmo SQL de Eleição da Próxima Abertura (`Project.getKpis()`)
+Para evitar que lojas já concluídas ou canceladas monopolizem o cartão de destaque da interface, o método `Project.getKpis()` aplica um critério de filtragem em duas etapas:
+
+1. **Consulta Primária (Abertura Iminente Ativa)**:
+   ```sql
+   SELECT * FROM projects 
+   WHERE status NOT IN ('concluido', 'cancelado') 
+     AND go_live_date >= DATE('now', 'localtime') 
+   ORDER BY go_live_date ASC 
+   LIMIT 1;
+   ```
+2. **Consulta Secundária de Fallback**:
+   Caso não existam registos que satisfaçam a condição temporal (ex.: datas em revisão ou em fase final de planeamento), o sistema recupera a loja ativa mais recente:
+   ```sql
+   SELECT * FROM projects 
+   WHERE status NOT IN ('concluido', 'cancelado') 
+   ORDER BY go_live_date DESC 
+   LIMIT 1;
+   ```
+
+### 10.2. Arquitetura Anti-Cache HTTP (Zero Stale Data)
+Para garantir que refreshes da página no navegador (`F5` / `⌘R`) reflitam instantaneamente qualquer alteração em base de dados:
+* **Camada de Transporte (`server.js`)**: O helper `sendJson()` injeta cabeçalhos de invalidação de cache em todas as respostas JSON da API REST:
+  ```http
+  Cache-Control: no-store, no-cache, must-revalidate, proxy-revalidate
+  Pragma: no-cache
+  Expires: 0
+  ```
+* **Camada de Consumo (`dashboard.html`)**: Todos os pedidos `fetch` da aplicação utilizam a opção `{ cache: 'no-store' }`.
+* **Cálculo de Fuso Horário Local**: As funções de contagem decrescente e formatação de datas utilizam desconstrução numérica `[YYYY, MM, DD]` sem conversão UTC, eliminando desvios de 1 dia causados por fusos horários locais.
+
+### 10.3. Pipeline de Atualização Estrutural de Lojas (`PATCH /api/v1/projects/:id`)
+A rota `PATCH` e `PUT /api/v1/projects/:id` permite a atualização transacional dos seguintes campos:
+```json
+{
+  "name": "Fnac Famalicão",
+  "brand": "Fnac",
+  "store_format": "Standard",
+  "location": "Famalicão",
+  "go_live_date": "2026-09-16",
+  "status": "planeamento",
+  "daily_cost": 380,
+  "total_budget": 35000
+}
+```
+A resposta emite o payload da loja atualizada, permitindo reatividade imediata no frontend sem requerer recarregar a aplicação.
+
 

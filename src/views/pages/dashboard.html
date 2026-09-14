@@ -296,28 +296,28 @@
         <div class="kpi-card hero-countdown" id="kpiHeroCard">
           <div class="kpi-header">
             <span class="kpi-label">Próxima Abertura</span>
-            <span class="brand-badge fnac" id="kpiHeroBadge">Fnac Flagship</span>
+            <span class="brand-badge fnac" id="kpiHeroBadge">—</span>
           </div>
 
-          <div class="store-title" id="kpiHeroStoreName" style="font-size: 16px; margin-bottom: 4px;">Fnac Cascais</div>
-          <div class="kpi-subtitle" id="kpiHeroLocation">CascaiShopping • Inauguração Oficial</div>
+          <div class="store-title" id="kpiHeroStoreName" style="font-size: 16px; margin-bottom: 4px;">A carregar próxima abertura...</div>
+          <div class="kpi-subtitle" id="kpiHeroLocation">Gabinete Multimédia • Fnac Darty</div>
 
           <!-- Relógio de Contagem Decrescente Live -->
           <div class="countdown-box" id="countdownTimer">
             <div class="time-segment">
-              <span class="time-val" id="daysCount">18</span>
+              <span class="time-val" id="daysCount">00</span>
               <span class="time-unit">Dias</span>
             </div>
             <div class="time-segment">
-              <span class="time-val" id="hoursCount">06</span>
+              <span class="time-val" id="hoursCount">00</span>
               <span class="time-unit">Horas</span>
             </div>
             <div class="time-segment">
-              <span class="time-val" id="minCount">42</span>
+              <span class="time-val" id="minCount">00</span>
               <span class="time-unit">Min</span>
             </div>
             <div class="time-segment">
-              <span class="time-val" id="secCount">15</span>
+              <span class="time-val" id="secCount">00</span>
               <span class="time-unit">Seg</span>
             </div>
           </div>
@@ -351,8 +351,8 @@
           </div>
 
           <div class="target-store-meta">
-            <span>Inauguração: <strong id="kpiHeroTargetDate">22 Set 2026</strong></span>
-            <span class="status-badge badge-signage-testing" id="kpiHeroStatus">Planeamento</span>
+            <span>Inauguração: <strong id="kpiHeroTargetDate">—</strong></span>
+            <span class="status-badge badge-signage-testing" id="kpiHeroStatus">A carregar...</span>
           </div>
         </div>
 
@@ -2559,6 +2559,13 @@
     // Formatação de Datas
     function formatDate(dateStr) {
       if (!dateStr) return 'A definir';
+      if (typeof dateStr === 'string' && dateStr.includes('-')) {
+        const parts = dateStr.split('T')[0].split('-');
+        if (parts.length === 3) {
+          const d = new Date(parseInt(parts[0], 10), parseInt(parts[1], 10) - 1, parseInt(parts[2], 10));
+          return d.toLocaleDateString('pt-PT', { day: '2-digit', month: 'short', year: 'numeric' });
+        }
+      }
       const d = new Date(dateStr);
       return d.toLocaleDateString('pt-PT', { day: '2-digit', month: 'short', year: 'numeric' });
     }
@@ -2566,7 +2573,14 @@
     // Cálculo de Dias Restantes
     function getDaysRemaining(dateStr) {
       if (!dateStr) return 0;
-      const target = new Date(dateStr);
+      let target;
+      if (typeof dateStr === 'string' && dateStr.includes('-')) {
+        const parts = dateStr.split('T')[0].split('-');
+        target = new Date(parseInt(parts[0], 10), parseInt(parts[1], 10) - 1, parseInt(parts[2], 10));
+      } else {
+        target = new Date(dateStr);
+      }
+      target.setHours(0, 0, 0, 0);
       const now = new Date();
       now.setHours(0, 0, 0, 0);
       const diff = target - now;
@@ -2574,7 +2588,7 @@
     }
 
     // Inicialização da Contagem Decrescente Dinâmica
-    function setupCountdown(targetDateStr, storeName, location, brand) {
+    function setupCountdown(targetDateStr, storeName, location, brand, storeFormat) {
       if (countdownInterval) clearInterval(countdownInterval);
 
       const daysEl = document.getElementById('daysCount');
@@ -2587,15 +2601,24 @@
       const badgeEl = document.getElementById('kpiHeroBadge');
       const targetDateEl = document.getElementById('kpiHeroTargetDate');
 
-      if (nameEl) nameEl.innerText = storeName || 'Fnac Cascais';
-      if (locEl) locEl.innerText = location || 'CascaiShopping';
+      if (nameEl) nameEl.innerText = storeName || '—';
+      if (locEl) {
+        locEl.innerText = location ? `${location} • Inauguração Oficial` : 'Inauguração Oficial';
+      }
       if (badgeEl) {
         badgeEl.className = `brand-badge ${brand?.toLowerCase() || 'fnac'}`;
-        badgeEl.innerText = brand || 'Fnac';
+        const fmt = storeFormat ? ` • ${storeFormat}` : '';
+        badgeEl.innerText = `${brand || 'Fnac'}${fmt}`;
       }
       if (targetDateEl) targetDateEl.innerText = formatDate(targetDateStr);
 
-      const target = new Date(targetDateStr).getTime();
+      let target;
+      if (typeof targetDateStr === 'string' && targetDateStr.includes('-')) {
+        const parts = targetDateStr.split('T')[0].split('-');
+        target = new Date(parseInt(parts[0], 10), parseInt(parts[1], 10) - 1, parseInt(parts[2], 10), 0, 0, 0).getTime();
+      } else {
+        target = new Date(targetDateStr).getTime();
+      }
 
       function update() {
         const now = new Date().getTime();
@@ -2780,7 +2803,7 @@
     // Carregar Projetos da API REST
     async function loadProjects() {
       try {
-        const res = await fetch('/api/v1/projects');
+        const res = await fetch('/api/v1/projects', { cache: 'no-store' });
         const json = await res.json();
         if (json.success && Array.isArray(json.data)) {
           allProjects = json.data;
@@ -2792,7 +2815,7 @@
           applyFilter(currentFilter);
           populateGlobalTasksStoreDropdowns();
           renderStoresPlanningCard(allProjects);
-          loadKpis();
+          await loadKpis();
         }
       } catch (err) {
         console.error('Erro ao carregar projetos:', err);
@@ -2802,7 +2825,7 @@
     // Carregar KPIs da API REST
     async function loadKpis() {
       try {
-        const res = await fetch('/api/v1/projects/kpis');
+        const res = await fetch('/api/v1/projects/kpis', { cache: 'no-store' });
         const json = await res.json();
         if (json.success && json.data) {
           const kpis = json.data;
@@ -2813,7 +2836,8 @@
               kpis.nextOpening.go_live_date,
               kpis.nextOpening.name,
               kpis.nextOpening.location,
-              kpis.nextOpening.brand
+              kpis.nextOpening.brand,
+              kpis.nextOpening.store_format
             );
 
             // 1. Progresso da Loja (%)
@@ -2840,7 +2864,7 @@
               playlistsBadgeEl.innerText = pState;
             }
 
-            // Status Badge
+            // Status Badge (texto e classes visuais sincronizadas)
             const statusEl = document.getElementById('kpiHeroStatus');
             if (statusEl && kpis.nextOpening.status) {
               const statusMap = {
@@ -2850,6 +2874,14 @@
                 'concluido': 'Concluído',
                 'atrasado': 'Atrasado'
               };
+              const statusClassMap = {
+                'em_curso': 'badge-signage-ok',
+                'planeamento': 'badge-signage-testing',
+                'testes_signage': 'badge-signage-testing',
+                'concluido': 'badge-signage-ok',
+                'atrasado': 'badge-signage-pending'
+              };
+              statusEl.className = `status-badge ${statusClassMap[kpis.nextOpening.status] || 'badge-signage-testing'}`;
               statusEl.innerText = statusMap[kpis.nextOpening.status] || kpis.nextOpening.status;
             }
           }
@@ -3288,6 +3320,87 @@
               👁️ <strong>Sessão de Consulta (Viewer):</strong> Modo de auditoria ativo. Apenas visualização de dados — alterações técnicas e financeiras bloqueadas.
             </div>` : ''}
 
+            <!-- Painel de Edição de Dados da Loja (Collapsible) -->
+            <div id="cardEditProject" style="display: none; margin-bottom: 20px; background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: 10px; padding: 18px 20px;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
+                <strong style="font-size: 14px; color: var(--text-white); display: flex; align-items: center; gap: 8px;">
+                  <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                  </svg>
+                  <span>Editar Dados de Abertura da Loja</span>
+                </strong>
+                <button type="button" class="modal-close-btn" onclick="toggleEditProjectForm()" style="position: static; padding: 4px;" title="Fechar Edição">
+                  <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                  </svg>
+                </button>
+              </div>
+              <form id="formEditProject" onsubmit="handleUpdateProject(event, ${p.id})">
+                <div style="display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 12px; margin-bottom: 12px;">
+                  <div class="form-group" style="margin-bottom: 0;">
+                    <label class="form-label">Nome da Loja</label>
+                    <input type="text" id="editProjName" class="form-input" value="${escapeHtml(p.name)}" required>
+                  </div>
+                  <div class="form-group" style="margin-bottom: 0;">
+                    <label class="form-label">Insígnia</label>
+                    <select id="editProjBrand" class="form-select" required>
+                      <option value="Fnac" ${p.brand === 'Fnac' ? 'selected' : ''}>Fnac</option>
+                      <option value="Darty" ${p.brand === 'Darty' ? 'selected' : ''}>Darty</option>
+                    </select>
+                  </div>
+                  <div class="form-group" style="margin-bottom: 0;">
+                    <label class="form-label">Formato</label>
+                    <select id="editProjFormat" class="form-select">
+                      <option value="Standard" ${p.store_format === 'Standard' ? 'selected' : ''}>Standard</option>
+                      <option value="Flagship" ${p.store_format === 'Flagship' ? 'selected' : ''}>Flagship</option>
+                      <option value="Express" ${p.store_format === 'Express' ? 'selected' : ''}>Express</option>
+                      <option value="Pro" ${p.store_format === 'Pro' ? 'selected' : ''}>Pro</option>
+                      <option value="Gabinete" ${p.store_format === 'Gabinete' ? 'selected' : ''}>Gabinete</option>
+                    </select>
+                  </div>
+                </div>
+                <div style="display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 12px; margin-bottom: 12px;">
+                  <div class="form-group" style="margin-bottom: 0;">
+                    <label class="form-label">Localização</label>
+                    <input type="text" id="editProjLocation" class="form-input" value="${escapeHtml(p.location || '')}" placeholder="Centro comercial / morada">
+                  </div>
+                  <div class="form-group" style="margin-bottom: 0;">
+                    <label class="form-label">Inauguração (Go-Live)</label>
+                    <input type="date" id="editProjGoLive" class="form-input" value="${(p.go_live_date || '').split('T')[0]}" required>
+                  </div>
+                  <div class="form-group" style="margin-bottom: 0;">
+                    <label class="form-label">Estado da Loja</label>
+                    <select id="editProjStatus" class="form-select" required>
+                      <option value="planeamento" ${p.status === 'planeamento' ? 'selected' : ''}>Planeamento</option>
+                      <option value="em_curso" ${p.status === 'em_curso' ? 'selected' : ''}>Em Curso</option>
+                      <option value="testes_signage" ${p.status === 'testes_signage' ? 'selected' : ''}>Testes Signage</option>
+                      <option value="concluido" ${p.status === 'concluido' ? 'selected' : ''}>Concluído</option>
+                      <option value="atrasado" ${p.status === 'atrasado' ? 'selected' : ''}>Atrasado</option>
+                    </select>
+                  </div>
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 14px;">
+                  <div class="form-group" style="margin-bottom: 0;">
+                    <label class="form-label">Custo Diário Estimado (€)</label>
+                    <input type="number" step="0.01" id="editProjDailyCost" class="form-input" value="${p.daily_cost || 0}">
+                  </div>
+                  <div class="form-group" style="margin-bottom: 0;">
+                    <label class="form-label">Budget Total Alocado (€)</label>
+                    <input type="number" step="0.01" id="editProjTotalBudget" class="form-input" value="${p.total_budget || 0}">
+                  </div>
+                </div>
+                <div style="display: flex; justify-content: flex-end; gap: 10px;">
+                  <button type="button" class="btn-secondary" onclick="toggleEditProjectForm()">Cancelar</button>
+                  <button type="submit" class="btn-primary" id="btnSaveProjectEdit">
+                    <svg width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                    </svg>
+                    <span>Guardar Alterações</span>
+                  </button>
+                </div>
+              </form>
+            </div>
+
             <!-- Abas de Navegação do Modal -->
             <div class="modal-nav-tabs">
               <button type="button" class="modal-tab-btn ${currentActiveTab === 'tabTasks' ? 'active' : ''}" onclick="switchModalTab('tabTasks', this)">
@@ -3623,11 +3736,22 @@
             </div>
           `;
 
-          // Renderizar Ações de Projeto no Rodapé (Eliminação restrita a Admin)
+          // Renderizar Ações de Projeto no Rodapé (Edição e Eliminação)
           const actionsEl = document.getElementById('modalDetalheProjectActions');
           if (actionsEl) {
+            let actionsHtml = '';
+            if (isAdmin || canManageSignage) {
+              actionsHtml += `
+                <button type="button" class="btn-secondary" style="font-size: 12px; display: inline-flex; align-items: center; gap: 6px; margin-right: 8px;" onclick="toggleEditProjectForm()">
+                  <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                  </svg>
+                  <span>Editar Loja</span>
+                </button>
+              `;
+            }
             if (isAdmin) {
-              actionsEl.innerHTML = `
+              actionsHtml += `
                 <button type="button" class="btn-secondary" style="color: var(--darty-red); border-color: rgba(239, 68, 68, 0.4); font-size: 12px; display: inline-flex; align-items: center; gap: 6px;" onclick="deleteProject(${p.id})">
                   <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
@@ -3635,15 +3759,83 @@
                   <span>Eliminar Projeto</span>
                 </button>
               `;
-            } else {
-              actionsEl.innerHTML = '';
             }
+            actionsEl.innerHTML = actionsHtml;
           }
 
           modalDetalhe.classList.add('active');
         }
       } catch (err) {
         showToast('Erro ao carregar detalhes: ' + err.message, 'error');
+      }
+    }
+
+    // Toggle Formulário de Edição de Loja
+    function toggleEditProjectForm() {
+      const card = document.getElementById('cardEditProject');
+      if (card) {
+        card.style.display = card.style.display === 'none' ? 'block' : 'none';
+        if (card.style.display === 'block') {
+          card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+      }
+    }
+
+    // Ação: Submeter Atualização dos Dados da Loja (PATCH /api/v1/projects/:id)
+    async function handleUpdateProject(e, projectId) {
+      e.preventDefault();
+      const saveBtn = document.getElementById('btnSaveProjectEdit');
+      if (saveBtn) {
+        saveBtn.disabled = true;
+        saveBtn.innerText = 'A guardar...';
+      }
+
+      const name = document.getElementById('editProjName')?.value;
+      const brand = document.getElementById('editProjBrand')?.value;
+      const store_format = document.getElementById('editProjFormat')?.value;
+      const location = document.getElementById('editProjLocation')?.value;
+      const go_live_date = document.getElementById('editProjGoLive')?.value;
+      const status = document.getElementById('editProjStatus')?.value;
+      const daily_cost = parseFloat(document.getElementById('editProjDailyCost')?.value) || 0;
+      const total_budget = parseFloat(document.getElementById('editProjTotalBudget')?.value) || 0;
+
+      try {
+        const res = await fetch(`/api/v1/projects/${projectId}`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            name,
+            brand,
+            store_format,
+            location,
+            go_live_date,
+            status,
+            daily_cost,
+            total_budget
+          })
+        });
+
+        const json = await res.json();
+        if (json.success) {
+          showToast('Dados da loja atualizados com sucesso!', 'success');
+          await openProjectDetails(projectId);
+          await loadProjects();
+          await loadKpis();
+        } else {
+          showToast(json.message || 'Erro ao atualizar dados da loja', 'error');
+        }
+      } catch (err) {
+        showToast('Erro de comunicação: ' + err.message, 'error');
+      } finally {
+        if (saveBtn) {
+          saveBtn.disabled = false;
+          saveBtn.innerHTML = `
+            <svg width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+            </svg>
+            <span>Guardar Alterações</span>
+          `;
+        }
       }
     }
 
@@ -4864,7 +5056,8 @@
       // 2. Carregar Parâmetros do Sistema (Modelos, Zonas, Resoluções)
       await loadConfigParameters();
 
-      // 3. Carregar Projetos e KPIs
+      // 3. Carregar KPIs e Projetos em paralelo
+      loadKpis();
       loadProjects();
 
       // 4. Vincular cliques nos blocos do Card Checklists & Prazos

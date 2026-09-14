@@ -21,6 +21,7 @@ Este diretório armazena todos os registos históricos de planeamento técnico (
 | **9** | **Adaptação do Dashboard para Piloto Multimédia (Infraestrutura Multimédia)** | [FASE_9_PLANO.md](file:///Users/daviscorreia/Antigravity%20/RetailLaunchOS/docs/implementation_plans/FASE_9_PLANO.md) | [FASE_9_WALKTHROUGH.md](file:///Users/daviscorreia/Antigravity%20/RetailLaunchOS/docs/walkthroughs/FASE_9_WALKTHROUGH.md) | ✅ Concluído |
 | **10**| **KPIs de Gestão de Aberturas, Checklist Global e Alertas Due Soon** | [FASE_10_PLANO.md](file:///Users/daviscorreia/Antigravity%20/RetailLaunchOS/docs/implementation_plans/FASE_10_PLANO.md) | [FASE_10_WALKTHROUGH.md](file:///Users/daviscorreia/Antigravity%20/RetailLaunchOS/docs/walkthroughs/FASE_10_WALKTHROUGH.md) | ✅ Concluído |
 | **11**| **Gestão de Parâmetros Multimédia (Modelos, Zonas, Resoluções) & Cores de Estado Operacional** | [FASE_11_PLANO.md](file:///Users/daviscorreia/Antigravity%20/RetailLaunchOS/docs/implementation_plans/FASE_11_PLANO.md) | [FASE_11_WALKTHROUGH.md](file:///Users/daviscorreia/Antigravity%20/RetailLaunchOS/docs/walkthroughs/FASE_11_WALKTHROUGH.md) | ✅ Concluído |
+| **12**| **Sincronização Dinâmica do Cartão "Próxima Abertura" & Edição de Lojas** | [FASE_12_PLANO.md](file:///Users/daviscorreia/Antigravity%20/RetailLaunchOS/docs/implementation_plans/FASE_12_PLANO.md) | [FASE_12_WALKTHROUGH.md](file:///Users/daviscorreia/Antigravity%20/RetailLaunchOS/docs/walkthroughs/FASE_12_WALKTHROUGH.md) | ✅ Concluído |
 
 ---
 

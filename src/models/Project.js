@@ -207,10 +207,16 @@ class Project {
 
   // Métricas agregadas em tempo real para os KPIs do Dashboard
   static async getKpis() {
-    // 1. Próxima Abertura Mais Iminente
+    // 1. Próxima Abertura Mais Iminente (ignora lojas já concluídas ou canceladas)
     let nextOpening = db.get(`
       SELECT * FROM projects 
-      WHERE go_live_date >= DATE('now')
+      WHERE status NOT IN ('concluido', 'cancelado') 
+        AND go_live_date >= DATE('now', 'localtime')
+      ORDER BY go_live_date ASC 
+      LIMIT 1
+    `) || db.get(`
+      SELECT * FROM projects 
+      WHERE status NOT IN ('concluido', 'cancelado')
       ORDER BY go_live_date ASC 
       LIMIT 1
     `) || db.get(`SELECT * FROM projects ORDER BY go_live_date ASC LIMIT 1`);

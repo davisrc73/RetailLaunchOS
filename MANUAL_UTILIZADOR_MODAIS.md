@@ -9,6 +9,7 @@ Este manual destina-se aos utilizadores e operadores do **Gabinete Multimédia**
 1. [Visão Geral do Dashboard](#1-visão-geral-do-dashboard)
 2. [Modal: Registar Nova Abertura de Loja](#2-modal-registar-nova-abertura-de-loja)
 3. [Modal / Gaveta: Gestão da Loja (Abas: Marcos Técnicos, Custos e Telas)](#3-modal--gaveta-gestão-da-loja-abas-marcos-técnicos-custos-e-telas)
+   - [3.1.1. Edição de Dados Estruturais da Loja (Fase 12)](#311-edição-de-dados-estruturais-da-loja-fase-12)
    - [3.2. Aba 1: Marcos Técnicos & Digital Signage](#32-aba-1-marcos-técnicos--digital-signage)
    - [3.3. Aba 2: Custos, Diárias & Orçamento (Fase 3)](#33-aba-2-custos-diárias--orçamento-fase-3)
    - [3.4. Aba 3: Telas & Players da Loja (Fase 4)](#34-aba-3-telas--players-da-loja-fase-4)
@@ -35,6 +36,10 @@ Este manual destina-se aos utilizadores e operadores do **Gabinete Multimédia**
     - [13.3. Adicionar, Editar e Remover Parâmetros](#133-adicionar-editar-e-remover-parâmetros)
     - [13.4. Propagação Automática nos Seletores (Dropdowns) de Telas & Players](#134-propagação-automática-nos-seletores-dropdowns-de-telas--players)
     - [13.5. Padrão Cromático Oficial de Estado Operacional](#135-padrão-cromático-oficial-de-estado-operacional)
+14. [Sincronização Dinâmica da Próxima Abertura & Prevenção de Cache (Fase 12)](#14-sincronização-dinâmica-da-próxima-abertura--prevenção-de-cache-fase-12)
+    - [14.1. Regras de Elegibilidade da Loja no Hero Card](#141-regras-de-elegibilidade-da-loja-no-hero-card)
+    - [14.2. Eliminação de Armazenamento em Cache (HTTP Cache Prevention)](#142-eliminação-de-armazenamento-em-cache-http-cache-prevention)
+    - [14.3. Fluxo de Edição Estrutural e Atualização Instantânea](#143-fluxo-de-edição-estrutural-e-atualização-instantânea)
 
 ---
 
@@ -85,6 +90,23 @@ Na tabela **"Aberturas em Curso"**, clica no botão **"Gerir"** situado na colun
 * **Aba 1: Marcos Técnicos & Signage**
 * **Aba 2: Custos, Diárias & Orçamento**
 * **Aba 3: Telas & Players da Loja (Fase 4)**
+
+### 3.1.1. Edição de Dados Estruturais da Loja (Fase 12)
+No cabeçalho superior do modal de gestão de abertura, os utilizadores com perfil de **Administrador (`admin`)** ou **Gestor Multimédia (`multimedia_user`)** têm disponível o botão **"✏️ Editar Loja"** (`#btnToggleEditProject`).
+
+1. **Abertura do Formulário**: Ao clicar no botão, expande-se o painel retrátil de edição direta (`#cardEditProject`).
+2. **Campos Editáveis**:
+   * **Nome da Loja**: Designação oficial do projeto (ex.: `Fnac Vila Nova de Famalicão`).
+   * **Insígnia**: Seletor de marca (`Fnac` ou `Darty`).
+   * **Formato da Loja**: Tipo de superfície (`Standard`, `Flagship`, `Express`, etc.).
+   * **Localização / Morada**: Morada física do estabelecimento.
+   * **Data de Inauguração (Go-Live)**: Altera a data de abertura oficial da loja.
+   * **Estado da Obra**: Permite comutar o estado operacional (`planeamento`, `em_curso`, `testes_signage`, `concluido`, `atrasado`).
+   * **Custo Diário Estimado (€)** e **Orçamento Total (€)**: Ajuste dos valores de referência financeira.
+3. **Gravação e Propagação em Tempo Real**:
+   * Ao clicar em **"Guardar Alterações"**, o sistema submete via `PATCH /api/v1/projects/:id`.
+   * Os dados são validados e persistidos na base de dados SQLite.
+   * O modal, a tabela principal de aberturas e o painel superior de KPIs (incluindo o relógio de contagem decrescente do cartão **"Próxima Abertura"**) são atualizados imediatamente sem necessidade de recarregar a página!
 
 ---
 
@@ -319,12 +341,15 @@ O sistema utiliza 6 cores secundárias normalizadas para identificação de peri
 O painel superior do Dashboard é composto por **3 cartões estratégicos e equilibrados de alta densidade**, reestruturados na **Fase 10** para apoiar a operação sem desperdício de espaço e com visibilidade imediata de cada loja e marco:
 
 1. **Card 1 • Próxima Abertura (Hero Card)**:
-   * Deteta automaticamente a loja com data de go-live mais iminente (*Fnac Famalicão*).
-   * Apresenta relógio com contagem decrescente ativa ao segundo: `[Dias : Horas : Minutos : Segundos]`.
+   * **Deteção Dinâmica Inteligente**: Deteta e elege automaticamente a loja ativa com a data de go-live mais iminente (`go_live_date >= hoje`). **Exclui de forma estrita** lojas que já tenham o estado `concluido` ou `cancelado`.
+   * **Subtítulo Estruturado**: Apresenta a marca e o formato da loja (ex.: *Fnac Standard*, *Fnac Flagship*, *Darty Pro*).
+   * **Relógio Decrescente ao Segundo**: Contagem precisa calculada a partir do fuso horário local `[Dias : Horas : Minutos : Segundos]`.
+   * **Badge de Signage Dinâmico**: Badges cromáticos oficiais (`badge-signage-ok`, `badge-signage-testing`, `badge-signage-pending`).
    * **Progresso da Loja (%)**: Barra de progresso calculada matematicamente a partir dos marcos concluídos da loja (`(concluídas / total) * 100`).
    * **Displays**: Quantidade total de ecrãs/players alocados a esta abertura específica.
    * **Formatos**: Contagem de formatos de saída distintos (ex.: *4K*, *FHD*, *LED Wall*).
    * **Playlists**: Estado de vinculação de campanhas para as telas da loja (`100% OK`, `X a Associar` ou `0 Telas`).
+   * **Sincronização & Zero Cache**: As requisições de dados utilizam cabeçalhos `Cache-Control: no-store`. Ao fazer refresh da página (`F5`), o cartão reflete imediatamente quaisquer alterações em datas, nomes ou conclusões de obras.
 
 2. **Card 2 • Planeamento Lojas (Progresso Individual por Loja)**:
    * **Visualização Global por Loja**: Apresenta a lista organizada de todas as lojas em fase de planeamento e abertura ativa.
@@ -600,4 +625,36 @@ Para garantir leitura operacional imediata e evitar ambiguidades de monitorizaç
 
 > [!TIP]
 > Esta paleta aplica-se tanto às opções das caixas de seleção `<select>`, como aos chips e badges da tabela de catálogo e aos pontos luminosos (*status-dot-ping*) na ficha técnica de cada loja.
+
+---
+
+## 14. Sincronização Dinâmica da Próxima Abertura & Prevenção de Cache (Fase 12)
+
+### 14.1. Regras de Elegibilidade da Loja no Hero Card
+O cartão **"Próxima Abertura"** obedece a um algoritmo estrito de priorização para garantir que reflete fielmente a realidade das obras do Gabinete Multimédia:
+
+1. **Critério Principal**: O sistema consulta a base de dados SQLite filtrando apenas lojas que:
+   * **NÃO** estejam no estado `concluido` nem `cancelado`.
+   * Possuam data de go-live igual ou posterior à data atual (`go_live_date >= DATE('now', 'localtime')`).
+   * Ordena por data de inauguração ascendente (`ORDER BY go_live_date ASC LIMIT 1`).
+2. **Critério Fallback**: Se todas as lojas ativas tiverem datas anteriores (ou pendentes de nova calendarização), o sistema seleciona a loja ativa mais recente que permaneça em curso ou planeamento, garantindo que o cartão nunca surge vazio.
+3. **Conclusão Automática**: Assim que uma loja é marcada como `concluido`, o sistema promove imediatamente a próxima loja ativa do portfólio (por exemplo, ao concluir *Fnac Famalicão*, o sistema avança automaticamente para *FNAC Madeira*).
+
+### 14.2. Eliminação de Armazenamento em Cache (HTTP Cache Prevention)
+Para garantir que o comando de atualização do navegador (`F5`, `⌘R` ou `Ctrl+R`) apresente dados rigorosamente sincronizados:
+* O servidor HTTP emite os cabeçalhos normativos:
+  ```http
+  Cache-Control: no-store, no-cache, must-revalidate, proxy-revalidate
+  Pragma: no-cache
+  Expires: 0
+  ```
+* Todas as invocações `fetch()` efetuadas pelo frontend incluem o parâmetro `{ cache: 'no-store' }`.
+* Não são mantidas variáveis estáticas de template com nomes fictícios no HTML, eliminando qualquer cintilação visual (*layout shift* ou dados fantasmas).
+
+### 14.3. Fluxo de Edição Estrutural e Atualização Instantânea
+Quando um operador com perfil autorizado altera a data de go-live ou o estado de uma loja através do botão **"✏️ Editar Loja"**:
+1. O pedido `PATCH /api/v1/projects/:id` grava os novos valores diretamente no SQLite.
+2. O modal atualiza os seus títulos e datas.
+3. A grelha de abertura e os cartões superiores de KPIs recalculam os valores e o relógio decrescente ajusta-se imediatamente ao novo prazo sem requerer recarregar a página.
+
 

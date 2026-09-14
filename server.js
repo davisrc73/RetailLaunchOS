@@ -20,6 +20,9 @@ const authMiddleware = require('./src/middleware/authMiddleware');
 function sendJson(res, statusCode, data) {
   res.writeHead(statusCode, {
     'Content-Type': 'application/json; charset=utf-8',
+    'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
+    'Pragma': 'no-cache',
+    'Expires': '0',
     'Access-Control-Allow-Origin': '*',
     'Access-Control-Allow-Methods': 'GET, POST, PUT, PATCH, DELETE, OPTIONS',
     'Access-Control-Allow-Headers': 'Content-Type, Authorization'
@@ -296,7 +299,26 @@ const server = http.createServer(async (req, res) => {
       return projectController.getById(req, mockRes);
     }
 
-    // 12. DELETE /api/v1/projects/:id (restrito exclusivamente a Admin)
+    // 12. PATCH ou PUT /api/v1/projects/:id (atualizar dados da loja - admin e multimedia_user)
+    if (singleMatch && (method === 'PATCH' || method === 'PUT')) {
+      if (!checkAuth(req, res, 'admin', 'multimedia_user')) return;
+
+      req.params = { id: singleMatch[1] };
+      let body = '';
+      req.on('data', chunk => { body += chunk.toString(); });
+      req.on('end', async () => {
+        try {
+          req.body = body ? JSON.parse(body) : {};
+          const mockRes = { status: (code) => ({ json: (data) => sendJson(res, code, data) }) };
+          await projectController.update(req, mockRes);
+        } catch (err) {
+          sendJson(res, 400, { success: false, message: 'JSON Inválido: ' + err.message });
+        }
+      });
+      return;
+    }
+
+    // 13. DELETE /api/v1/projects/:id (restrito exclusivamente a Admin)
     if (singleMatch && method === 'DELETE') {
       if (!checkAuth(req, res, 'admin')) return;
 
