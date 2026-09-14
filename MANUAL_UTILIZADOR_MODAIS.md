@@ -40,6 +40,10 @@ Este manual destina-se aos utilizadores e operadores do **Gabinete Multimédia**
     - [14.1. Regras de Elegibilidade da Loja no Hero Card](#141-regras-de-elegibilidade-da-loja-no-hero-card)
     - [14.2. Eliminação de Armazenamento em Cache (HTTP Cache Prevention)](#142-eliminação-de-armazenamento-em-cache-http-cache-prevention)
     - [14.3. Fluxo de Edição Estrutural e Atualização Instantânea](#143-fluxo-de-edição-estrutural-e-atualização-instantânea)
+15. [Modal: Base de Dados, Backup & Migração para Synology NAS (Fase 13)](#15-modal-base-de-dados-backup--migração-para-synology-nas-fase-13)
+    - [15.1. Como Aceder](#151-como-aceder)
+    - [15.2. Funcionalidades do Modal](#152-funcionalidades-do-modal)
+    - [15.3. Fluxo de Migração Rápida Mac ➔ Synology NAS (1-Clique)](#153-fluxo-de-migração-rápida-mac--synology-nas-1-clique)
 
 ---
 
@@ -656,5 +660,53 @@ Quando um operador com perfil autorizado altera a data de go-live ou o estado de
 1. O pedido `PATCH /api/v1/projects/:id` grava os novos valores diretamente no SQLite.
 2. O modal atualiza os seus títulos e datas.
 3. A grelha de abertura e os cartões superiores de KPIs recalculam os valores e o relógio decrescente ajusta-se imediatamente ao novo prazo sem requerer recarregar a página.
+
+---
+
+## 15. Modal: Base de Dados, Backup & Migração para Synology NAS (Fase 13)
+
+### 15.1. Como Aceder
+No menu lateral esquerdo (Sidebar), sob o grupo **"Configurações"**, clica na opção **"Base de Dados & Migração"** (`#nav-config-database`). O modal sobrepõe-se ao Dashboard, disponibilizando a gestão central do ficheiro SQLite (`retaillaunch.sqlite`).
+
+> [!NOTE]
+> Esta funcionalidade está restrita a utilizadores com perfil de **Administrador (`admin`)** ou **Gestor Multimédia (`multimedia_user`)** para garantir a segurança e integridade dos dados da organização.
+
+---
+
+### 15.2. Funcionalidades do Modal
+
+#### A. Painel de Estado da Base de Dados Ativa
+Exibe a telemetria em tempo real da base de dados ativa no servidor atual:
+* **Tamanho em Disco**: Tamanho consolidado (ex: `128.0 KB`).
+* **Lojas / Projetos**: Contagem total de aberturas cadastradas.
+* **Tarefas Técnicas**: Volume de marcos técnicos registados.
+* **Telas & Players**: Parque de hardware multimédia inventariado.
+* **Caminho Físico e Última Modificação**: Caminho no sistema operativo (ou dentro do contentor Docker `/app/database/retaillaunch.sqlite`) e carimbo de data/hora da última escrita.
+* **Botão "🔄 Atualizar"**: Força um novo checkpoint WAL e recarrega as métricas da base de dados.
+
+#### B. Descarregar Backup Local
+* Ao clicar no botão dourado **"⬇️ Descarregar Base de Dados"**, o sistema executa um `PRAGMA wal_checkpoint(TRUNCATE)` que unifica todas as transações pendentes e transfere para o teu computador o ficheiro consolidado `retaillaunch_backup_AAAA-MM-DD.sqlite`.
+* Este ficheiro é 100% autónomo e pode ser guardado como cópia de segurança de desastre (*Disaster Recovery*) ou utilizado diretamente para migrar dados entre o Mac e o Synology NAS.
+
+#### C. Restaurar / Migrar Base de Dados para o Servidor
+Permite substituir a base de dados do servidor (Mac ou NAS) através de upload direto no browser:
+1. Clica na caixa de seleção ou arrasta o ficheiro `.sqlite` desejado.
+2. O sistema indica o nome e tamanho do ficheiro selecionado e ativa o botão de confirmação.
+3. Clica em **"⬆️ Confirmar Restauro / Migração"**:
+   * O sistema solicita uma confirmação explícita de segurança.
+   * Cria automaticamente uma cópia de salvaguarda da base de dados atual (`retaillaunch.sqlite.bak`).
+   * Valida a integridade do ficheiro enviado (verificando a assinatura binária `SQLite format 3` e a presença das tabelas essenciais).
+   * Substitui o ficheiro, limpa buffers WAL/SHM residuais e recarrega a ligação em tempo real.
+   * Apresenta notificação de sucesso e atualiza automaticamente os dados da página.
+
+---
+
+### 15.3. Fluxo de Migração Rápida Mac ➔ Synology NAS (1-Clique)
+1. No **Mac** (`http://localhost:3000`), vai a **Configurações ➔ Base de Dados & Migração** e clica em **"⬇️ Descarregar Base de Dados"**.
+2. No **Synology NAS** (`http://<IP_DO_NAS>:3000`), vai a **Configurações ➔ Base de Dados & Migração**.
+3. Seleciona o ficheiro `.sqlite` descarregado e clica em **"⬆️ Confirmar Restauro / Migração"**.
+4. Concluído! O NAS passa a ter exatamente as mesmas lojas, datas, tarefas e parâmetros do teu Mac.
+5. Nas próximas atualizações de código com `git pull` e `docker compose`, o volume persistente do NAS mantém todos estes dados permanentemente salvaguardados.
+
 
 

@@ -392,6 +392,12 @@ A API segue os padrões RESTful com payloads JSON e códigos de resposta HTTP se
 | **PUT** | `/api/v1/config/parameters/:id` | `:id` (Param ID) + Body JSON com campos a atualizar | `admin`, `multimedia_user` | Atualiza designação, descrição ou ordem de apresentação |
 | **DELETE** | `/api/v1/config/parameters/:id` | `:id` (Param ID) | `admin`, `multimedia_user` | Remove permanentemente um parâmetro da base de dados |
 
+### 4.7. Endpoints de Base de Dados, Backup & Migração (`/api/v1/database`) (Fase 13)
+| Método | Endpoint | Parâmetros | Permissões | Descrição |
+| :--- | :--- | :--- | :---: | :--- |
+| **GET** | `/api/v1/database/info` | — | `admin`, `multimedia_user` | Retorna o caminho, tamanho em disco, data da última escrita e contagem de lojas/tarefas/players |
+| **GET** | `/api/v1/database/backup` | — | `admin` | Executa checkpoint WAL e descarrega o binário `retaillaunch.sqlite` consolidado |
+| **POST** | `/api/v1/database/restore` | Body binário (`.sqlite`) | `admin` | Valida integridade SQLite 3, cria cópia `.bak`, substitui o ficheiro e recarrega a ligação |
 
 ---
 
@@ -623,5 +629,37 @@ A rota `PATCH` e `PUT /api/v1/projects/:id` permite a atualização transacional
 }
 ```
 A resposta emite o payload da loja atualizada, permitindo reatividade imediata no frontend sem requerer recarregar a aplicação.
+
+---
+
+## 11. Arquitetura de Migração de Dados, Invalidação de Cache & Persistência Contínua (Fase 13)
+
+### 11.1. Invalidação Contínua de Cache em Ativos Estáticos
+Para garantir que navegadores clientes e proxies do Synology não retêm versões obsoletas de código em produção:
+* As rotas `/`, `/dashboard` e `*.html` emitem obrigatoriamente:
+  ```http
+  Cache-Control: no-cache, no-store, must-revalidate, proxy-revalidate
+  Pragma: no-cache
+  Expires: 0
+  ```
+* Os ficheiros de estilo (`/css/dashboard.css`) e scripts cliente (`/js/*.js`) são servidos com os mesmos cabeçalhos anti-cache e referenciados no HTML com parâmetros de versão (*cache-busting*): `/css/dashboard.css?v=13.0`.
+
+### 11.2. Pipeline de Backup e Restauro Atómico da Base de Dados
+A migração entre o Mac (desenvolvimento) e o Synology NAS (produção) é realizada através de um pipeline transacional seguro:
+1. **Exportação / Backup (`GET /api/v1/database/backup`)**:
+   - Executa `PRAGMA wal_checkpoint(TRUNCATE)` em `src/database/db.js`, garantindo que todas as transações em `retaillaunch.sqlite-wal` são unificadas no ficheiro principal `.sqlite`.
+   - Transmite o ficheiro como stream binário com cabeçalho `Content-Type: application/vnd.sqlite3`.
+2. **Importação / Restauro Atómico (`POST /api/v1/database/restore`)**:
+   - Valida os 16 bytes de cabeçalho (`SQLite format 3\000`).
+   - Grava um ficheiro de teste temporário (`.tmp`) e executa verificação de esquema com `new DatabaseSync()`.
+   - Cria uma cópia de salvaguarda da base de dados anterior (`retaillaunch.sqlite.bak`).
+   - Remove eventuais ficheiros WAL e SHM anteriores e substitui atómicamente o ficheiro principal.
+   - Executa `dbModule.reloadConnection()`, reabrindo a ligação à nova base de dados sem necessidade de reiniciar o contentor ou o processo Node.js.
+
+### 11.3. Garantia de Persistência no Synology NAS
+* **Volume Docker (`retaillaunch_data:/app/database`)**: A pasta de dados `/app/database` é mantida fora do sistema de ficheiros efémero do contentor.
+* **Isolamento via Git (`.gitignore`)**: Como `database/*.sqlite*` está no `.gitignore`, os comandos de atualização `git pull origin main` no NAS não interagem com o ficheiro de base de dados de produção.
+* **Reconstrução Segura**: Ao executar `docker compose build --no-cache && docker compose up -d --force-recreate`, o Docker reconstrói o contentor com o código mais recente, mas religa automaticamente o volume `retaillaunch_data` com todos os dados intactos.
+
 
 

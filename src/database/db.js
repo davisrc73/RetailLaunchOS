@@ -16,15 +16,18 @@ if (!fs.existsSync(dbDir)) {
 const dbPath = config.sqlite?.storage || path.join(dbDir, 'retaillaunch.sqlite');
 const isNewDb = !fs.existsSync(dbPath);
 
-const db = new DatabaseSync(dbPath);
+let db = new DatabaseSync(dbPath);
 
-// Ativar suporte a chaves estrangeiras e modo WAL para concorrência
-try {
-  db.exec('PRAGMA foreign_keys = ON;');
-  db.exec('PRAGMA journal_mode = WAL;');
-} catch (err) {
-  console.warn('[DB Warning] Não foi possível ativar PRAGMAs:', err.message);
+function applyPragmas(targetDb) {
+  try {
+    targetDb.exec('PRAGMA foreign_keys = ON;');
+    targetDb.exec('PRAGMA journal_mode = WAL;');
+  } catch (err) {
+    console.warn('[DB Warning] Não foi possível ativar PRAGMAs:', err.message);
+  }
 }
+
+applyPragmas(db);
 
 // Auto-bootstrap: Se a tabela projects não existir, executa o schema.sql inicial
 function initSchema() {
@@ -162,8 +165,76 @@ migrateSchema();
 migrateSystemParameters();
 
 
+function checkpointWal() {
+  try {
+    db.exec('PRAGMA wal_checkpoint(TRUNCATE);');
+    return true;
+  } catch (err) {
+    console.error('[DB Checkpoint Error]', err.message);
+    return false;
+  }
+}
+
+function reloadConnection() {
+  try {
+    try {
+      db.close();
+    } catch (closeErr) {
+      // Ignorar se a ligação já estiver fechada
+    }
+    db = new DatabaseSync(dbPath);
+    applyPragmas(db);
+    initSchema();
+    migrateSchema();
+    migrateSystemParameters();
+    console.log('✅ [DB] Ligação à base de dados recarregada e esquemas verificados com sucesso!');
+    return true;
+  } catch (err) {
+    console.error('[DB Reload Connection Error]', err.message);
+    throw err;
+  }
+}
+
+function getDatabaseStats() {
+  checkpointWal();
+  const exists = fs.existsSync(dbPath);
+  const stats = exists ? fs.statSync(dbPath) : { size: 0, mtime: new Date() };
+  let projectsCount = 0;
+  let tasksCount = 0;
+  let playersCount = 0;
+  let usersCount = 0;
+
+  try {
+    projectsCount = db.prepare('SELECT COUNT(*) as c FROM projects').get()?.c || 0;
+    tasksCount = db.prepare('SELECT COUNT(*) as c FROM tasks').get()?.c || 0;
+    playersCount = db.prepare('SELECT COUNT(*) as c FROM signage_players').get()?.c || 0;
+    usersCount = db.prepare('SELECT COUNT(*) as c FROM users').get()?.c || 0;
+  } catch (e) {
+    // Ignorar erro se tabelas estiverem em transição
+  }
+
+  return {
+    path: dbPath,
+    filename: path.basename(dbPath),
+    sizeBytes: stats.size,
+    sizeFormatted: (stats.size / 1024).toFixed(1) + ' KB',
+    lastModified: stats.mtime,
+    projectsCount,
+    tasksCount,
+    playersCount,
+    usersCount
+  };
+}
+
 module.exports = {
-  db,
+  get db() {
+    return db;
+  },
+  dbPath,
+  dbDir,
+  checkpointWal,
+  reloadConnection,
+  getDatabaseStats,
   // Executa uma consulta que retorna múltiplos registos
   query: (sql, params = []) => {
     try {

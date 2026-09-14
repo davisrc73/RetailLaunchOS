@@ -31,8 +31,8 @@
     href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap"
     rel="stylesheet">
   <!-- Stylesheets -->
-  <link rel="stylesheet" href="../../../public/css/dashboard.css">
-  <link rel="stylesheet" href="/css/dashboard.css">
+  <link rel="stylesheet" href="../../../public/css/dashboard.css?v=13.0">
+  <link rel="stylesheet" href="/css/dashboard.css?v=13.0">
 </head>
 
 <body>
@@ -170,6 +170,16 @@
               </path>
             </svg>
             <span>Modelos, Zonas &amp; Formatos</span>
+          </a>
+        </li>
+        <li>
+          <a href="#" class="nav-link" id="nav-config-database">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round"
+                d="M20.25 6.375c0 2.278-3.694 4.125-8.25 4.125S3.75 8.653 3.75 6.375m16.5 0c0-2.278-3.694-4.125-8.25-4.125S3.75 4.097 3.75 6.375m16.5 0v11.25c0 2.278-3.694 4.125-8.25 4.125s-8.25-1.847-8.25-4.125V6.375m16.5 5.625c0 2.278-3.694 4.125-8.25 4.125s-8.25-1.847-8.25-4.125m16.5 5.625c0 2.278-3.694 4.125-8.25 4.125s-8.25-1.847-8.25-4.125">
+              </path>
+            </svg>
+            <span>Base de Dados &amp; Migração</span>
           </a>
         </li>
       </ul>
@@ -1402,6 +1412,136 @@
     </div>
   </div>
 
+  <!-- =========================================================================
+       MODAL: GESTÃO DE BASE DE DADOS, BACKUP & MIGRAÇÃO (FASE 13)
+       ========================================================================= -->
+  <div class="modal-backdrop" id="modalDatabaseMigration">
+    <div class="modal-card" style="max-width: 860px; width: 95%;">
+      <div class="modal-header">
+        <div class="modal-title">
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+              style="color: var(--fnac-gold);">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M20.25 6.375c0 2.278-3.694 4.125-8.25 4.125S3.75 8.653 3.75 6.375m16.5 0c0-2.278-3.694-4.125-8.25-4.125S3.75 4.097 3.75 6.375m16.5 0v11.25c0 2.278-3.694 4.125-8.25 4.125s-8.25-1.847-8.25-4.125V6.375m16.5 5.625c0 2.278-3.694 4.125-8.25 4.125s-8.25-1.847-8.25-4.125m16.5 5.625c0 2.278-3.694 4.125-8.25 4.125s-8.25-1.847-8.25-4.125">
+              </path>
+            </svg>
+            <div>
+              <span>Base de Dados • Backup &amp; Migração de Dados</span>
+              <div style="font-size: 11.5px; color: var(--text-dim); font-weight: 400; margin-top: 2px;">
+                Exportação consolidada, migração para o Synology NAS e persistência em volume Docker
+              </div>
+            </div>
+          </div>
+        </div>
+        <button class="modal-close-btn" id="btnCloseDbMigrationModal" onclick="closeDbMigrationModal()" aria-label="Fechar">
+          <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+          </svg>
+        </button>
+      </div>
+
+      <div class="modal-body" style="padding: 20px 24px;">
+        <!-- Card 1: Estado da Base de Dados Ativa -->
+        <div class="card" style="background: rgba(255, 255, 255, 0.03); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: 18px; margin-bottom: 20px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <span style="font-size: 16px;">📊</span>
+              <span style="font-weight: 700; font-size: 13.5px; color: var(--text-white);">Estado da Base de Dados Ativa</span>
+            </div>
+            <button type="button" class="btn-secondary" id="btnRefreshDbStats" onclick="loadDatabaseStats()" style="padding: 4px 10px; font-size: 12px; height: 28px;">
+              🔄 Atualizar
+            </button>
+          </div>
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 10px; margin-bottom: 12px;">
+            <div style="background: rgba(0,0,0,0.25); padding: 10px; border-radius: var(--radius-sm); border: 1px solid rgba(255,255,255,0.05);">
+              <div style="font-size: 10.5px; color: var(--text-muted); text-transform: uppercase;">Tamanho</div>
+              <div style="font-size: 15px; font-weight: 700; color: var(--fnac-gold); font-family: 'JetBrains Mono', monospace;" id="dbStatSize">--</div>
+            </div>
+            <div style="background: rgba(0,0,0,0.25); padding: 10px; border-radius: var(--radius-sm); border: 1px solid rgba(255,255,255,0.05);">
+              <div style="font-size: 10.5px; color: var(--text-muted); text-transform: uppercase;">Lojas / Projetos</div>
+              <div style="font-size: 15px; font-weight: 700; color: var(--text-white); font-family: 'JetBrains Mono', monospace;" id="dbStatProjects">--</div>
+            </div>
+            <div style="background: rgba(0,0,0,0.25); padding: 10px; border-radius: var(--radius-sm); border: 1px solid rgba(255,255,255,0.05);">
+              <div style="font-size: 10.5px; color: var(--text-muted); text-transform: uppercase;">Tarefas</div>
+              <div style="font-size: 15px; font-weight: 700; color: var(--text-white); font-family: 'JetBrains Mono', monospace;" id="dbStatTasks">--</div>
+            </div>
+            <div style="background: rgba(0,0,0,0.25); padding: 10px; border-radius: var(--radius-sm); border: 1px solid rgba(255,255,255,0.05);">
+              <div style="font-size: 10.5px; color: var(--text-muted); text-transform: uppercase;">Telas &amp; Players</div>
+              <div style="font-size: 15px; font-weight: 700; color: var(--text-white); font-family: 'JetBrains Mono', monospace;" id="dbStatPlayers">--</div>
+            </div>
+          </div>
+          <div style="font-size: 11px; color: var(--text-dim); font-family: 'JetBrains Mono', monospace; word-break: break-all;" id="dbStatPath">
+            Localização: A carregar...
+          </div>
+        </div>
+
+        <!-- Seção de Ações Lado a Lado: Exportar vs Restaurar -->
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-bottom: 20px;">
+          <!-- Card 2: Exportar Backup -->
+          <div class="card" style="background: rgba(255, 255, 255, 0.02); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: 18px; display: flex; flex-direction: column; justify-content: space-between;">
+            <div>
+              <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+                <span style="font-size: 18px;">⬇️</span>
+                <span style="font-weight: 700; font-size: 14px; color: var(--text-white);">Descarregar Backup</span>
+              </div>
+              <p style="font-size: 12px; color: var(--text-muted); line-height: 1.5; margin-bottom: 16px;">
+                Transfira a cópia integral e consolidada da base de dados ativa (<code style="font-family: 'JetBrains Mono'; font-size: 11px;">retaillaunch.sqlite</code>).
+                Ideal para salvaguarda ou para migrar os dados do <strong>Mac (Localhost)</strong> para o <strong>Synology NAS</strong>.
+              </p>
+            </div>
+            <button type="button" class="btn-primary" onclick="downloadDatabaseBackup()" style="width: 100%; justify-content: center; gap: 8px;">
+              <span>⬇️ Descarregar Base de Dados</span>
+            </button>
+          </div>
+
+          <!-- Card 3: Restaurar / Migrar -->
+          <div class="card" style="background: rgba(255, 255, 255, 0.02); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: 18px; display: flex; flex-direction: column; justify-content: space-between;">
+            <div>
+              <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+                <span style="font-size: 18px;">⬆️</span>
+                <span style="font-weight: 700; font-size: 14px; color: var(--text-white);">Restaurar / Migrar Dados</span>
+              </div>
+              <p style="font-size: 12px; color: var(--text-muted); line-height: 1.5; margin-bottom: 12px;">
+                Carregue um ficheiro <code style="font-family: 'JetBrains Mono'; font-size: 11px;">.sqlite</code> para substituir a base de dados deste servidor.
+                O sistema cria automaticamente uma cópia de segurança de salvaguarda (<code style="font-family: 'JetBrains Mono'; font-size: 11px;">.bak</code>) antes da substituição.
+              </p>
+              <input type="file" id="inputDbRestoreFile" accept=".sqlite,.db" style="display: none;" onchange="handleDbFileSelected(event)">
+              <div id="dropZoneDbRestore" onclick="document.getElementById('inputDbRestoreFile').click()"
+                style="border: 2px dashed rgba(245, 176, 39, 0.35); border-radius: var(--radius-sm); padding: 14px; text-align: center; cursor: pointer; background: rgba(245, 176, 39, 0.03); transition: var(--transition); margin-bottom: 12px;">
+                <span style="font-size: 18px;">📁</span>
+                <div style="font-size: 12px; font-weight: 600; color: var(--text-white); margin-top: 4px;" id="lblSelectedDbFile">
+                  Clique para escolher ficheiro .sqlite
+                </div>
+                <div style="font-size: 10.5px; color: var(--text-dim); margin-top: 2px;">ou arraste o ficheiro para aqui</div>
+              </div>
+            </div>
+            <button type="button" class="btn-primary" id="btnSubmitDbRestore" onclick="submitDatabaseRestore()" style="width: 100%; justify-content: center; background: #e21212; border-color: #e21212; color: #ffffff;" disabled>
+              <span>⬆️ Confirmar Restauro / Migração</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Card 4: Instruções de Persistência no Synology NAS -->
+        <div style="background: rgba(0, 110, 250, 0.08); border: 1px solid rgba(0, 110, 250, 0.25); border-radius: var(--radius-md); padding: 14px 18px;">
+          <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 6px;">
+            <span style="font-size: 16px;">💡</span>
+            <span style="font-size: 12.5px; font-weight: 700; color: #60a5fa;">Como funciona a persistência contínua no Synology NAS?</span>
+          </div>
+          <p style="font-size: 11.5px; color: var(--text-muted); line-height: 1.5; margin: 0;">
+            1. No <strong>Synology NAS</strong>, os dados residem no volume Docker <code style="font-family: 'JetBrains Mono'; font-size: 10.5px;">retaillaunch_data</code>.<br>
+            2. Como a base de dados está em <code style="font-family: 'JetBrains Mono'; font-size: 10.5px;">.gitignore</code>, futuros <code style="font-family: 'JetBrains Mono'; font-size: 10.5px;">git pull origin main</code> <strong>nunca apagam nem substituem</strong> os dados do NAS.<br>
+            3. Ao reconstruir o contentor com <code style="font-family: 'JetBrains Mono'; font-size: 10.5px;">docker compose build --no-cache && docker compose up -d --force-recreate</code>, o volume preserva todos os dados intactos.
+          </p>
+        </div>
+      </div>
+
+      <div class="modal-footer" style="display: flex; justify-content: flex-end; gap: 10px;">
+        <button type="button" class="btn-secondary" onclick="closeDbMigrationModal()">Fechar</button>
+      </div>
+    </div>
+  </div>
+
 
   <!-- =========================================================================
        SCRIPT DINÂMICO COMPLETO (INTEGRAÇÃO API REST + BASE DE DADOS SQLITE)
@@ -2011,6 +2151,164 @@
         }
       } catch (err) {
         showToast('Erro de comunicação: ' + err.message, 'error');
+      }
+    }
+
+    // =========================================================================
+    // BASE DE DADOS, BACKUP & MIGRAÇÃO (FASE 13)
+    // =========================================================================
+    let selectedDbRestoreFile = null;
+
+    function openDbMigrationModal() {
+      const modal = document.getElementById('modalDatabaseMigration');
+      if (!modal) return;
+      modal.classList.add('active');
+      loadDatabaseStats();
+    }
+
+    function closeDbMigrationModal() {
+      const modal = document.getElementById('modalDatabaseMigration');
+      if (!modal) return;
+      modal.classList.remove('active');
+      selectedDbRestoreFile = null;
+      const fileInput = document.getElementById('inputDbRestoreFile');
+      if (fileInput) fileInput.value = '';
+      const lbl = document.getElementById('lblSelectedDbFile');
+      if (lbl) lbl.textContent = 'Clique para escolher ficheiro .sqlite';
+      const btn = document.getElementById('btnSubmitDbRestore');
+      if (btn) {
+        btn.disabled = true;
+        btn.textContent = '⬆️ Confirmar Restauro / Migração';
+      }
+    }
+
+    async function loadDatabaseStats() {
+      try {
+        const token = localStorage.getItem('retaillaunch_token') || sessionStorage.getItem('retaillaunch_token');
+        const headers = { 'Cache-Control': 'no-cache' };
+        if (token) headers['Authorization'] = 'Bearer ' + token;
+
+        const res = await fetch('/api/v1/database/info', {
+          headers,
+          cache: 'no-store'
+        });
+
+        if (res.status === 401 || res.status === 403) {
+          showToast('Permissão de Administrador necessária para aceder à base de dados.', 'warning');
+          return;
+        }
+
+        const json = await res.json();
+        if (json.success && json.data) {
+          const d = json.data;
+          const elSize = document.getElementById('dbStatSize');
+          const elProjects = document.getElementById('dbStatProjects');
+          const elTasks = document.getElementById('dbStatTasks');
+          const elPlayers = document.getElementById('dbStatPlayers');
+          const elPath = document.getElementById('dbStatPath');
+
+          if (elSize) elSize.textContent = d.sizeFormatted || '--';
+          if (elProjects) elProjects.textContent = d.projectsCount ?? '--';
+          if (elTasks) elTasks.textContent = d.tasksCount ?? '--';
+          if (elPlayers) elPlayers.textContent = d.playersCount ?? '--';
+          if (elPath) {
+            const dtStr = d.lastModified ? new Date(d.lastModified).toLocaleString('pt-PT') : '--';
+            elPath.textContent = `Ficheiro: ${d.path || '--'} (Modificado: ${dtStr})`;
+          }
+        }
+      } catch (err) {
+        console.error('Erro ao carregar estatísticas da base de dados:', err);
+      }
+    }
+
+    async function downloadDatabaseBackup() {
+      try {
+        showToast('A preparar snapshot consolidado da base de dados...', 'info');
+        const token = localStorage.getItem('retaillaunch_token') || sessionStorage.getItem('retaillaunch_token');
+        const headers = {};
+        if (token) headers['Authorization'] = 'Bearer ' + token;
+
+        const res = await fetch('/api/v1/database/backup', {
+          headers,
+          cache: 'no-store'
+        });
+
+        if (!res.ok) {
+          const errData = await res.json().catch(() => ({}));
+          return showToast(errData.message || 'Erro ao descarregar base de dados.', 'error');
+        }
+
+        const blob = await res.blob();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.style.display = 'none';
+        a.href = url;
+        const now = new Date().toISOString().slice(0, 10);
+        a.download = `retaillaunch_backup_${now}.sqlite`;
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(url);
+        document.body.removeChild(a);
+        showToast('Download do backup concluído com sucesso!', 'success');
+      } catch (err) {
+        showToast('Erro ao transferir ficheiro: ' + err.message, 'error');
+      }
+    }
+
+    function handleDbFileSelected(e) {
+      const file = e.target.files?.[0];
+      if (!file) return;
+      selectedDbRestoreFile = file;
+      const lbl = document.getElementById('lblSelectedDbFile');
+      if (lbl) lbl.textContent = `Ficheiro: ${file.name} (${(file.size / 1024).toFixed(1)} KB)`;
+      const btn = document.getElementById('btnSubmitDbRestore');
+      if (btn) btn.disabled = false;
+    }
+
+    async function submitDatabaseRestore() {
+      if (!selectedDbRestoreFile) {
+        return showToast('Por favor selecione um ficheiro .sqlite primeiro.', 'warning');
+      }
+      const confirmRestore = confirm(
+        `ATENÇÃO: A base de dados ativa deste servidor será substituída pelo ficheiro "${selectedDbRestoreFile.name}".\n\nUma cópia de segurança automática (.bak) será criada antes da substituição.\n\nDeseja continuar?`
+      );
+      if (!confirmRestore) return;
+
+      const btn = document.getElementById('btnSubmitDbRestore');
+      btn.disabled = true;
+      btn.textContent = 'A aplicar base de dados...';
+
+      try {
+        const token = localStorage.getItem('retaillaunch_token') || sessionStorage.getItem('retaillaunch_token');
+        const headers = { 'Content-Type': 'application/octet-stream' };
+        if (token) headers['Authorization'] = 'Bearer ' + token;
+
+        const res = await fetch('/api/v1/database/restore', {
+          method: 'POST',
+          headers,
+          body: selectedDbRestoreFile,
+          cache: 'no-store'
+        });
+
+        const json = await res.json();
+        if (json.success) {
+          showToast(json.message || 'Base de dados restaurada com sucesso!', 'success');
+          loadDatabaseStats();
+          loadKpis();
+          loadProjects();
+          setTimeout(() => {
+            alert('A base de dados foi sincronizada com sucesso! A página será atualizada.');
+            window.location.reload();
+          }, 1000);
+        } else {
+          showToast(json.message || 'Falha ao restaurar base de dados.', 'error');
+          btn.disabled = false;
+          btn.textContent = '⬆️ Confirmar Restauro / Migração';
+        }
+      } catch (err) {
+        showToast('Erro na comunicação com o servidor: ' + err.message, 'error');
+        btn.disabled = false;
+        btn.textContent = '⬆️ Confirmar Restauro / Migração';
       }
     }
 
@@ -4967,6 +5265,8 @@
     if (navConfigPlayers) navConfigPlayers.addEventListener('click', (e) => { e.preventDefault(); openPlayersCatalog(); });
     const navConfigParams = document.getElementById('nav-config-parameters');
     if (navConfigParams) navConfigParams.addEventListener('click', (e) => { e.preventDefault(); openConfigParametersModal(); });
+    const navConfigDatabase = document.getElementById('nav-config-database');
+    if (navConfigDatabase) navConfigDatabase.addEventListener('click', (e) => { e.preventDefault(); openDbMigrationModal(); });
     const btnOpenParamsFromCatalog = document.getElementById('btnOpenParamsFromCatalog');
     if (btnOpenParamsFromCatalog) btnOpenParamsFromCatalog.addEventListener('click', (e) => { e.preventDefault(); openConfigParametersModal(); });
     if (modalAuth) {
@@ -5013,6 +5313,14 @@
       });
     }
 
+    // Modal Base de Dados & Migração — fechar ao clicar no backdrop
+    const modalDbMigrationEl = document.getElementById('modalDatabaseMigration');
+    if (modalDbMigrationEl) {
+      modalDbMigrationEl.addEventListener('click', (e) => {
+        if (e.target === modalDbMigrationEl) closeDbMigrationModal();
+      });
+    }
+
     // Fechar modais com tecla ESC
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Escape') {
@@ -5020,6 +5328,7 @@
         closeUsersManagement();
         closePlayersCatalog();
         closeConfigParametersModal();
+        closeDbMigrationModal();
         closeGlobalTasksModal();
         if (modalDetalhe) modalDetalhe.classList.remove('active');
         if (modalHubSignage) modalHubSignage.classList.remove('active');

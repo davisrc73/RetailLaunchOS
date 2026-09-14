@@ -14,6 +14,7 @@ const costController = require('./src/controllers/costController');
 const signageController = require('./src/controllers/signageController');
 const authController = require('./src/controllers/authController');
 const configController = require('./src/controllers/configController');
+const databaseController = require('./src/controllers/databaseController');
 const authMiddleware = require('./src/middleware/authMiddleware');
 
 // Helper para responder JSON em servidor HTTP nativo
@@ -590,12 +591,50 @@ const server = http.createServer(async (req, res) => {
     }
   }
 
+  // --- API ROUTES: /api/v1/database (Backup & Migração) ---
+  if (pathname.startsWith('/api/v1/database')) {
+    // 1. GET /api/v1/database/info
+    if (pathname === '/api/v1/database/info' && (method === 'GET' || method === 'HEAD')) {
+      if (!checkAuth(req, res, 'admin', 'multimedia_user')) return;
+      const mockRes = { status: (code) => ({ json: (data) => sendJson(res, code, data) }) };
+      return databaseController.getInfo(req, mockRes);
+    }
+
+    // 2. GET /api/v1/database/backup
+    if (pathname === '/api/v1/database/backup' && method === 'GET') {
+      if (!checkAuth(req, res, 'admin')) return;
+      return databaseController.backup(req, res);
+    }
+
+    // 3. POST /api/v1/database/restore
+    if (pathname === '/api/v1/database/restore' && method === 'POST') {
+      if (!checkAuth(req, res, 'admin')) return;
+      const chunks = [];
+      req.on('data', chunk => chunks.push(chunk));
+      req.on('end', async () => {
+        try {
+          req.bodyBuffer = Buffer.concat(chunks);
+          const mockRes = { status: (code) => ({ json: (data) => sendJson(res, code, data) }) };
+          await databaseController.restore(req, mockRes);
+        } catch (err) {
+          sendJson(res, 500, { success: false, message: 'Erro ao processar restauro: ' + err.message });
+        }
+      });
+      return;
+    }
+  }
+
   // --- STATIC ASSETS ---
   if (pathname.startsWith('/css/') || pathname.startsWith('/public/css/')) {
     const filename = path.basename(pathname);
     const cssPath = path.join(__dirname, 'public/css', filename);
     if (fs.existsSync(cssPath)) {
-      res.writeHead(200, { 'Content-Type': 'text/css; charset=utf-8' });
+      res.writeHead(200, {
+        'Content-Type': 'text/css; charset=utf-8',
+        'Cache-Control': 'no-cache, no-store, must-revalidate, proxy-revalidate',
+        'Pragma': 'no-cache',
+        'Expires': '0'
+      });
       fs.createReadStream(cssPath).pipe(res);
       return;
     }
@@ -605,7 +644,12 @@ const server = http.createServer(async (req, res) => {
     const filename = path.basename(pathname);
     const jsPath = path.join(__dirname, 'public/js', filename);
     if (fs.existsSync(jsPath)) {
-      res.writeHead(200, { 'Content-Type': 'application/javascript; charset=utf-8' });
+      res.writeHead(200, {
+        'Content-Type': 'application/javascript; charset=utf-8',
+        'Cache-Control': 'no-cache, no-store, must-revalidate, proxy-revalidate',
+        'Pragma': 'no-cache',
+        'Expires': '0'
+      });
       fs.createReadStream(jsPath).pipe(res);
       return;
     }
@@ -615,7 +659,12 @@ const server = http.createServer(async (req, res) => {
   if (pathname === '/' || pathname === '/dashboard' || pathname.endsWith('.html')) {
     const htmlPath = path.join(__dirname, 'src/views/pages/dashboard.html');
     if (fs.existsSync(htmlPath)) {
-      res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
+      res.writeHead(200, {
+        'Content-Type': 'text/html; charset=utf-8',
+        'Cache-Control': 'no-cache, no-store, must-revalidate, proxy-revalidate',
+        'Pragma': 'no-cache',
+        'Expires': '0'
+      });
       fs.createReadStream(htmlPath).pipe(res);
       return;
     }

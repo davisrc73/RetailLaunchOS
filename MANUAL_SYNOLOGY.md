@@ -61,7 +61,9 @@ Quando fizeres `git push` no teu Mac, basta aceder ao NAS e executar:
 ```bash
 cd /volume1/docker/retaillaunch
 git pull origin main
-docker compose up -d --build
+# Reconstruir sem cache de camadas para garantir código 100% fresco
+docker compose build --no-cache
+docker compose up -d --force-recreate
 ```
 
 ### Opção 2: Atualização Automática no Synology (Agendador de Tarefas / Task Scheduler)
@@ -86,7 +88,8 @@ REMOTE=$(git rev-parse origin/main)
 if [ $LOCAL != $REMOTE ]; then
     echo "Novas atualizações encontradas. A atualizar..."
     git pull origin main
-    docker compose up -d --build
+    docker compose build --no-cache
+    docker compose up -d --force-recreate
 else
     echo "Sem alterações no GitHub."
 fi
@@ -107,3 +110,50 @@ git add .
 git commit -m "mensagem da alteração"
 git push origin main
 ```
+
+---
+
+## 5. Como Migrar a Base de Dados do Mac para o Synology NAS
+
+Como o ficheiro de base de dados SQLite (`database/*.sqlite*`) está incluído no `.gitignore` por razões de segurança e integridade de produção, o `git push` **nunca envia a base de dados do Mac para o GitHub**.
+
+Para passar os dados que tens no Mac para o Synology NAS, tens duas opções simples:
+
+### Opção A — Pela Interface Web (Recomendada • Zero Linha de Comandos):
+1. No teu Mac, abre o navegador em: `http://localhost:3000`.
+2. No menu lateral, acede a **Configurações ➔ Base de Dados & Migração**.
+3. Clica no botão **"⬇️ Descarregar Base de Dados"**. O navegador descarregará o ficheiro `retaillaunch_backup_AAAA-MM-DD.sqlite`.
+4. Agora abre o RetailLaunchOS no teu NAS: `http://<IP_DO_NAS>:3000`.
+5. No menu lateral do NAS, acede a **Configurações ➔ Base de Dados & Migração**.
+6. Na caixa **"Restaurar / Migrar Dados"**, clica para selecionar o ficheiro `.sqlite` que descarregaste no passo 3.
+7. Clica em **"⬆️ Confirmar Restauro / Migração"**.
+8. O sistema valida a integridade, cria um backup automático e substitui a base de dados do NAS. A página recarrega e o NAS fica exatamente com os mesmos dados do teu Mac!
+
+### Opção B — Por Linha de Comandos (SCP + Docker CP):
+No terminal do teu Mac, podes correr o script auxiliar incluído:
+```bash
+./scripts/sync_db_to_nas.sh
+```
+Ou executar diretamente:
+```bash
+# 1. Consolidar o ficheiro SQLite no Mac
+node -e "require('./src/database/db').checkpointWal();"
+
+# 2. Copiar para o NAS via SCP
+scp database/retaillaunch.sqlite <UTILIZADOR_NAS>@<IP_DO_NAS>:/volume1/docker/retaillaunch/database/retaillaunch.sqlite
+
+# 3. Copiar para dentro do contentor Docker no NAS e reiniciar
+ssh <UTILIZADOR_NAS>@<IP_DO_NAS> "docker cp /volume1/docker/retaillaunch/database/retaillaunch.sqlite retaillaunch-app:/app/database/retaillaunch.sqlite && docker restart retaillaunch-app"
+```
+
+---
+
+## 6. Garantia de Persistência Contínua no NAS (Sem Perda de Dados em Atualizações)
+
+Uma dúvida comum é: *Ao fazer `git pull` e reconstruir o contentor no NAS no futuro, os dados do NAS vão ser apagados ou substituídos?*
+
+**A resposta é NÃO. Os teus dados estão 100% seguros e persistem de forma contínua no NAS:**
+
+1. **Proteção pelo `.gitignore`**: O ficheiro `database/*.sqlite*` está no `.gitignore`. Quando o NAS executa `git pull origin main`, o Git **nunca toca, apaga nem sobrescreve** a base de dados do NAS.
+2. **Volume Docker Persistente (`retaillaunch_data`)**: No ficheiro `docker-compose.yml`, o diretório `/app/database` está mapeado para o volume persistente `retaillaunch_data`. Mesmo que o contentor seja destruído e recriado com `docker compose up -d --force-recreate`, o Docker volta a ligar exatamente o mesmo volume com todos os dados.
+3. **Regra de Ouro**: Apenas **NUNCA** deves correr `docker compose down -v` (com a flag `-v`), pois a flag `-v` remove volumes de dados. A atualização padrão com `docker compose up -d --build --force-recreate` preserva 100% dos dados.
