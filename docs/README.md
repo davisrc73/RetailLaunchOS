@@ -24,6 +24,7 @@ Este diretório armazena todos os registos históricos de planeamento técnico (
 | **12**| **Sincronização Dinâmica do Cartão "Próxima Abertura" & Edição de Lojas** | [FASE_12_PLANO.md](file:///Users/daviscorreia/Antigravity%20/RetailLaunchOS/docs/implementation_plans/FASE_12_PLANO.md) | [FASE_12_WALKTHROUGH.md](file:///Users/daviscorreia/Antigravity%20/RetailLaunchOS/docs/walkthroughs/FASE_12_WALKTHROUGH.md) | ✅ Concluído |
 | **13**| **Diagnóstico Synology NAS vs Localhost, Prevenção de Cache e Migração de Dados com Persistência Contínua** | [FASE_13_PLANO.md](file:///Users/daviscorreia/Antigravity%20/RetailLaunchOS/docs/implementation_plans/FASE_13_PLANO.md) | [FASE_13_WALKTHROUGH.md](file:///Users/daviscorreia/Antigravity%20/RetailLaunchOS/docs/walkthroughs/FASE_13_WALKTHROUGH.md) | ✅ Concluído |
 | **14**| **Feed Dinâmico de Atividade Recente & Identificador Único de Hardware (ID/Serial)** | [FASE_14_PLANO.md](file:///Users/daviscorreia/Antigravity%20/RetailLaunchOS/docs/implementation_plans/FASE_14_PLANO.md) | [FASE_14_WALKTHROUGH.md](file:///Users/daviscorreia/Antigravity%20/RetailLaunchOS/docs/walkthroughs/FASE_14_WALKTHROUGH.md) | ✅ Concluído |
+| **15**| **Sistema de Design Responsivo e Otimização Mobile para Operações On-Site** | [FASE_15_PLANO.md](file:///Users/daviscorreia/Antigravity%20/RetailLaunchOS/docs/implementation_plans/FASE_15_PLANO.md) | [FASE_15_WALKTHROUGH.md](file:///Users/daviscorreia/Antigravity%20/RetailLaunchOS/docs/walkthroughs/FASE_15_WALKTHROUGH.md) | ✅ Concluído |
 
 ---
 

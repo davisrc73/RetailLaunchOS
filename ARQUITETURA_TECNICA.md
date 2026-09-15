@@ -708,6 +708,42 @@ A migração entre o Mac (desenvolvimento) e o Synology NAS (produção) é real
 * **Sanitização de Entrada**: Nos métodos `SignagePlayer.create` e `SignagePlayer.update`, os valores são sanitizados com `.trim()` ou definidos como `null` quando vazios, assegurando consistência nas queries de pesquisa.
 * **Filtragem Indexada no Frontend**: A função `filterPlayersCatalog()` no cliente faz a comparação do termo de pesquisa contra `player_code`, `name`, `hardware_model`, `zone`, `ip_address`, `mac_address` e `serial_number`.
 
+---
+
+## 13. Arquitetura do Sistema de Design Responsivo & Mobile-First (Fase 15)
+
+### 13.1. Matriz Oficial de Breakpoints e Comportamento
+A camada de apresentação foi reestruturada para suportar a diversidade de dispositivos utilizados pelas equipas de retalho e multimédia:
+
+| Breakpoint | Viewport (`width`) | Layout Geral | Navegação | Exibição de Lojas | Modais |
+| :--- | :---: | :--- | :--- | :--- | :--- |
+| **Desktop Largo** | `>= 1024px` | 3 colunas em KPIs, layout amplo | Sidebar fixa de 270px à esquerda | Tabela tradicional com 6 colunas completas | Diálogo centralizado com sombras profundas |
+| **Tablet / Horizontal** | `769px - 1023px` | 1 a 2 colunas nos cartões superiores | Drawer móvel colapsável (`<= 900px`) | Tabela tradicional com scroll horizontal | Diálogo amplo central |
+| **Mobile Standard** | `481px - 768px` | 1 coluna fluida nos KPIs | Botão hambúrguer `☰` + Drawer lateral | **Cartões Táticos Móveis** (`.mobile-project-cards`) | **Bottom Sheet** (`border-radius: 20px 20px 0 0`) |
+| **Mobile Estreito** | `<= 480px` | 1 coluna compacta, countdown fluido | Botão hambúrguer `☰` + Drawer lateral | Cartões móveis com métricas empilhadas | Full-height sheet com scroll vertical seguro |
+
+### 13.2. Gaveta de Navegação Lateral (Off-Canvas Drawer)
+* **Estrutura**: Composta por `.app-sidebar` com transição `transform: translateX(-100%)` para `translateX(0)` e um overlay escurecido `#sidebarBackdrop` com `backdrop-filter: blur(8px)`.
+* **Gatilhos**: Acionado pelo botão `#btnMobileMenuToggle` no header (`.btn-mobile-menu`).
+* **Ciclo de Vida do Drawer**:
+  - Abre ao toque no botão de menu.
+  - Bloqueia a rolagem do corpo da página aplicando a classe `sidebar-locked` no `body`.
+  - Fecha com toque no backdrop, clique em links de navegação interna ou através da tecla `Escape`.
+
+### 13.3. Componente Híbrido de Apresentação: Tabela Desktop vs Cartões Táticos Mobile
+* **Problema Resolvido**: Tabelas tradicionais em smartphones forçam rolagem horizontal com perda de contexto e dificultam a fiscalização de lojas no terreno.
+* **Arquitetura de Apresentação Adaptativa**:
+  - O método JavaScript `renderProjectsTable(projects)` alimenta em simultâneo `#projectsTableBody` (para visualização em desktop) e `#mobileProjectCards` (para visualização em smartphone).
+  - O CSS chaveia automaticamente a visibilidade (`display: none` / `display: flex`) com base no breakpoint de 768px.
+  - Cada cartão móvel integra insígnia, nome, código, data com contagem decrescente, estado de Digital Signage, barra de progresso visual e botão de toque de largura total (`.btn-mobile-manage`).
+
+### 13.4. Padrão de Diálogos: Mobile Bottom-Sheet & Abas Deslizantes
+* **Bottom-Sheet Modal**: Em ecrãs móveis, o contentor `.modal-card` fixa-se à base do ecrã (`align-items: flex-end; width: 100% !important; max-height: 92vh !important;`).
+* **Abas com Rolagem Horizontal Livre**: O contentor `.modal-nav-tabs` utiliza `overflow-x: auto; flex-wrap: nowrap;` com barras de rolagem invisíveis (`scrollbar-width: none`), impedindo quebras inestéticas de abas no modal da loja.
+* **Prevenção de Zoom Indesejado**: Todos os controlos de formulário (`.form-input`, `.form-select`, `.form-textarea`) aplicam `font-size: 16px` no mobile, evitando o comportamento forçado de zoom automático do motor WebKit (iOS Safari).
+* **Safe-Area Insets**: Respeito pelas áreas seguras de notch e barra de gestos através de `env(safe-area-inset-top)` e `env(safe-area-inset-bottom)`.
+
+
 
 
 

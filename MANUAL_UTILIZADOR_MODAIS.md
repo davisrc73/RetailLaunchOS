@@ -48,6 +48,11 @@ Este manual destina-se aos utilizadores e operadores do **Gabinete Multimédia**
     - [16.1. Normalização do Título: "Atividade Recente"](#161-normalização-do-título-atividade-recente)
     - [16.2. Auditoria e Telemetria em Tempo Real de Eventos Operacionais](#162-auditoria-e-telemetria-em-tempo-real-de-eventos-operacionais)
     - [16.3. Identificador Único (ID/Serial) de Equipamentos de Hardware](#163-identificador-único-idserial-de-equipamentos-de-hardware)
+17. [Experiência Móvel & Operações On-Site em Smartphone / Tablet (Fase 15)](#17-experiência-móvel--operações-on-site-em-smartphone--tablet-fase-15)
+    - [17.1. Gaveta de Navegação Lateral (Menu Hambúrguer & Backdrop)](#171-gaveta-de-navegação-lateral-menu-hambúrguer--backdrop)
+    - [17.2. Visualização de Aberturas em Cartões Táticos Móveis](#172-visualização-de-aberturas-em-cartões-táticos-móveis)
+    - [17.3. Modais em Modo Mobile Sheet & Abas Roláveis](#173-modais-em-modo-mobile-sheet--abas-roláveis)
+    - [17.4. Boas Práticas de Operação On-Site no Terreno](#174-boas-práticas-de-operação-on-site-no-terreno)
 
 ---
 
@@ -750,6 +755,44 @@ Para responder aos requisitos de gestão patrimonial, rastreabilidade física e 
    - Se um equipamento não tiver número de série atribuído, o sistema indica com elegância `🏷️ Sem S/N`.
 3. **Pesquisa Instantânea**:
    - O campo de pesquisa do Catálogo Global pesquisa instantaneamente por qualquer fragmento do número de série ou ID.
+
+---
+
+## 17. Experiência Móvel & Operações On-Site em Smartphone / Tablet (Fase 15)
+
+O RetailLaunchOS foi concebido para acompanhar técnicos e gestores do Gabinete Multimédia em trabalho de campo no local das inaugurações (*on-site*). A interface adapta-se automaticamente ao tamanho do ecrã do dispositivo utilizado (smartphone iOS/Android, tablet ou desktop).
+
+### 17.1. Gaveta de Navegação Lateral (Menu Hambúrguer & Backdrop)
+* **Acesso em Ecrãs Reduzidos (`<= 900px`)**:
+  - No canto superior esquerdo do cabeçalho surge o botão de menu **"☰"** (`#btnMobileMenuToggle`).
+  - Ao tocar, a barra lateral desliza suavemente em modo **Drawer** com um fundo escuro enevoado (*backdrop blur*).
+  - O operador pode navegar entre módulos (Lojas, Digital Signage, Playlists, Custos, Utilizadores, Parâmetros e Base de Dados) ou alternar de perfil RBAC no rodapé da gaveta.
+* **Fecho Rápido e Seguro**:
+  - A gaveta fecha-se automaticamente com um toque no fundo escurecido, com um toque no link de destino pretendido ou premindo a tecla `Escape`.
+
+### 17.2. Visualização de Aberturas em Cartões Táticos Móveis
+Em smartphones (`<= 768px`), a tabela clássica de 6 colunas dá automaticamente lugar a **Cartões Táticos de Abertura (`.mobile-project-cards`)**:
+* **Leitura Imediata sem Scroll Horizontal**: Cada loja é apresentada num cartão vertical com margem esquerda colorida correspondente à insígnia (Dourado Fnac / Vermelho Darty).
+* **Dados Rápidos de Fiscalização**:
+  - Nome da loja, insígnia e formato comercial.
+  - Data de go-live prevista com contagem decrescente em dias (`X dias restantes`).
+  - Estado operacional de Digital Signage (Pendente, Configuração, Validação, Pronto).
+  - Barra de progresso percentual calculada em tempo real pelas tarefas concluídas.
+* **Ação Direta de Polegar**: O botão de largura total **"Gerir Loja • Checklist & Telas"** abre diretamente a gaveta da obra com um simples toque.
+* **Filtros e Pesquisa em Mobile**: Os seletores de marca (*Todas*, *Fnac*, *Darty*) dispõem de rolagem horizontal fluida e atualizam instantaneamente os cartões exibidos.
+
+### 17.3. Modais em Modo Mobile Sheet & Abas Roláveis
+Quando um operador abre qualquer formulário ou modal de detalhe em ecrãs móveis:
+* **Formato Bottom-Sheet**: O modal sobe a partir da base do ecrã com cantos superiores arredondados e preenche a altura útil da tela (até 92% da altura visível), facilitando a interação com o polegar.
+* **Cabeçalho Fixo (Sticky)**: O título da obra e o botão de fechar **"✕"** permanecem sempre acessíveis no topo do ecrã durante a rolagem.
+* **Abas com Rolagem Horizontal Livre**: As abas operacionais (*"1. Marcos Técnicos"*, *"2. Custos & Diárias"*, *"3. Telas & Players"*) nunca quebram linhas; deslizam suavemente na horizontal permitindo alternar de contexto com facilidade.
+* **Formulários Otimizados**: Todos os formulários colapsam automaticamente para **coluna única** (`grid-template-columns: 1fr`). Os campos de texto e data possuem tamanho de fonte calibrado a 16px para evitar o efeito indesejado de zoom forçado no Safari iOS.
+
+### 17.4. Boas Práticas de Operação On-Site no Terreno
+1. **Verificação Rápida de Telas**: Na aba *"3. Telas & Players"* da loja, clica em **"📡 Ping"** para testar a conectividade em tempo real de cada BrightSign ou Samsung SSP a partir do smartphone. O resultado atualiza o badge e reflete-se imediatamente no feed de *Atividade Recente*.
+2. **Validação de Tarefas Técnicas**: Na aba *"1. Marcos Técnicos"*, as caixas de seleção (*checkboxes*) possuem área de toque generosa (22x22px), permitindo marcar tarefas concluídas mesmo ao operar com uma só mão ou luvas técnicas leves no local de obra.
+3. **Consulta de S/N**: Para confirmar se um display corresponde ao património alocado à loja, pesquisa ou confirma a badge `🏷️ SN-XXXX` diretamente no cartão de hardware.
+
 
 
 

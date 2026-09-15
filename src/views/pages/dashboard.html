@@ -31,8 +31,8 @@
     href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap"
     rel="stylesheet">
   <!-- Stylesheets -->
-  <link rel="stylesheet" href="../../../public/css/dashboard.css?v=13.0">
-  <link rel="stylesheet" href="/css/dashboard.css?v=13.0">
+  <link rel="stylesheet" href="../../../public/css/dashboard.css?v=15.0">
+  <link rel="stylesheet" href="/css/dashboard.css?v=15.0">
 </head>
 
 <body>
@@ -217,6 +217,9 @@
     </div>
   </aside>
 
+  <!-- Backdrop para Drawer da Sidebar em Dispositivos Móveis -->
+  <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
+
   <!-- =========================================================================
        2. CORPO PRINCIPAL (HEADER + DASHBOARD)
        ========================================================================= -->
@@ -224,6 +227,12 @@
     <!-- Header Superior -->
     <header class="app-header">
       <div class="header-left">
+        <!-- Botão Menu Hambúrguer Móvel (Exibido em ecrãs <= 900px) -->
+        <button type="button" class="btn-mobile-menu" id="btnMobileMenuToggle" aria-label="Abrir Menu de Navegação" title="Navegação">
+          <svg width="22" height="22" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"></path>
+          </svg>
+        </button>
         <h2 class="page-title">Piloto Multimédia • Aberturas de Lojas</h2>
         <div class="system-status-pill">
           <span class="pulse-dot"></span>
@@ -522,7 +531,7 @@
           </div>
         </div>
 
-        <!-- Tabela Responsiva de Projetos -->
+        <!-- Tabela Responsiva de Projetos (Desktop & Tablets Largos) -->
         <div class="responsive-table-wrap">
           <table class="data-table" id="projectsTable">
             <thead>
@@ -539,6 +548,11 @@
               <!-- As linhas são carregadas dinamicamente via JavaScript da base de dados SQLite -->
             </tbody>
           </table>
+        </div>
+
+        <!-- Visualização Adaptativa em Cartões Táticos (Mobile & Operações On-Site) -->
+        <div class="mobile-project-cards" id="mobileProjectCards" aria-label="Lista de Aberturas de Lojas em Cartões Móveis">
+          <!-- Os cartões móveis são renderizados dinamicamente via JavaScript -->
         </div>
       </section>
 
@@ -2928,26 +2942,36 @@
       countdownInterval = setInterval(update, 1000);
     }
 
-    // Renderizar Tabela de Projetos
+    // Renderizar Tabela e Cartões Móveis de Projetos
     function renderProjectsTable(projects) {
       const tbody = document.getElementById('projectsTableBody');
-      if (!tbody) return;
-
-      tbody.innerHTML = '';
+      const mobileContainer = document.getElementById('mobileProjectCards');
+      if (tbody) tbody.innerHTML = '';
+      if (mobileContainer) mobileContainer.innerHTML = '';
 
       if (!projects || projects.length === 0) {
-        tbody.innerHTML = `
-          <tr>
-            <td colspan="6" style="text-align: center; padding: 32px; color: var(--text-dim);">
+        if (tbody) {
+          tbody.innerHTML = `
+            <tr>
+              <td colspan="6" style="text-align: center; padding: 32px; color: var(--text-dim);">
+                Nenhum projeto encontrado com os filtros selecionados.
+              </td>
+            </tr>
+          `;
+        }
+        if (mobileContainer) {
+          mobileContainer.innerHTML = `
+            <div style="text-align: center; padding: 28px 16px; color: var(--text-dim); background: var(--bg-surface); border: 1px dashed var(--border-subtle); border-radius: var(--radius-md); font-size: 13px;">
               Nenhum projeto encontrado com os filtros selecionados.
-            </td>
-          </tr>
-        `;
+            </div>
+          `;
+        }
         return;
       }
 
       projects.forEach(p => {
         const brandClass = p.brand?.toLowerCase().includes('darty') ? 'darty' : 'fnac';
+        const brandLabel = p.brand?.toLowerCase().includes('darty') ? 'DARTY' : 'FNAC';
         const daysLeft = getDaysRemaining(p.go_live_date);
 
         let tagClass = 'tag-relaxed';
@@ -2966,57 +2990,124 @@
           signageLabel = 'Configuração IP';
         }
 
-        const tr = document.createElement('tr');
-        tr.setAttribute('data-brand', p.brand);
-        tr.setAttribute('data-status', p.status);
-        tr.innerHTML = `
-          <td>
-            <div class="store-cell">
-              <div class="store-brand-pill ${brandClass}">${p.brand ? p.brand.toUpperCase() : 'LOJA'}</div>
-              <div>
-                <div class="store-title">${p.name}</div>
-                <div class="store-sub">${p.location || 'Localização a definir'}</div>
+        const progressVal = (p.progress !== undefined && p.progress !== null) ? p.progress : 0;
+
+        // 1. Inserir linha na Tabela Desktop
+        if (tbody) {
+          const tr = document.createElement('tr');
+          tr.setAttribute('data-brand', p.brand);
+          tr.setAttribute('data-status', p.status);
+          tr.innerHTML = `
+            <td>
+              <div class="store-cell">
+                <div class="store-brand-pill ${brandClass}">${p.brand ? p.brand.toUpperCase() : 'LOJA'}</div>
+                <div>
+                  <div class="store-title">${escapeHtml(p.name)}</div>
+                  <div class="store-sub">${escapeHtml(p.location || 'Localização a definir')}</div>
+                </div>
+              </div>
+            </td>
+            <td>
+              <span class="brand-badge ${brandClass}">${escapeHtml(p.store_format || 'Standard')}</span>
+            </td>
+            <td>
+              <div class="date-pill">
+                <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5"></path>
+                </svg>
+                <span>${formatDate(p.go_live_date)}</span>
+                <span class="date-countdown-tag ${tagClass}">${daysLeft} dias</span>
+              </div>
+            </td>
+            <td>
+              <span class="status-badge ${signageBadgeClass}">
+                <span class="pulse-dot" style="width: 5px; height: 5px; background: currentColor; box-shadow: none;"></span>
+                ${signageLabel}
+              </span>
+              <div style="font-size: 11px; color: var(--text-dim); margin-top: 4px;">Playlist ${escapeHtml(p.playlist_version || 'v1.0')}</div>
+            </td>
+            <td>
+              <div class="progress-bar-container">
+                <div class="progress-track">
+                  <div class="progress-fill-bar ${brandClass === 'darty' ? 'progress-fill-red' : 'progress-fill-gold'}" style="width: ${progressVal}%;"></div>
+                </div>
+                <span class="progress-percent-label">${progressVal}%</span>
+              </div>
+            </td>
+            <td>
+              <div class="action-btn-group">
+                <button class="btn-secondary btn-manage" data-id="${p.id}" title="Gerir Abertura">Gerir</button>
+              </div>
+            </td>
+          `;
+          tbody.appendChild(tr);
+        }
+
+        // 2. Inserir Cartão Tático para Mobile (Operações On-Site)
+        if (mobileContainer) {
+          const card = document.createElement('div');
+          card.className = `mobile-project-card ${brandClass}-border`;
+          card.setAttribute('data-brand', p.brand);
+          card.setAttribute('data-status', p.status);
+          card.innerHTML = `
+            <div class="mobile-card-top">
+              <div class="mobile-card-brand-wrap">
+                <span class="brand-badge ${brandClass}">${brandLabel}</span>
+                <span class="mobile-card-format">${escapeHtml(p.store_format || 'Standard')}</span>
+              </div>
+              <span class="mobile-card-code">${escapeHtml(p.code || '')}</span>
+            </div>
+
+            <div class="mobile-card-title">${escapeHtml(p.name)}</div>
+            <div class="mobile-card-sub">${escapeHtml(p.location || 'Localização a definir')}</div>
+
+            <div class="mobile-card-metrics-grid">
+              <div class="mobile-card-metric">
+                <span class="mobile-metric-label">Inauguração (Go-Live)</span>
+                <div class="date-pill" style="margin-top: 4px; padding: 4px 8px; font-size: 11.5px;">
+                  <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5"></path>
+                  </svg>
+                  <span>${formatDate(p.go_live_date)}</span>
+                  <span class="date-countdown-tag ${tagClass}">${daysLeft}d</span>
+                </div>
+              </div>
+              <div class="mobile-card-metric">
+                <span class="mobile-metric-label">Digital Signage</span>
+                <span class="status-badge ${signageBadgeClass}" style="margin-top: 4px; padding: 4px 8px; font-size: 11px;">
+                  <span class="pulse-dot" style="width: 5px; height: 5px; background: currentColor; box-shadow: none;"></span>
+                  ${signageLabel}
+                </span>
               </div>
             </div>
-          </td>
-          <td>
-            <span class="brand-badge ${brandClass}">${p.store_format || 'Standard'}</span>
-          </td>
-          <td>
-            <div class="date-pill">
-              <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5"></path>
-              </svg>
-              <span>${formatDate(p.go_live_date)}</span>
-              <span class="date-countdown-tag ${tagClass}">${daysLeft} dias</span>
-            </div>
-          </td>
-          <td>
-            <span class="status-badge ${signageBadgeClass}">
-              <span class="pulse-dot" style="width: 5px; height: 5px; background: currentColor; box-shadow: none;"></span>
-              ${signageLabel}
-            </span>
-            <div style="font-size: 11px; color: var(--text-dim); margin-top: 4px;">Playlist ${p.playlist_version || 'v1.0'}</div>
-          </td>
-          <td>
-            <div class="progress-bar-container">
-              <div class="progress-track">
-                <div class="progress-fill-bar ${brandClass === 'darty' ? 'progress-fill-red' : 'progress-fill-gold'}" style="width: ${(p.progress !== undefined && p.progress !== null) ? p.progress : 0}%;"></div>
+
+            <div class="mobile-card-progress-wrap">
+              <div class="mobile-progress-header">
+                <span>Progresso Checklist</span>
+                <strong>${progressVal}%</strong>
               </div>
-              <span class="progress-percent-label">${(p.progress !== undefined && p.progress !== null) ? p.progress : 0}%</span>
+              <div class="progress-bar-container">
+                <div class="progress-track">
+                  <div class="progress-fill-bar ${brandClass === 'darty' ? 'progress-fill-red' : 'progress-fill-gold'}" style="width: ${progressVal}%;"></div>
+                </div>
+              </div>
             </div>
-          </td>
-          <td>
-            <div class="action-btn-group">
-              <button class="btn-secondary btn-manage" data-id="${p.id}" title="Gerir Abertura">Gerir</button>
+
+            <div class="mobile-card-actions">
+              <button type="button" class="btn-primary btn-mobile-manage" data-id="${p.id}">
+                <svg width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.5 6h9.75M10.5 6a1.5 1.5 0 11-3 0m3 0a1.5 1.5 0 10-3 0M3.75 6H7.5m3 12h9.75m-9.75 0a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m-3.75 0H7.5m9-6h3.75m-3.75 0a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m-9.75 0h9.75"></path>
+                </svg>
+                <span>Gerir Loja • Checklist & Telas</span>
+              </button>
             </div>
-          </td>
-        `;
-        tbody.appendChild(tr);
+          `;
+          mobileContainer.appendChild(card);
+        }
       });
 
-      // Ligar botões "Gerir"
-      document.querySelectorAll('.btn-manage').forEach(btn => {
+      // Ligar botões "Gerir" em desktop e mobile
+      document.querySelectorAll('.btn-manage, .btn-mobile-manage').forEach(btn => {
         btn.addEventListener('click', () => {
           const id = btn.getAttribute('data-id');
           openProjectDetails(id);
@@ -5445,13 +5536,63 @@
         if (modalHubSignage) modalHubSignage.classList.remove('active');
         const modalNova = document.getElementById('modalNovaAbertura');
         if (modalNova) modalNova.classList.remove('active');
+
+        // Fechar gaveta da sidebar móvel se aberta
+        const sidebarEl = document.getElementById('sidebar');
+        const backdropEl = document.getElementById('sidebarBackdrop');
+        if (sidebarEl && sidebarEl.classList.contains('open')) {
+          sidebarEl.classList.remove('open');
+          if (backdropEl) backdropEl.classList.remove('active');
+          document.body.classList.remove('sidebar-locked');
+        }
       }
     });
 
+    // Navegação Móvel (Sidebar Drawer & Backdrop)
+    function initMobileNavigation() {
+      const btnMenu = document.getElementById('btnMobileMenuToggle');
+      const sidebar = document.getElementById('sidebar');
+      const backdrop = document.getElementById('sidebarBackdrop');
+
+      function toggleMobileSidebar(forceClose = false) {
+        if (!sidebar || !backdrop) return;
+        if (forceClose) {
+          sidebar.classList.remove('open');
+          backdrop.classList.remove('active');
+          document.body.classList.remove('sidebar-locked');
+          return;
+        }
+        const isOpen = sidebar.classList.toggle('open');
+        backdrop.classList.toggle('active', isOpen);
+        document.body.classList.toggle('sidebar-locked', isOpen);
+      }
+
+      if (btnMenu) {
+        btnMenu.addEventListener('click', (e) => {
+          e.stopPropagation();
+          toggleMobileSidebar();
+        });
+      }
+
+      if (backdrop) {
+        backdrop.addEventListener('click', () => toggleMobileSidebar(true));
+      }
+
+      // Fechar ao clicar em qualquer item da sidebar em ecrãs móveis
+      document.querySelectorAll('.sidebar-nav a, .user-widget-actions button').forEach(link => {
+        link.addEventListener('click', () => {
+          if (window.innerWidth <= 900) {
+            toggleMobileSidebar(true);
+          }
+        });
+      });
+    }
+
     // Arranque Inicial
     document.addEventListener('DOMContentLoaded', async () => {
-      // 0. Inicializar Motor Multi-Tema
+      // 0. Inicializar Motor Multi-Tema e Navegação Móvel
       initThemeEngine();
+      initMobileNavigation();
 
       // 1. Inicializar Sessão Auth
       const storedToken = localStorage.getItem('retaillaunch_token');
