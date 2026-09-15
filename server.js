@@ -293,6 +293,55 @@ const server = http.createServer(async (req, res) => {
       return;
     }
 
+    // 10a. POST /api/v1/projects/:id/floor-plan (upload de planta arquitetónica de loja - Fase 17)
+    const floorPlanMatch = pathname.match(/^\/api\/v1\/projects\/([^\/]+)\/floor-plan$/);
+    if (floorPlanMatch && method === 'POST') {
+      if (!checkAuth(req, res, 'admin', 'multimedia_user')) return;
+
+      req.params = { id: floorPlanMatch[1] };
+      let body = '';
+      req.on('data', chunk => { body += chunk.toString(); });
+      req.on('end', async () => {
+        try {
+          req.body = body ? JSON.parse(body) : {};
+          const mockRes = { status: (code) => ({ json: (data) => sendJson(res, code, data) }) };
+          await projectController.uploadFloorPlan(req, mockRes);
+        } catch (err) {
+          sendJson(res, 400, { success: false, message: 'JSON Inválido: ' + err.message });
+        }
+      });
+      return;
+    }
+
+    // 10b. DELETE /api/v1/projects/:id/floor-plan (remover planta de loja - Fase 17)
+    if (floorPlanMatch && method === 'DELETE') {
+      if (!checkAuth(req, res, 'admin', 'multimedia_user')) return;
+
+      req.params = { id: floorPlanMatch[1] };
+      const mockRes = { status: (code) => ({ json: (data) => sendJson(res, code, data) }) };
+      return projectController.deleteFloorPlan(req, mockRes);
+    }
+
+    // 10c. PATCH ou POST /api/v1/projects/:id/floor-plan/positions (gravar coordenadas dos ecrãs na planta - Fase 17)
+    const floorPlanPositionsMatch = pathname.match(/^\/api\/v1\/projects\/([^\/]+)\/floor-plan\/positions$/);
+    if (floorPlanPositionsMatch && (method === 'PATCH' || method === 'POST' || method === 'PUT')) {
+      if (!checkAuth(req, res, 'admin', 'multimedia_user', 'store_manager')) return;
+
+      req.params = { id: floorPlanPositionsMatch[1] };
+      let body = '';
+      req.on('data', chunk => { body += chunk.toString(); });
+      req.on('end', async () => {
+        try {
+          req.body = body ? JSON.parse(body) : {};
+          const mockRes = { status: (code) => ({ json: (data) => sendJson(res, code, data) }) };
+          await projectController.updateFloorPlanPositions(req, mockRes);
+        } catch (err) {
+          sendJson(res, 400, { success: false, message: 'JSON Inválido: ' + err.message });
+        }
+      });
+      return;
+    }
+
     // 11. GET /api/v1/projects/:id
     const singleMatch = pathname.match(/^\/api\/v1\/projects\/([^\/]+)$/);
     if (singleMatch && method === 'GET') {
@@ -649,6 +698,35 @@ const server = http.createServer(async (req, res) => {
   }
 
   // --- STATIC ASSETS ---
+  if (pathname.startsWith('/uploads/') || pathname.startsWith('/public/uploads/')) {
+    const relPath = pathname.replace(/^\/(public\/)?uploads\//, '');
+    const safeFilename = path.normalize(relPath).replace(/^(\.\.[\/\\])+/, '');
+
+    // Procura primeiro em database/uploads (volume persistente Synology NAS), depois em public/uploads
+    let filePath = path.join(__dirname, 'database/uploads', safeFilename);
+    if (!fs.existsSync(filePath)) {
+      filePath = path.join(__dirname, 'public/uploads', safeFilename);
+    }
+
+    if (fs.existsSync(filePath) && fs.statSync(filePath).isFile()) {
+      const ext = path.extname(filePath).toLowerCase();
+      const mimeTypes = {
+        '.png': 'image/png',
+        '.jpg': 'image/jpeg',
+        '.jpeg': 'image/jpeg',
+        '.webp': 'image/webp',
+        '.svg': 'image/svg+xml',
+        '.gif': 'image/gif'
+      };
+      res.writeHead(200, {
+        'Content-Type': mimeTypes[ext] || 'application/octet-stream',
+        'Cache-Control': 'public, max-age=86400'
+      });
+      fs.createReadStream(filePath).pipe(res);
+      return;
+    }
+  }
+
   if (pathname.startsWith('/css/') || pathname.startsWith('/public/css/')) {
     const filename = path.basename(pathname);
     const cssPath = path.join(__dirname, 'public/css', filename);

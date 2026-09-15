@@ -45,11 +45,12 @@ docker compose up -d --build
 ```
 A aplicação ficará acessível na rede local através de: `http://<IP_DO_NAS>:3000`.
 
-### Passo D: Variáveis de Ambiente Opcionais (`docker-compose.yml`)
+### Passo D: Variáveis de Ambiente Opcionais (`docker-compose.yml`) & Volume Persistente
 Podes definir variáveis de ambiente personalizadas no ficheiro `docker-compose.yml` ou num ficheiro `.env` na raiz:
 * `PORT`: Porta HTTP do servidor (predefinição: `3000`).
 * `JWT_SECRET`: Chave secreta de assinatura criptográfica HMAC-SHA256 para os tokens de autenticação RBAC (predefinição: chave padrão de piloto).
 * `DATA_DIR`: Diretório de persistência da base de dados SQLite (predefinição: `/app/database`).
+* **Volume Persistente de Dados & Plantas Arquitetónicas (Fase 17)**: O mapeamento de volume no Docker Compose (`./database:/app/database`) assegura que tanto o ficheiro SQLite `retaillaunch.sqlite` como as plantas de loja carregadas em `/app/database/uploads/floor_plans/` residem fisicamente no storage permanente do Synology NAS (`/volume1/docker/retaillaunch/database/`). Desta forma, qualquer recriação de contentores (`docker compose up -d --build`) preserva a 100% quer as tabelas quer as plantas enviadas pelos operadores.
 * **Zero Dependências Adicionais**: O módulo de autenticação e criptografia utiliza exclusivamente o módulo nativo `node:crypto`, sem requerer instalação de pacotes adicionais no contentor Alpine.
 
 ---

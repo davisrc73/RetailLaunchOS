@@ -3045,6 +3045,10 @@
             <td>
               <div class="action-btn-group">
                 <button class="btn-secondary btn-manage" data-id="${p.id}" title="Gerir Abertura">Gerir</button>
+                <button type="button" class="btn-secondary" onclick="openProjectDetails(${p.id}, 'tabFloorPlan')" title="Planta & Telas Interativa" style="padding: 6px 10px; display: inline-flex; align-items: center; gap: 4px; border-color: rgba(217, 119, 6, 0.4); color: var(--fnac-gold);">
+                  <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"></path></svg>
+                  <span>Planta</span>
+                </button>
               </div>
             </td>
           `;
@@ -3101,12 +3105,16 @@
               </div>
             </div>
 
-            <div class="mobile-card-actions">
-              <button type="button" class="btn-primary btn-mobile-manage" data-id="${p.id}">
+            <div class="mobile-card-actions" style="display: flex; gap: 8px;">
+              <button type="button" class="btn-primary btn-mobile-manage" data-id="${p.id}" style="flex: 1;">
                 <svg width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.5 6h9.75M10.5 6a1.5 1.5 0 11-3 0m3 0a1.5 1.5 0 10-3 0M3.75 6H7.5m3 12h9.75m-9.75 0a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m-3.75 0H7.5m9-6h3.75m-3.75 0a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m-9.75 0h9.75"></path>
                 </svg>
-                <span>Gerir Loja • Checklist & Telas</span>
+                <span>Gerir Loja</span>
+              </button>
+              <button type="button" class="btn-secondary" onclick="openProjectDetails(${p.id}, 'tabFloorPlan')" style="padding: 10px 14px; font-weight: 600; display: inline-flex; align-items: center; gap: 6px; border-color: rgba(217,119,6,0.5); color: var(--fnac-gold);" title="Planta & Telas">
+                <svg width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"></path></svg>
+                <span>Planta</span>
               </button>
             </div>
           `;
@@ -3164,6 +3172,9 @@
                 <div class="store-planning-fill ${brandClass}" style="width: ${pct}%;"></div>
               </div>
               <span class="store-planning-pct">${pct}%</span>
+              <button type="button" class="btn-secondary" onclick="event.stopPropagation(); openProjectDetails(${p.id}, 'tabFloorPlan')" style="padding: 2px 7px; font-size: 11px; margin-left: 6px; border-color: rgba(217, 119, 6, 0.4); color: var(--fnac-gold);" title="Ver Planta de ${escapeHtml(p.name)}">
+                🗺️
+              </button>
             </div>
           </div>
         `;
@@ -3578,7 +3589,8 @@
       if (activePane) activePane.classList.add('active');
     }
 
-    async function openProjectDetails(id) {
+    async function openProjectDetails(id, targetTab) {
+      if (targetTab) currentActiveTab = targetTab;
       currentProjectIdInModal = id;
       try {
         const [resProj, resCosts, resPlayers, resPlaylists] = await Promise.all([
@@ -3604,6 +3616,11 @@
           };
           const players = (jsonPlayers.success && Array.isArray(jsonPlayers.data)) ? jsonPlayers.data : [];
           const playlists = (jsonPlaylists.success && Array.isArray(jsonPlaylists.data)) ? jsonPlaylists.data : [];
+
+          const pinnedPlayers = players.filter(pl => pl.pos_x !== null && pl.pos_x !== undefined && pl.pos_y !== null && pl.pos_y !== undefined);
+          const unpinnedPlayers = players.filter(pl => pl.pos_x === null || pl.pos_x === undefined || pl.pos_y === null || pl.pos_y === undefined);
+          activeFloorPlanPlayers = players;
+          activeFloorPlanProject = p;
 
           if (!_allConfigParams || !_allConfigParams.hardware_models || _allConfigParams.hardware_models.length === 0) {
             await loadConfigParameters();
@@ -3920,6 +3937,12 @@
                 </svg>
                 <span>Telas & Players (${players.length})</span>
               </button>
+              <button type="button" class="modal-tab-btn ${currentActiveTab === 'tabFloorPlan' ? 'active' : ''}" onclick="switchModalTab('tabFloorPlan', this)">
+                <svg width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 6.75V15m6-6v8.25m.503 3.498l4.875-2.437c.381-.19.622-.58.622-1.006V4.82c0-.836-.88-1.38-1.628-1.006l-3.869 1.934a1.12 1.12 0 01-1.006 0L9.503 3.314a1.125 1.125 0 00-1.006 0L3.622 5.751A1.125 1.125 0 003 6.757v12.235c0 .836.88 1.38 1.628 1.006l3.869-1.934c.315-.157.69-.157 1.006 0l4.994 2.497c.317.158.69.158 1.006 0z"></path>
+                </svg>
+                <span>Planta & Telas (${pinnedPlayers.length}/${players.length})</span>
+              </button>
             </div>
 
             <!-- =================================================================
@@ -4232,6 +4255,13 @@
                   ${playersListHtml}
                 </div>
               </div>
+            </div>
+
+            <!-- =================================================================
+                 ABA 4: PLANTA & MAPEAMENTO DE TELAS (FASE 17)
+                 ================================================================= -->
+            <div class="tab-pane ${currentActiveTab === 'tabFloorPlan' ? 'active' : ''}" id="tabFloorPlan">
+              ${renderFloorPlanTabContent(p, players, pinnedPlayers, unpinnedPlayers, isAdmin, canManageSignage)}
             </div>
           `;
 
@@ -4976,6 +5006,617 @@
           await loadKpis();
         } else {
           showToast(json.message || 'Erro ao remover ecrã', 'error');
+        }
+      } catch (err) {
+        showToast('Erro de comunicação: ' + err.message, 'error');
+      }
+    }
+
+    // =========================================================================
+    // FASE 17: MÓDULO DE MAPEAMENTO INTERATIVO DE EQUIPAMENTOS EM PLANTA DE LOJA
+    // =========================================================================
+
+    let currentFloorPlanZoom = 1.0;
+    let placingPlayerState = null;
+    let activeFloorPlanProject = null;
+    let activeFloorPlanPlayers = [];
+
+    function getPlayerStatusColor(status) {
+      switch (status) {
+        case 'online': return '#34D399';
+        case 'syncing': return '#60A5FA';
+        case 'testing': return '#FBBF24';
+        case 'offline': return '#F87171';
+        default: return '#94A3B8';
+      }
+    }
+
+    function renderFloorPlanTabContent(p, players, pinnedPlayers, unpinnedPlayers, isAdmin, canManageSignage) {
+      if (!p.floor_plan_image) {
+        return `
+          <div class="floorplan-empty-zone" id="floorPlanDropzone"
+               ondragover="handleFloorPlanDragOver(event)"
+               ondragleave="handleFloorPlanDragLeave(event)"
+               ondrop="handleFloorPlanDrop(event, ${p.id})">
+            <div class="floorplan-empty-icon">
+              <svg width="34" height="34" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 6.75V15m6-6v8.25m.503 3.498l4.875-2.437c.381-.19.622-.58.622-1.006V4.82c0-.836-.88-1.38-1.628-1.006l-3.869 1.934a1.12 1.12 0 01-1.006 0L9.503 3.314a1.125 1.125 0 00-1.006 0L3.622 5.751A1.125 1.125 0 003 6.757v12.235c0 .836.88 1.38 1.628 1.006l3.869-1.934c.315-.157.69-.157 1.006 0l4.994 2.497c.317.158.69.158 1.006 0z"></path>
+              </svg>
+            </div>
+            <h3 style="font-size: 16px; font-weight: 700; color: var(--text-white); margin-bottom: 6px;">Nenhuma Planta Arquitetónica Carregada</h3>
+            <p style="font-size: 13px; color: var(--text-muted); max-width: 500px; margin-bottom: 22px; line-height: 1.6;">
+              Faz o upload da planta arquitetónica ou layout da loja para mapear e localizar visualmente os equipamentos multimédia e displays (${players.length} equipamentos associados).
+            </p>
+            <input type="file" id="floorPlanFileInput" accept="image/*,.svg" style="display: none;" onchange="handleFloorPlanFileSelect(event, ${p.id})">
+            <div style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap; justify-content: center;">
+              <button type="button" class="btn-primary" onclick="document.getElementById('floorPlanFileInput').click()" style="padding: 10px 22px; font-size: 13px; display: inline-flex; align-items: center; gap: 8px;">
+                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path>
+                </svg>
+                <span>Carregar Planta da Loja</span>
+              </button>
+            </div>
+            <div style="font-size: 11.5px; color: var(--text-dim); margin-top: 18px;">
+              Formatos aceites: PNG, JPG, JPEG, SVG, WebP • Até 15 MB • Persistência contínua Synology NAS
+            </div>
+          </div>
+        `;
+      }
+
+      const unpinnedHtml = unpinnedPlayers.length === 0
+        ? `<div style="padding: 14px; font-size: 12px; color: var(--status-success); text-align: center; background: rgba(57, 214, 106, 0.08); border-radius: 6px; border: 1px solid rgba(57, 214, 106, 0.2);">
+             ✓ Todos os ecrãs (${pinnedPlayers.length}) estão posicionados na planta!
+           </div>`
+        : unpinnedPlayers.map(pl => `
+            <div class="floorplan-hw-item" id="sidebar-unpinned-${pl.id}">
+              <div class="floorplan-hw-item-left">
+                <span class="status-dot-ping" style="background: ${getPlayerStatusColor(pl.status)};"></span>
+                <div style="min-width: 0;">
+                  <div class="floorplan-hw-name" title="${escapeHtml(pl.name)}">${escapeHtml(pl.name)}</div>
+                  <div class="floorplan-hw-sub">
+                    <span>${escapeHtml(pl.zone_location)}</span>
+                    ${pl.serial_number ? `<span class="player-serial-badge" style="font-size: 9.5px;">🏷️ ${escapeHtml(pl.serial_number)}</span>` : ''}
+                  </div>
+                </div>
+              </div>
+              <button type="button" class="btn-pin-place" onclick="startPlacingPlayer(${pl.id}, '${escapeHtml(pl.name).replace(/'/g, "\\'")}')" title="Fixar este equipamento na planta">
+                <span>Fixar</span>
+                <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                </svg>
+              </button>
+            </div>
+          `).join('');
+
+      const pinnedHtml = pinnedPlayers.length === 0
+        ? `<div style="padding: 14px; font-size: 12px; color: var(--text-dim); text-align: center;">
+             Nenhum ecrã posicionado na planta. Clica em "Fixar" num equipamento acima para colocá-lo no mapa!
+           </div>`
+        : pinnedPlayers.map(pl => `
+            <div class="floorplan-hw-item" id="sidebar-pinned-${pl.id}">
+              <div class="floorplan-hw-item-left">
+                <span class="status-dot-ping" style="background: ${getPlayerStatusColor(pl.status)};"></span>
+                <div style="min-width: 0;">
+                  <div class="floorplan-hw-name" title="${escapeHtml(pl.name)}">${escapeHtml(pl.name)}</div>
+                  <div class="floorplan-hw-sub">
+                    <span style="font-family: 'JetBrains Mono', monospace; color: var(--fnac-gold); font-size: 10px;">${pl.pos_x}% • ${pl.pos_y}%</span>
+                    <span>• ${escapeHtml(pl.zone_location)}</span>
+                  </div>
+                </div>
+              </div>
+              <div style="display: flex; align-items: center; gap: 6px;">
+                <button type="button" class="btn-param-action" onclick="focusFloorPlanPin(${pl.id})" title="Destacar na planta" style="padding: 4px 6px;">
+                  <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                  </svg>
+                </button>
+                ${canManageSignage ? `
+                <button type="button" class="btn-pin-unpin" onclick="unpinPlayerFromFloorPlan(${pl.id}, ${p.id})" title="Desafixar da planta">
+                  ✕
+                </button>` : ''}
+              </div>
+            </div>
+          `).join('');
+
+      // Renderizar pins no mapa
+      const pinsHtml = pinnedPlayers.map(pl => {
+        const statusColor = getPlayerStatusColor(pl.status);
+        return `
+          <div class="floorplan-pin status-${pl.status}"
+               id="map-pin-${pl.id}"
+               style="left: ${pl.pos_x}%; top: ${pl.pos_y}%;"
+               data-player-id="${pl.id}"
+               onmousedown="startPinDrag(event, ${pl.id}, ${p.id})"
+               ontouchstart="startPinTouchDrag(event, ${pl.id}, ${p.id})"
+               onclick="togglePinPopover(event, ${pl.id})">
+            <div class="floorplan-pin-marker">
+              <span class="floorplan-pin-radar"></span>
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+              </svg>
+            </div>
+            <span class="floorplan-pin-label">${escapeHtml(pl.serial_number || pl.name)}</span>
+
+            <!-- Popover de Detalhes do Pin -->
+            <div class="floorplan-pin-popover" id="popover-pin-${pl.id}" style="display: none;" onclick="event.stopPropagation()">
+              <div class="popover-header">
+                <span class="popover-title">${escapeHtml(pl.name)}</span>
+                <button type="button" class="modal-close-btn" style="position: static; padding: 2px;" onclick="closeAllPinPopovers(event)">✕</button>
+              </div>
+              <div class="popover-body-item">
+                <span>ID / Serial:</span>
+                <strong>${escapeHtml(pl.serial_number || 'Sem S/N')}</strong>
+              </div>
+              <div class="popover-body-item">
+                <span>Modelo:</span>
+                <strong>${escapeHtml(pl.device_model)}</strong>
+              </div>
+              <div class="popover-body-item">
+                <span>Resolução:</span>
+                <strong>${escapeHtml(pl.resolution)}</strong>
+              </div>
+              <div class="popover-body-item">
+                <span>Zona:</span>
+                <strong>${escapeHtml(pl.zone_location)}</strong>
+              </div>
+              <div class="popover-body-item">
+                <span>Playlist:</span>
+                <strong>${escapeHtml(pl.playlist_name ? (pl.playlist_name + ' (' + pl.playlist_version_code + ')') : 'Nenhuma')}</strong>
+              </div>
+              <div class="popover-body-item">
+                <span>Estado:</span>
+                <strong style="color: ${statusColor}; text-transform: uppercase;">● ${pl.status}</strong>
+              </div>
+              <div class="popover-body-item">
+                <span>Último Ping:</span>
+                <span style="font-size: 10.5px; color: var(--text-dim);">${formatRelativeTime(pl.last_ping) || 'Recente'}</span>
+              </div>
+              <div class="popover-actions">
+                <button type="button" class="btn-ping" onclick="pingPlayerFromMap(${pl.id}, ${p.id})" style="flex: 1; font-size: 11px; height: 26px;">
+                  <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                  </svg>
+                  <span>Testar Ping</span>
+                </button>
+                ${canManageSignage ? `
+                <button type="button" class="btn-secondary" onclick="unpinPlayerFromFloorPlan(${pl.id}, ${p.id})" style="padding: 2px 8px; font-size: 11px; height: 26px; color: var(--darty-red);" title="Desafixar da planta">
+                  Desafixar
+                </button>` : ''}
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      return `
+        <div class="floorplan-workspace">
+          <!-- Coluna Esquerda: O Mapa da Planta -->
+          <div class="floorplan-canvas-wrap" id="floorplanCanvasWrap">
+            
+            <!-- Toolbar Flutuante -->
+            <div class="floorplan-toolbar">
+              <button type="button" class="floorplan-tool-btn" onclick="zoomFloorPlan(0.15)" title="Aumentar Zoom (+)">
+                <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                </svg>
+              </button>
+              <span class="floorplan-zoom-label" id="floorplanZoomLabel">100%</span>
+              <button type="button" class="floorplan-tool-btn" onclick="zoomFloorPlan(-0.15)" title="Diminuir Zoom (-)">
+                <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"></path>
+                </svg>
+              </button>
+              <button type="button" class="floorplan-tool-btn" onclick="resetFloorPlanZoom()" title="Ajustar ao Ecrã (1:1)" style="font-size: 11px; font-weight: 700;">
+                1:1
+              </button>
+              <button type="button" class="floorplan-tool-btn" onclick="toggleFloorPlanFullscreen()" title="Modo Vistoria em Ecrã Inteiro (Fullscreen)">
+                <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"></path>
+                </svg>
+              </button>
+            </div>
+
+            <!-- Banner de Modo de Colocação -->
+            <div class="floorplan-placing-banner" id="floorplanPlacingBanner" style="display: none;">
+              <span>📍 <strong>Modo de Colocação:</strong> Clica na planta no local onde o ecrã está instalado.</span>
+              <button type="button" class="floorplan-btn-cancel-place" onclick="cancelPlacingPlayer()">Cancelar</button>
+            </div>
+
+            <!-- Viewport do Mapa -->
+            <div class="floorplan-viewport" id="floorplanViewport" onclick="onFloorPlanMapClick(event, ${p.id})">
+              <div class="floorplan-map-surface" id="floorplanMapSurface">
+                <img id="floorplanImg" class="floorplan-img" src="${escapeHtml(p.floor_plan_image)}" alt="Planta ${escapeHtml(p.name)}" />
+                <div class="floorplan-pins-layer" id="floorplanPinsLayer">
+                  ${pinsHtml}
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Coluna Direita: Gestão de Equipamentos na Planta -->
+          <div class="floorplan-sidebar">
+            <div class="floorplan-sidebar-header">
+              <div>
+                <div style="font-size: 13.5px; font-weight: 700; color: var(--text-white);">Telas &amp; Equipamentos</div>
+                <div style="font-size: 11px; color: var(--text-muted); margin-top: 1px;">
+                  ${pinnedPlayers.length} de ${players.length} posicionados na planta
+                </div>
+              </div>
+              ${canManageSignage ? `
+              <div style="display: flex; gap: 6px;">
+                <input type="file" id="floorPlanReplaceInput" accept="image/*,.svg" style="display: none;" onchange="handleFloorPlanFileSelect(event, ${p.id})">
+                <button type="button" class="btn-secondary" onclick="document.getElementById('floorPlanReplaceInput').click()" style="padding: 4px 8px; font-size: 11px;" title="Substituir planta atual">
+                  Substituir
+                </button>
+                ${isAdmin ? `
+                <button type="button" class="btn-secondary" onclick="handleDeleteFloorPlan(${p.id})" style="padding: 4px 8px; font-size: 11px; color: var(--darty-red);" title="Remover planta da loja">
+                  Remover
+                </button>` : ''}
+              </div>` : ''}
+            </div>
+
+            <!-- Secção 1: Pendentes de Posicionar -->
+            <div>
+              <div class="floorplan-section-title">
+                <span>Pendentes de Posicionar</span>
+                <span class="badge" style="background: rgba(245, 176, 39, 0.2); color: var(--fnac-gold); font-size: 10px; font-weight: 700;">${unpinnedPlayers.length}</span>
+              </div>
+              <div class="floorplan-list-container">
+                ${unpinnedHtml}
+              </div>
+            </div>
+
+            <!-- Secção 2: Posicionados na Planta -->
+            <div>
+              <div class="floorplan-section-title">
+                <span>Posicionados na Planta</span>
+                <span class="badge" style="background: rgba(57, 214, 106, 0.2); color: var(--status-success); font-size: 10px; font-weight: 700;">${pinnedPlayers.length}</span>
+              </div>
+              <div class="floorplan-list-container">
+                ${pinnedHtml}
+              </div>
+            </div>
+
+            <div style="font-size: 11px; color: var(--text-dim); line-height: 1.4; border-top: 1px solid var(--border-subtle); padding-top: 10px;">
+              💡 <strong>Dica de Operação:</strong> Podes arrastar os pins na planta para ajuste fino de posição. No terreno, toca no pin para inspecionar o ID/Serial e testar o Ping em tempo real.
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function zoomFloorPlan(delta) {
+      currentFloorPlanZoom = Math.min(2.5, Math.max(0.5, currentFloorPlanZoom + delta));
+      applyFloorPlanZoom();
+    }
+
+    function resetFloorPlanZoom() {
+      currentFloorPlanZoom = 1.0;
+      applyFloorPlanZoom();
+    }
+
+    function applyFloorPlanZoom() {
+      const surface = document.getElementById('floorplanMapSurface');
+      const label = document.getElementById('floorplanZoomLabel');
+      if (surface) {
+        surface.style.transform = `scale(${currentFloorPlanZoom})`;
+      }
+      if (label) {
+        label.innerText = Math.round(currentFloorPlanZoom * 100) + '%';
+      }
+    }
+
+    function toggleFloorPlanFullscreen() {
+      const wrap = document.getElementById('floorplanCanvasWrap');
+      if (!wrap) return;
+      wrap.classList.toggle('is-fullscreen');
+    }
+
+    function handleFloorPlanDragOver(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      document.getElementById('floorPlanDropzone')?.classList.add('drag-over');
+    }
+
+    function handleFloorPlanDragLeave(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      document.getElementById('floorPlanDropzone')?.classList.remove('drag-over');
+    }
+
+    function handleFloorPlanDrop(e, projectId) {
+      e.preventDefault();
+      e.stopPropagation();
+      document.getElementById('floorPlanDropzone')?.classList.remove('drag-over');
+      const files = e.dataTransfer?.files;
+      if (files && files.length > 0) {
+        uploadFloorPlanImage(files[0], projectId);
+      }
+    }
+
+    function handleFloorPlanFileSelect(e, projectId) {
+      const files = e.target.files;
+      if (files && files.length > 0) {
+        uploadFloorPlanImage(files[0], projectId);
+      }
+    }
+
+    async function uploadFloorPlanImage(file, projectId) {
+      if (!file) return;
+      if (!file.type.startsWith('image/') && !file.name.endsWith('.svg')) {
+        showToast('Por favor seleciona um ficheiro de imagem válido (PNG, JPG, SVG, WebP).', 'warning');
+        return;
+      }
+      if (file.size > 15 * 1024 * 1024) {
+        showToast('A imagem excede o tamanho máximo de 15 MB.', 'warning');
+        return;
+      }
+
+      showToast('A carregar planta arquitetónica...', 'info');
+
+      const reader = new FileReader();
+      reader.onload = async () => {
+        try {
+          const dataUrl = reader.result;
+          const res = await fetch(`/api/v1/projects/${projectId}/floor-plan`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              image_data: dataUrl,
+              filename: file.name
+            })
+          });
+          const json = await res.json();
+          if (json.success) {
+            showToast('Planta da loja carregada com sucesso!', 'success');
+            await openProjectDetails(projectId, 'tabFloorPlan');
+            await loadProjects();
+            await loadActivityFeed();
+          } else {
+            showToast(json.message || 'Erro ao carregar planta', 'error');
+          }
+        } catch (err) {
+          showToast('Erro de comunicação: ' + err.message, 'error');
+        }
+      };
+      reader.readAsDataURL(file);
+    }
+
+    async function handleDeleteFloorPlan(projectId) {
+      if (!confirm('Desejas desassociar a planta arquitetónica desta loja? Os ecrãs permanecerão associados ao projeto.')) return;
+      try {
+        const res = await fetch(`/api/v1/projects/${projectId}/floor-plan`, { method: 'DELETE' });
+        const json = await res.json();
+        if (json.success) {
+          showToast('Planta desassociada com sucesso!', 'success');
+          await openProjectDetails(projectId, 'tabFloorPlan');
+          await loadProjects();
+          await loadActivityFeed();
+        } else {
+          showToast(json.message || 'Erro ao desassociar planta', 'error');
+        }
+      } catch (err) {
+        showToast('Erro de comunicação: ' + err.message, 'error');
+      }
+    }
+
+    function startPlacingPlayer(playerId, playerName) {
+      placingPlayerState = { id: playerId, name: playerName };
+      const banner = document.getElementById('floorplanPlacingBanner');
+      const viewport = document.getElementById('floorplanViewport');
+      if (banner) {
+        banner.innerHTML = `
+          <span>📍 <strong>Modo de Colocação:</strong> Clica na planta no local onde está instalado <u>${escapeHtml(playerName)}</u>.</span>
+          <button type="button" class="floorplan-btn-cancel-place" onclick="cancelPlacingPlayer()">Cancelar</button>
+        `;
+        banner.style.display = 'flex';
+      }
+      if (viewport) {
+        viewport.classList.add('is-placing-mode');
+      }
+      document.querySelectorAll('.floorplan-hw-item').forEach(el => el.classList.remove('is-selected'));
+      document.getElementById(`sidebar-unpinned-${playerId}`)?.classList.add('is-selected');
+    }
+
+    function cancelPlacingPlayer() {
+      placingPlayerState = null;
+      const banner = document.getElementById('floorplanPlacingBanner');
+      const viewport = document.getElementById('floorplanViewport');
+      if (banner) banner.style.display = 'none';
+      if (viewport) viewport.classList.remove('is-placing-mode');
+      document.querySelectorAll('.floorplan-hw-item').forEach(el => el.classList.remove('is-selected'));
+    }
+
+    async function onFloorPlanMapClick(e, projectId) {
+      if (!placingPlayerState) return;
+      const surface = document.getElementById('floorplanMapSurface');
+      if (!surface) return;
+
+      const rect = surface.getBoundingClientRect();
+      const clickX = e.clientX - rect.left;
+      const clickY = e.clientY - rect.top;
+
+      const posX = Math.max(1, Math.min(99, ((clickX / rect.width) * 100))).toFixed(2);
+      const posY = Math.max(1, Math.min(99, ((clickY / rect.height) * 100))).toFixed(2);
+
+      const playerId = placingPlayerState.id;
+      const playerName = placingPlayerState.name;
+      cancelPlacingPlayer();
+
+      await savePlayerCoordinates(playerId, parseFloat(posX), parseFloat(posY), projectId, playerName);
+    }
+
+    async function savePlayerCoordinates(playerId, posX, posY, projectId, playerName = '') {
+      try {
+        const res = await fetch(`/api/v1/projects/${projectId}/floor-plan/positions`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            positions: [{ id: playerId, pos_x: posX, pos_y: posY }]
+          })
+        });
+        const json = await res.json();
+        if (json.success) {
+          showToast(`Equipamento ${playerName || ''} posicionado na planta!`, 'success');
+          await openProjectDetails(projectId, 'tabFloorPlan');
+        } else {
+          showToast(json.message || 'Erro ao posicionar equipamento', 'error');
+        }
+      } catch (err) {
+        showToast('Erro de comunicação: ' + err.message, 'error');
+      }
+    }
+
+    async function unpinPlayerFromFloorPlan(playerId, projectId) {
+      if (!confirm('Desejas desafixar este equipamento da planta? O hardware continuará registado na loja.')) return;
+      try {
+        const res = await fetch(`/api/v1/projects/${projectId}/floor-plan/positions`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            positions: [{ id: playerId, pos_x: null, pos_y: null }]
+          })
+        });
+        const json = await res.json();
+        if (json.success) {
+          showToast('Equipamento desafixado da planta com sucesso.', 'info');
+          await openProjectDetails(projectId, 'tabFloorPlan');
+        } else {
+          showToast(json.message || 'Erro ao desafixar equipamento', 'error');
+        }
+      } catch (err) {
+        showToast('Erro de comunicação: ' + err.message, 'error');
+      }
+    }
+
+    function startPinDrag(e, playerId, projectId) {
+      if (e.button !== 0) return;
+      e.preventDefault();
+      e.stopPropagation();
+      closeAllPinPopovers();
+
+      const pin = document.getElementById(`map-pin-${playerId}`);
+      const surface = document.getElementById('floorplanMapSurface');
+      if (!pin || !surface) return;
+
+      const rect = surface.getBoundingClientRect();
+      pin.classList.add('is-dragging');
+
+      const onMouseMove = (moveEvent) => {
+        moveEvent.preventDefault();
+        const curX = moveEvent.clientX - rect.left;
+        const curY = moveEvent.clientY - rect.top;
+        const pctX = Math.max(1, Math.min(99, ((curX / rect.width) * 100)));
+        const pctY = Math.max(1, Math.min(99, ((curY / rect.height) * 100)));
+        pin.style.left = `${pctX}%`;
+        pin.style.top = `${pctY}%`;
+      };
+
+      const onMouseUp = async (upEvent) => {
+        document.removeEventListener('mousemove', onMouseMove);
+        document.removeEventListener('mouseup', onMouseUp);
+        pin.classList.remove('is-dragging');
+
+        const curX = upEvent.clientX - rect.left;
+        const curY = upEvent.clientY - rect.top;
+        const finalX = parseFloat(Math.max(1, Math.min(99, ((curX / rect.width) * 100))).toFixed(2));
+        const finalY = parseFloat(Math.max(1, Math.min(99, ((curY / rect.height) * 100))).toFixed(2));
+
+        await savePlayerCoordinates(playerId, finalX, finalY, projectId);
+      };
+
+      document.addEventListener('mousemove', onMouseMove);
+      document.addEventListener('mouseup', onMouseUp);
+    }
+
+    function startPinTouchDrag(e, playerId, projectId) {
+      e.stopPropagation();
+      closeAllPinPopovers();
+
+      const touch = e.touches[0];
+      const pin = document.getElementById(`map-pin-${playerId}`);
+      const surface = document.getElementById('floorplanMapSurface');
+      if (!pin || !surface || !touch) return;
+
+      const rect = surface.getBoundingClientRect();
+      pin.classList.add('is-dragging');
+
+      let lastX = touch.clientX;
+      let lastY = touch.clientY;
+
+      const onTouchMove = (moveEvent) => {
+        if (!moveEvent.touches[0]) return;
+        const curTouch = moveEvent.touches[0];
+        lastX = curTouch.clientX;
+        lastY = curTouch.clientY;
+        const curX = curTouch.clientX - rect.left;
+        const curY = curTouch.clientY - rect.top;
+        const pctX = Math.max(1, Math.min(99, ((curX / rect.width) * 100)));
+        const pctY = Math.max(1, Math.min(99, ((curY / rect.height) * 100)));
+        pin.style.left = `${pctX}%`;
+        pin.style.top = `${pctY}%`;
+      };
+
+      const onTouchEnd = async () => {
+        document.removeEventListener('touchmove', onTouchMove);
+        document.removeEventListener('touchend', onTouchEnd);
+        pin.classList.remove('is-dragging');
+
+        const curX = lastX - rect.left;
+        const curY = lastY - rect.top;
+        const finalX = parseFloat(Math.max(1, Math.min(99, ((curX / rect.width) * 100))).toFixed(2));
+        const finalY = parseFloat(Math.max(1, Math.min(99, ((curY / rect.height) * 100))).toFixed(2));
+
+        await savePlayerCoordinates(playerId, finalX, finalY, projectId);
+      };
+
+      document.addEventListener('touchmove', onTouchMove, { passive: false });
+      document.addEventListener('touchend', onTouchEnd);
+    }
+
+    function togglePinPopover(e, playerId) {
+      e.stopPropagation();
+      const popover = document.getElementById(`popover-pin-${playerId}`);
+      if (!popover) return;
+      const isVisible = popover.style.display === 'block';
+      closeAllPinPopovers();
+      if (!isVisible) {
+        popover.style.display = 'block';
+      }
+    }
+
+    function closeAllPinPopovers(e) {
+      if (e) e.stopPropagation();
+      document.querySelectorAll('.floorplan-pin-popover').forEach(p => p.style.display = 'none');
+    }
+
+    function focusFloorPlanPin(playerId) {
+      closeAllPinPopovers();
+      const pin = document.getElementById(`map-pin-${playerId}`);
+      if (pin) {
+        pin.classList.add('is-highlighted');
+        pin.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'center' });
+        const popover = document.getElementById(`popover-pin-${playerId}`);
+        if (popover) popover.style.display = 'block';
+        setTimeout(() => {
+          pin.classList.remove('is-highlighted');
+        }, 3000);
+      }
+    }
+
+    async function pingPlayerFromMap(playerId, projectId) {
+      try {
+        const res = await fetch(`/api/v1/signage/players/${playerId}/ping`, { method: 'POST' });
+        const json = await res.json();
+        if (json.success) {
+          showToast('Sinal de ping enviado com sucesso ao equipamento!', 'success');
+          await openProjectDetails(projectId, 'tabFloorPlan');
+          focusFloorPlanPin(playerId);
+        } else {
+          showToast(json.message || 'Erro ao enviar ping', 'error');
         }
       } catch (err) {
         showToast('Erro de comunicação: ' + err.message, 'error');

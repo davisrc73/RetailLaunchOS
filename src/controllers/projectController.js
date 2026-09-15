@@ -3,7 +3,10 @@
 // Gabinete Multimédia - Camada de Controlo REST
 // ==============================================================================
 
+const fs = require('fs');
+const path = require('path');
 const Project = require('../models/Project');
+const SignagePlayer = require('../models/SignagePlayer');
 const ActivityLog = require('../models/ActivityLog');
 
 const projectController = {
@@ -152,6 +155,146 @@ const projectController = {
     } catch (error) {
       console.error('[projectController.updateSignage]', error);
       return res.status(400).json({ success: false, message: error.message });
+    }
+  },
+
+  // Upload e associação de planta arquitetónica de loja (Fase 17)
+  uploadFloorPlan: async (req, res) => {
+    try {
+      const { id } = req.params;
+      const { image_data, filename } = req.body || {};
+
+      if (!image_data) {
+        return res.status(400).json({ success: false, message: 'Dados da imagem não fornecidos.' });
+      }
+
+      const project = await Project.findById(id);
+      if (!project) {
+        return res.status(404).json({ success: false, message: 'Projeto de abertura não encontrado.' });
+      }
+
+      // Processar Data URL base64
+      const matches = image_data.match(/^data:([A-Za-z-+\/]+);base64,(.+)$/);
+      let buffer;
+      let ext = '.png';
+
+      if (matches && matches.length === 3) {
+        const mimeType = matches[1];
+        buffer = Buffer.from(matches[2], 'base64');
+        if (mimeType.includes('jpeg') || mimeType.includes('jpg')) ext = '.jpg';
+        else if (mimeType.includes('webp')) ext = '.webp';
+        else if (mimeType.includes('svg')) ext = '.svg';
+        else if (mimeType.includes('gif')) ext = '.gif';
+        else ext = '.png';
+      } else {
+        buffer = Buffer.from(image_data, 'base64');
+      }
+
+      const uploadsDir = path.resolve(__dirname, '../../database/uploads/floor_plans');
+      if (!fs.existsSync(uploadsDir)) {
+        fs.mkdirSync(uploadsDir, { recursive: true });
+      }
+
+      const safeName = `floorplan_proj_${id}_${Date.now()}${ext}`;
+      const targetPath = path.join(uploadsDir, safeName);
+      fs.writeFileSync(targetPath, buffer);
+
+      const publicUrl = `/uploads/floor_plans/${safeName}`;
+
+      // Remover imagem antiga do disco se for personalizada
+      if (project.floor_plan_image && project.floor_plan_image.startsWith('/uploads/floor_plans/floorplan_proj_')) {
+        try {
+          const oldPath = path.join(uploadsDir, path.basename(project.floor_plan_image));
+          if (fs.existsSync(oldPath)) fs.unlinkSync(oldPath);
+        } catch (e) {
+          console.warn('[uploadFloorPlan] Aviso ao limpar imagem antiga:', e.message);
+        }
+      }
+
+      const updated = await Project.update(id, { floor_plan_image: publicUrl });
+
+      ActivityLog.log({
+        action_type: 'project_updated',
+        title: `Planta de Loja Carregada: ${project.name}`,
+        description: `Nova planta arquitetónica associada à loja ${project.name}.`,
+        project_id: project.id,
+        project_name: project.name,
+        user_name: req.user?.name || 'Gabinete Multimédia',
+        icon_type: 'project'
+      });
+
+      return res.status(200).json({
+        success: true,
+        message: 'Planta arquitetónica carregada com sucesso!',
+        data: updated
+      });
+    } catch (error) {
+      console.error('[projectController.uploadFloorPlan]', error);
+      return res.status(500).json({ success: false, message: error.message });
+    }
+  },
+
+  // Remoção de planta arquitetónica de loja (Fase 17)
+  deleteFloorPlan: async (req, res) => {
+    try {
+      const { id } = req.params;
+      const project = await Project.findById(id);
+      if (!project) {
+        return res.status(404).json({ success: false, message: 'Projeto não encontrado.' });
+      }
+
+      if (project.floor_plan_image && project.floor_plan_image.startsWith('/uploads/floor_plans/floorplan_proj_')) {
+        try {
+          const uploadsDir = path.resolve(__dirname, '../../database/uploads/floor_plans');
+          const filePath = path.join(uploadsDir, path.basename(project.floor_plan_image));
+          if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
+        } catch (e) {
+          console.warn('[deleteFloorPlan] Aviso ao remover ficheiro:', e.message);
+        }
+      }
+
+      const updated = await Project.update(id, { floor_plan_image: null });
+
+      ActivityLog.log({
+        action_type: 'project_updated',
+        title: `Planta de Loja Removida: ${project.name}`,
+        description: `A planta da loja ${project.name} foi desassociada.`,
+        project_id: project.id,
+        project_name: project.name,
+        user_name: req.user?.name || 'Gabinete Multimédia',
+        icon_type: 'project'
+      });
+
+      return res.status(200).json({
+        success: true,
+        message: 'Planta de loja desassociada com sucesso!',
+        data: updated
+      });
+    } catch (error) {
+      console.error('[projectController.deleteFloorPlan]', error);
+      return res.status(500).json({ success: false, message: error.message });
+    }
+  },
+
+  // Atualização em lote de coordenadas de ecrãs na planta (Fase 17)
+  updateFloorPlanPositions: async (req, res) => {
+    try {
+      const { id } = req.params;
+      const { positions } = req.body || {};
+
+      if (!Array.isArray(positions)) {
+        return res.status(400).json({ success: false, message: 'O array "positions" é obrigatório.' });
+      }
+
+      await SignagePlayer.updatePositions(positions);
+
+      return res.status(200).json({
+        success: true,
+        message: 'Posições dos ecrãs na planta atualizadas com sucesso!'
+      });
+    } catch (error) {
+      console.error('[projectController.updateFloorPlanPositions]', error);
+      return res.status(500).json({ success: false, message: error.message });
     }
   }
 };

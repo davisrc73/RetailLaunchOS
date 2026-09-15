@@ -91,6 +91,8 @@ class SignagePlayer {
     const zone_location = data.zone_location ? data.zone_location.trim() : 'Entrada Principal';
     const resolution = data.resolution || '4K UHD';
     const serial_number = data.serial_number ? data.serial_number.trim() : null;
+    const pos_x = (data.pos_x !== undefined && data.pos_x !== null && data.pos_x !== '') ? parseFloat(data.pos_x) : null;
+    const pos_y = (data.pos_y !== undefined && data.pos_y !== null && data.pos_y !== '') ? parseFloat(data.pos_y) : null;
     const status = data.status || 'online';
     const playlist_id = (data.playlist_id !== undefined && data.playlist_id !== null && data.playlist_id !== '' && data.playlist_id !== 'none')
       ? parseInt(data.playlist_id, 10)
@@ -100,21 +102,21 @@ class SignagePlayer {
     const sql = `
       INSERT INTO signage_players (
         project_id, name, device_model, zone_location, resolution, serial_number,
-        status, playlist_id, current_firmware, last_ping
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
+        pos_x, pos_y, status, playlist_id, current_firmware, last_ping
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
     `;
 
     const result = db.run(sql, [
       projectId, name, device_model, zone_location, resolution, serial_number,
-      status, playlist_id, current_firmware
+      pos_x, pos_y, status, playlist_id, current_firmware
     ]);
 
     return this.findById(result.lastInsertRowid);
   }
 
-  // Atualiza dados de um player (ex: loja, zona, serial, playlist vinculada, status)
+  // Atualiza dados de um player (ex: loja, zona, serial, playlist vinculada, coordenadas, status)
   static async update(id, data) {
-    const allowed = ['project_id', 'name', 'device_model', 'zone_location', 'resolution', 'serial_number', 'status', 'playlist_id', 'current_firmware'];
+    const allowed = ['project_id', 'name', 'device_model', 'zone_location', 'resolution', 'serial_number', 'pos_x', 'pos_y', 'status', 'playlist_id', 'current_firmware'];
     const updates = [];
     const params = [];
 
@@ -126,6 +128,8 @@ class SignagePlayer {
           val = (val !== null && val !== '' && val !== 'none' && !isNaN(val)) ? parseInt(val, 10) : null;
         } else if (key === 'serial_number') {
           val = (val !== null && val !== undefined) ? val.trim() : null;
+        } else if (key === 'pos_x' || key === 'pos_y') {
+          val = (val !== null && val !== '' && !isNaN(val)) ? Math.min(100, Math.max(0, parseFloat(val))) : null;
         }
         params.push(val);
       }
@@ -138,6 +142,23 @@ class SignagePlayer {
 
     db.run(`UPDATE signage_players SET ${updates.join(', ')} WHERE id = ?`, params);
     return this.findById(id);
+  }
+
+  // Atualiza em lote as posições na planta de vários players
+  static async updatePositions(positions = []) {
+    if (!Array.isArray(positions)) return false;
+    for (const pos of positions) {
+      if (pos && pos.id) {
+        const x = (pos.pos_x !== null && pos.pos_x !== undefined && pos.pos_x !== '' && !isNaN(pos.pos_x))
+          ? Math.min(100, Math.max(0, parseFloat(pos.pos_x)))
+          : null;
+        const y = (pos.pos_y !== null && pos.pos_y !== undefined && pos.pos_y !== '' && !isNaN(pos.pos_y))
+          ? Math.min(100, Math.max(0, parseFloat(pos.pos_y)))
+          : null;
+        db.run('UPDATE signage_players SET pos_x = ?, pos_y = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?', [x, y, pos.id]);
+      }
+    }
+    return true;
   }
 
   // Simula um teste de ping / verificação de conectividade ao dispositivo

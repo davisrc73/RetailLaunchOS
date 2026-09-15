@@ -8,11 +8,12 @@ Este manual destina-se aos utilizadores e operadores do **Gabinete Multimédia**
 ## Índice
 1. [Visão Geral do Dashboard](#1-visão-geral-do-dashboard)
 2. [Modal: Registar Nova Abertura de Loja](#2-modal-registar-nova-abertura-de-loja)
-3. [Modal / Gaveta: Gestão da Loja (Abas: Marcos Técnicos, Custos e Telas)](#3-modal--gaveta-gestão-da-loja-abas-marcos-técnicos-custos-e-telas)
+3. [Modal / Gaveta: Gestão da Loja (Abas: Marcos Técnicos, Custos, Telas e Planta)](#3-modal--gaveta-gestão-da-loja-abas-marcos-técnicos-custos-e-telas)
    - [3.1.1. Edição de Dados Estruturais da Loja (Fase 12)](#311-edição-de-dados-estruturais-da-loja-fase-12)
    - [3.2. Aba 1: Marcos Técnicos & Digital Signage](#32-aba-1-marcos-técnicos--digital-signage)
    - [3.3. Aba 2: Custos, Diárias & Orçamento (Fase 3)](#33-aba-2-custos-diárias--orçamento-fase-3)
    - [3.4. Aba 3: Telas & Players da Loja (Fase 4)](#34-aba-3-telas--players-da-loja-fase-4)
+   - [3.5. Aba 4: Planta & Telas Interativa da Loja (Fase 17)](#35-aba-4-planta--telas-interativa-da-loja-fase-17)
 4. [Modal: Hub Central de Digital Signage & Playlists (Fase 4)](#4-modal-hub-central-de-digital-signage--playlists-fase-4)
    - [4.1. Como Aceder](#41-como-aceder)
    - [4.2. Aba A: Catálogo de Playlists & Versões](#42-aba-a-catálogo-de-playlists--versões)
@@ -53,6 +54,13 @@ Este manual destina-se aos utilizadores e operadores do **Gabinete Multimédia**
     - [17.2. Visualização de Aberturas em Cartões Táticos Móveis](#172-visualização-de-aberturas-em-cartões-táticos-móveis)
     - [17.3. Modais em Modo Mobile Sheet & Abas Roláveis](#173-modais-em-modo-mobile-sheet--abas-roláveis)
     - [17.4. Boas Práticas de Operação On-Site no Terreno](#174-boas-práticas-de-operação-on-site-no-terreno)
+18. [Mapeamento Interativo de Equipamentos em Planta de Loja (Fase 17)](#18-mapeamento-interativo-de-equipamentos-em-planta-de-loja-fase-17)
+    - [18.1. Como Aceder (Atalho Rápido 'Planta' e 4ª Aba da Loja)](#181-como-aceder-atalho-rápido-planta-e-4ª-aba-da-loja)
+    - [18.2. Upload e Substituição de Planta Arquitetónica de Loja](#182-upload-e-substituição-de-planta-arquitetónica-de-loja)
+    - [18.3. Posicionamento de Displays na Planta (Drag & Drop, Clique e Touch)](#183-posicionamento-de-displays-na-planta-drag--drop-clique-e-touch)
+    - [18.4. Visualizador Tático: Zoom, Pan, Pins Coloridos e Radar de Estado](#184-visualizador-tático-zoom-pan-pins-coloridos-e-radar-de-estado)
+    - [18.5. Teste de Conectividade (Ping) e Popovers de Telemetria no Mapa](#185-teste-de-conectividade-ping-e-popovers-de-telemetria-no-mapa)
+    - [18.6. Persistência Atómica no Volume Synology NAS e Responsividade Mobile](#186-persistência-atómica-no-volume-synology-nas-e-responsividade-mobile)
 
 ---
 
@@ -220,6 +228,21 @@ Cada display é apresentado com:
 1. Clica no botão **"+ Associar Novo Ecrã / Player"** no cabeçalho da lista.
 2. Preenche: Nome do ecrã, ID / Serial (N.º Série), Zona na loja, Modelo de hardware, Resolução de saída e Playlist inicial.
 3. Clica em **"Gravar Ecrã"**: O registo é gravado via `POST /api/v1/projects/:id/players`, gera automaticamente um evento na auditoria de *Atividade Recente* e é integrado no cálculo de prontidão de Digital Signage.
+
+---
+
+### 3.5. Aba 4: Planta & Telas Interativa da Loja (Fase 17)
+
+Esta aba constitui o **Mapeamento Arquitetónico Interativo** da loja em obra, concebida especialmente para guiar os técnicos de campo e os gestores do Gabinete Multimédia no chão de loja (*on-site*).
+
+* **Contador Dinâmico no Separador**: O botão da aba indica a taxa de cobertura espacial dos equipamentos: `Planta & Telas (X/Y)`, onde `X` representa os ecrãs já posicionados e `Y` o total de hardware registado na loja.
+* **Carregamento da Planta Arquitetónica**: Permite carregar o layout técnico da loja em formato imagem (PNG, JPEG, WebP, SVG de alta definição).
+* **Posicionamento Relativo (%)**: Os equipamentos são afixados através de coordenadas percentuais relativas (`pos_x%`, `pos_y%`), garantindo exatidão milimétrica tanto num monitor 4K como num smartphone ou tablet.
+* **Pins Interativos com Telemetria**:
+  - Ícone representativo do tipo de hardware (TV/Monitor, Totem Vertical, Video Wall LED, Caixa de Som).
+  - Ponto de pulso cromático (*radar pulse*) correspondente ao estado operacional: 🟢 Online, 🟠 Em Testes, 🔵 Syncing ou 🔴 Offline.
+  - Ao clicar num pin, abre-se um **Popover Tático** com: Nome do equipamento, Modelo, S/N, Zona, Estado, Versão da Playlist e o botão **"📡 Testar Ping"** para validação imediata no local.
+* **Gestão de Pendentes vs Posicionados**: Uma barra lateral na área de trabalho da planta separa os equipamentos já posicionados dos "Pendentes de Posicionar", permitindo fixá-los com 1 clique guiado ou desafixá-los a qualquer momento.
 
 ---
 
@@ -792,6 +815,118 @@ Quando um operador abre qualquer formulário ou modal de detalhe em ecrãs móve
 1. **Verificação Rápida de Telas**: Na aba *"3. Telas & Players"* da loja, clica em **"📡 Ping"** para testar a conectividade em tempo real de cada BrightSign ou Samsung SSP a partir do smartphone. O resultado atualiza o badge e reflete-se imediatamente no feed de *Atividade Recente*.
 2. **Validação de Tarefas Técnicas**: Na aba *"1. Marcos Técnicos"*, as caixas de seleção (*checkboxes*) possuem área de toque generosa (22x22px), permitindo marcar tarefas concluídas mesmo ao operar com uma só mão ou luvas técnicas leves no local de obra.
 3. **Consulta de S/N**: Para confirmar se um display corresponde ao património alocado à loja, pesquisa ou confirma a badge `🏷️ SN-XXXX` diretamente no cartão de hardware.
+
+---
+
+## 18. Mapeamento Interativo de Equipamentos em Planta de Loja (Fase 17)
+
+O módulo de **Planta & Telas Interativa** foi introduzido para responder à necessidade crítica dos técnicos de campo e gestores do Gabinete Multimédia durante as operações de montagem, calibração e vistoria no local (*on-site*). Permite associar a cada projeto de abertura uma planta arquitetónica vetorial ou em imagem e posicionar interativamente os equipamentos audiovisuais (`signage_players`) sobre ela.
+
+---
+
+### 18.1. Como Aceder (Atalho Rápido 'Planta' e 4ª Aba da Loja)
+
+Existem três formas intuitivas e imediatas de aceder à planta de qualquer loja:
+1. **Atalho Direto na Tabela de Aberturas (Desktop)**: Na coluna de ações, junto ao botão *"Gerir"*, clica no botão dourado **"🗺️ Planta"**. O modal de gestão abre-se instantaneamente na 4ª aba (*"Planta & Telas"*).
+2. **Atalho Direto nos Cartões Móveis (Smartphone / Tablet)**: Em cada cartão tático de abertura, clica no botão **"🗺️ Planta"** ao lado de *"Gerir Loja"*.
+3. **Atalho no Cartão de Planeamento de Lojas (KPI Widget)**: Na secção *"Planeamento Lojas"*, clica no pequeno ícone de mapa **"🗺️"** ao lado da percentagem de progresso de qualquer obra.
+4. **Dentro da Gaveta de Detalhe da Loja**: Clica na 4ª aba **"Planta & Telas (X/Y)"** na barra de navegação superior do modal.
+
+---
+
+### 18.2. Upload e Substituição de Planta Arquitetónica de Loja
+
+Cada loja dispõe de um gestor de planta dedicado:
+1. **Se a loja ainda não tiver planta associada**:
+   - É exibida uma zona de upload acolhedora (*empty state*) com área pontilhada e botão **"Carregar Ficheiro de Planta"**.
+   - Formatos suportados: **PNG**, **JPEG**, **WebP** e **SVG** (vetorial de alta definição com zoom infinito).
+   - Tamanho máximo recomendado: até 15 MB.
+2. **Ao carregar o ficheiro**:
+   - A imagem é convertida em Base64 no cliente e transmitida de forma atómica para o endpoint `POST /api/v1/projects/:id/floor-plan`.
+   - O servidor guarda o ficheiro no diretório persistente do Synology NAS (`database/uploads/floor_plans/`) sob um nome sanitizado e único (ex: `floorplan_proj_6_1789510156911.svg`).
+   - É gerado automaticamente um registo de auditoria no feed de **Atividade Recente** (ex: *"Nova Planta Arquitetónica Carregada: Fnac Cascais"*).
+   - O visualizador renderiza imediatamente a planta sem necessidade de recarregar a página.
+3. **Substituição ou Remoção da Planta**:
+   - Na barra de ferramentas superior da planta, clica no botão **"🔄 Trocar Planta"** para selecionar um novo layout ou no botão **"🗑️ Eliminar Planta"** para removê-la (os equipamentos permanecem registados no inventário da loja, mantendo o histórico de património).
+
+---
+
+### 18.3. Posicionamento de Displays na Planta (Drag & Drop, Clique e Touch)
+
+O RetailLaunchOS oferece três métodos ergonómicos para afixar e ajustar a localização de qualquer tela:
+
+#### Método A: Modo de Colocação Guiada (1-Clique / Toque)
+1. Na barra lateral direita, na secção **"Pendentes de Posicionar"**, localiza o equipamento desejado.
+2. Clica no botão **"+ Posicionar na Planta"**.
+3. O cursor transforma-se numa mira tática e surge um banner indicativo: *"Modo de Colocação Ativo: Clica na planta onde se localiza o equipamento"*.
+4. Clica ou toca no local exato do mapa arquitetónico.
+5. O sistema calcula instantaneamente as coordenadas percentuais relativas (`pos_x`, `pos_y`) e grava via `PATCH /api/v1/projects/:id/floor-plan/positions`. O pin surge imediatamente no mapa com uma animação fluida de radar!
+
+#### Método B: Arrastamento Livre em Desktop (Drag-and-Drop)
+1. Clica e segura o botão esquerdo do rato sobre qualquer pin já afixado no mapa.
+2. Arrasta o pin para a nova localização.
+3. Ao soltar, as coordenadas são recalculadas e salvas automaticamente na base de dados SQLite.
+
+#### Método C: Ajuste Tátil em Smartphone / Tablet (Touch Drag)
+1. No smartphone ou tablet, toca e desliza o pin diretamente com o polegar.
+2. O sistema previne a rolagem indesejada da página (`touch-action: none`) enquanto arrastas o pin.
+3. Ao levantar o dedo, a nova coordenada é gravada e o utilizador recebe confirmação tátil/toast de sucesso.
+
+#### Desafixar Equipamento da Planta
+* Se um display mudar de local ou for desativado daquela área, clica no pin para abrir o popover e prime **"✕ Desafixar"** (ou clica no botão com o ícone do caixote na lista lateral). O equipamento regressa à secção *"Pendentes de Posicionar"* com coordenadas limpas (`pos_x = null`, `pos_y = null`).
+
+---
+
+### 18.4. Visualizador Tático: Zoom, Pan, Pins Coloridos e Radar de Estado
+
+A área de visualização (`.floorplan-canvas-wrap`) conta com ferramentas avançadas para inspeção em pisos extensos:
+
+1. **Barra de Ferramentas (Toolbar)**:
+   - **Botão `+` (Zoom In)**: Aumenta o mapa até 300% com interpolação suave.
+   - **Indicador de Escala**: Mostra o fator de ampliação atual (ex: `100%`, `150%`, `200%`).
+   - **Botão `-` (Zoom Out)**: Reduz o mapa até 60% para visão macro panorâmica.
+   - **Botão `↺` (Repor Zoom)**: Restaura a visualização padrão a 100%.
+   - **Botão `⛶` (Ecrã Inteiro)**: Expande a área de trabalho da planta ocupando a totalidade do ecrã do navegador ou tablet.
+2. **Pan e Rolagem Fluida**:
+   - Em níveis elevados de zoom, a barra de visualização ativa rolagem com barras de scroll discretas e estilizadas.
+3. **Anatomia dos Pins no Mapa**:
+   - **Ícone Central**: Ilustra a categoria do hardware (ex: ecrã de parede, totem vertical, videowall, etc.).
+   - **Ponto Pulsante (Status Dot & Radar Wave)**: Onda concêntrica animada que reflete em tempo real a saúde do equipamento:
+     - 🟢 **Verde Pulsante**: *Online* (conectado e a reproduzir sem falhas).
+     - 🟠 **Âmbar**: *Em Testes* (calibração ou montagem).
+     - 🔵 **Azul**: *Syncing* (descarregamento de nova playlist).
+     - 🔴 **Vermelho**: *Offline* (sem resposta na rede).
+   - **Rótulo Flutuante (Label)**: Exibe o nome do ecrã e o seu identificador de património ou número de série (ex: `🏷️ BS-XT1144`).
+
+---
+
+### 18.5. Teste de Conectividade (Ping) e Popovers de Telemetria no Mapa
+
+Ao clicar ou tocar num pin afixado na planta, abre-se um **Popover Tático Flutuante**:
+* **Cabeçalho com Estado Operacional**: Nome do ecrã e badge colorido de prontidão.
+* **Dados de Hardware**:
+  - Modelo de equipamento (ex: *BrightSign XT1144 4K*).
+  - Identificador Único / Serial (`serial_number`).
+  - Zona de loja registada (ex: *Montra Principal*, *Entrada*, *Balcão de Atendimento*).
+  - Resolução de saída (ex: *4K UHD*, *1080p FHD*).
+* **Playlist em Reprodução**: Nome e versão da campanha audiovisual ativa.
+* **Ação de Teste de Ping no Terreno**:
+  - Clica no botão **"📡 Testar Ping"** diretamente no popover.
+  - O sistema envia um pedido em tempo real ao equipamento via API REST.
+  - Se responder, o popover e o pin atualizam o badge para 🟢 *Online* com o timestamp do teste e emitem um rasto de auditoria no feed de atividades!
+* **Ação de Centrar a Partir da Lista**:
+  - Na barra lateral direita, ao clicar em qualquer item da secção *"Ecrãs na Planta"*, a visualização foca automaticamente o pin correspondente, acionando uma animação de destaque e abrindo o respetivo popover.
+
+---
+
+### 18.6. Persistência Atómica no Volume Synology NAS e Responsividade Mobile
+
+* **Coordenadas Relativas Normalizadas**: O armazenamento das posições é efetuado em percentagem de 0.00% a 100.00% com duas casas decimais (`DECIMAL(5, 2)`). Independentemente da resolução do monitor, tamanho da janela ou densidade de píxeis (Retina/Mobile), cada equipamento mantém a sua localização exata sobre os elementos físicos da planta (paredes, pilares, montras).
+* **Persistência Total no Volume Synology (`/app/database`)**:
+  - O caminho de gravação local é `/app/database/uploads/floor_plans/`.
+  - Como o `docker-compose.yml` mapeia o volume do host `/volume1/docker/retaillaunch/database:/app/database`, todos os ficheiros de plantas sobrevivem a paragens, migrações de hardware e recriações de contentores no Synology Container Manager.
+* **Otimização Mobile**: Em smartphones, a barra lateral de equipamentos dobra-se abaixo da planta com abas verticais táteis, garantindo que o técnico dispõe de 100% da largura do ecrã para inspecionar a planta com os dedos.
+
 
 
 

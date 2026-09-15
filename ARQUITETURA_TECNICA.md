@@ -16,7 +16,9 @@ RetailLaunchOS/
 │   └── database.js                  # Caminhos e dialetos (SQLite / PostgreSQL)
 ├── database/                        # Camada de definição e persistência de dados
 │   ├── schema.sql                   # DDL relacional (tabelas, índices e dados semente)
-│   └── retaillaunch.sqlite          # Ficheiro de base de dados SQLite (gerado automaticamente)
+│   ├── retaillaunch.sqlite          # Ficheiro de base de dados SQLite (gerado automaticamente)
+│   └── uploads/                     # Volume persistente de ficheiros multimédia (Fase 17)
+│       └── floor_plans/             # Plantas arquitetónicas de lojas (PNG, JPEG, WebP, SVG)
 ├── public/                          # Ficheiros estáticos públicos
 │   ├── css/
 │   │   └── dashboard.css            # Folha de estilos vanilla com design system Fnac/Darty
@@ -128,6 +130,7 @@ erDiagram
         string status
         string signage_status
         string playlist_version
+        string floor_plan_image
         int created_by FK
     }
 
@@ -177,6 +180,8 @@ erDiagram
         string orientation
         string hardware_model
         string os_version
+        decimal pos_x
+        decimal pos_y
         int current_playlist_id FK
         string status
         timestamp last_ping_at
@@ -361,8 +366,11 @@ A API segue os padrões RESTful com payloads JSON e códigos de resposta HTTP se
 | **GET** | `/api/v1/projects/kpis` | — | Todos | Retorna as métricas agregadas de contagem, signage e infraestrutura multimédia (hardware, resoluções, playlists pendentes, aberturas) |
 | **GET** | `/api/v1/projects/:id` | `:id` (ID ou Código) | Todos | Detalha a loja, marcos técnicos e histórico de custos |
 | **POST** | `/api/v1/projects` | Body JSON com dados da loja | `admin` | Cria uma nova abertura de loja na base de dados |
-| **PUT / PATCH** | `/api/v1/projects/:id` | Body JSON (`name`, `brand`, `store_format`, `location`, `go_live_date`, `status`, `daily_cost`, `total_budget`) | `admin`, `multimedia_user` | Atualiza dados estruturais ou parciais de uma abertura existente |
+| **PUT / PATCH** | `/api/v1/projects/:id` | Body JSON (`name`, `brand`, `store_format`, `location`, `go_live_date`, `status`, `daily_cost`, `total_budget`, `floor_plan_image`) | `admin`, `multimedia_user` | Atualiza dados estruturais ou parciais de uma abertura existente |
 | **PATCH**| `/api/v1/projects/:id/signage` | `{ signage_status, playlist_version }` | `admin`, `multimedia_user` | Atualiza parâmetros de Digital Signage e Playlist |
+| **POST** | `/api/v1/projects/:id/floor-plan` | Body JSON: `{ fileData (base64), fileName }` | `admin`, `multimedia_user` | **(Fase 17)** Faz upload atómico de planta arquitetónica de loja (PNG, JPG, WebP, SVG) para o volume persistente Synology |
+| **DELETE**| `/api/v1/projects/:id/floor-plan` | `:id` (Project ID) | `admin`, `multimedia_user` | **(Fase 17)** Remove a planta arquitetónica associada ao projeto sem apagar os equipamentos |
+| **PATCH**| `/api/v1/projects/:id/floor-plan/positions` | Body JSON: `{ positions: [{ id, pos_x, pos_y }] }` | `admin`, `multimedia_user`, `store_manager` | **(Fase 17)** Atualiza em lote ou individualmente as coordenadas relativas (%) dos ecrãs na planta |
 | **DELETE**| `/api/v1/projects/:id` | `:id` | `admin` | Remove um projeto e dependências em cascata |
 
 ### 4.2. Endpoints de Tarefas e Marcos (`/api/v1/projects/:id/tasks` & `/api/v1/tasks`)
@@ -763,6 +771,43 @@ A camada de apresentação foi reestruturada para suportar a diversidade de disp
 * **Remoção na Base de Dados**: As colunas legadas `ip_address` e `mac_address` foram removidas do esquema oficial em `database/schema.sql`.
 * **Migração Transparente**: O motor SQLite central em `src/database/db.js` executa a rotina `migrateRemoveNetworkFields()` via `ALTER TABLE signage_players DROP COLUMN` caso essas colunas ainda existam em bases de dados existentes.
 * **Consolidação no Identificador Único (`serial_number`)**: A rastreabilidade técnica e contratual de cada tela/player passa a residir exclusivamente no campo `serial_number`, refletido em todos os endpoints REST, modelos, tabelas do catálogo global, detalhe da loja e auditoria em tempo real (`activity_logs`).
+
+---
+
+## 15. Arquitetura de Mapeamento Interativo de Equipamentos em Planta de Loja (Fase 17)
+
+### 15.1. Esquema Relacional e Coordenadas Percentuais Normalizadas
+* **Desafio Técnico**: O parque de displays e totens multimédia de cada abertura de loja deve poder ser consultado e verificado no chão de loja através de mapas arquitetónicos, adaptando-se a qualquer resolução de monitor ou smartphone sem desvios de posição.
+* **Solução com Coordenadas Relativas Normalizadas**:
+  - Tabela `projects`: adicionada a coluna `floor_plan_image VARCHAR(255)` que armazena a URL relativa da imagem da planta (ex: `/uploads/floor_plans/floorplan_proj_6_1789510156911.svg`).
+  - Tabela `signage_players`: adicionadas as colunas `pos_x DECIMAL(5, 2)` e `pos_y DECIMAL(5, 2)`.
+  - Os valores de `pos_x` e `pos_y` são percentagens contínuas normalizadas no intervalo `0.00%` a `100.00%`, representando a distância relativa a partir do canto superior esquerdo da planta arquitetónica.
+  - Vantagem: Quando a imagem da planta é ampliada com zoom, reduzida para mobile ou exibida em monitores 4K de diferentes proporções, a posição física calculada no canvas permanece milimetricamente precisa:
+    $$\text{Left} = \text{pos\_x}\%, \quad \text{Top} = \text{pos\_y}\%$$
+
+### 15.2. Persistência de Ficheiros de Planta e Mapeamento Docker Synology NAS
+* **Diretório Persistente**: Criado em `database/uploads/floor_plans/`.
+* **Mapeamento de Volume Synology**: O contentor Docker define o volume `/volume1/docker/retaillaunch/database:/app/database`. Dado que a pasta `uploads` reside dentro de `database/`, todos os ficheiros de plantas beneficiam automaticamente da persistência no storage do NAS sem necessidade de alterar volumes do Docker Compose.
+* **Migração Idempotente**: A rotina `migrateFloorPlans()` em `src/database/db.js` assegura em tempo de arranque a existência do diretório físico no disco e aplica as alterações DDL via `ALTER TABLE` caso as colunas ainda não estejam presentes.
+
+### 15.3. Pipeline de Upload Atómico Base64 e Streaming Estático
+* **Receção no Servidor**: O endpoint `POST /api/v1/projects/:id/floor-plan` processa o payload JSON `{ fileData, fileName }` onde `fileData` é um Data URL Base64 nativo.
+* **Sanitização e Armazenamento**: O servidor extrai o MIME type e o buffer binário, valida extensões permitidas (`.png`, `.jpg`, `.jpeg`, `.webp`, `.svg`), gera um nome com timestamp único e grava o ficheiro atomicamente via `fs.writeFileSync`.
+* **Auditoria de Ações**: Gera de imediato um evento no modelo `ActivityLog` categorizado como `floor_plan_uploaded`.
+* **Streaming de Ficheiros**: O servidor `server.js` disponibiliza uma rota de ficheiros estáticos para `/uploads/` e `/public/uploads/` com deteção de Content-Type apropriado (`image/svg+xml`, `image/png`, `image/jpeg`, etc.).
+
+### 15.4. Motor de Renderização Interativo (Canvas, Zoom e Drag & Drop)
+* **Workspace Dinâmico (`.floorplan-workspace`)**:
+  - Grelha flexível composta pela área do canvas (`.floorplan-canvas-wrap`) e pela barra lateral tática (`.floorplan-sidebar`).
+* **Sistema de Zoom & Pan**:
+  - A matriz de escala `currentFloorPlanZoom` ajusta a propriedade CSS `transform: scale(zoom)` sobre a imagem e a camada de pins em simultâneo (`transform-origin: 0 0`), mantendo a integridade absoluta dos pontos de ancoragem.
+* **Drag-and-Drop e Touch**:
+  - Eventos de rato (`mousedown`, `mousemove`, `mouseup`) e toque (`touchstart`, `touchmove`, `touchend`) calculam a posição relativa no contentor `getBoundingClientRect()`, convertendo as coordenadas absolutas do ponteiro em percentagens relativas e disparando a persistência via `PATCH /api/v1/projects/:id/floor-plan/positions`.
+
+### 15.5. Telemetria e Popovers Flutuantes com Teste de Conectividade em Tempo Real
+* **Pins Inteligentes**: Cada pin possui um ícone de classe de hardware, halo de radar pulsante de acordo com o status (`online` verde, `testing` âmbar, `syncing` azul, `offline` vermelho) e etiqueta flutuante.
+* **Popover Tático**: Ao interagir com um pin, abre-se um popover estilizado com telemetria do hardware, número de série (`serial_number`), playlist vinculada e um botão de ação rápida para executar o teste de Ping em tempo real, sem necessidade de navegar para outros ecrãs.
+
 
 
 

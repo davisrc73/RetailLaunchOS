@@ -351,12 +351,72 @@ function migrateRemoveNetworkFields() {
   }
 }
 
+// Migração transparente Fase 17: Suporte a plantas arquitetónicas (floor_plan_image) e coordenadas de ecrãs (pos_x, pos_y)
+function migrateFloorPlans() {
+  try {
+    // 1. Garantir que o diretório persistente de uploads de plantas existe no volume
+    const uploadsDir = path.join(dbDir, 'uploads', 'floor_plans');
+    if (!fs.existsSync(uploadsDir)) {
+      fs.mkdirSync(uploadsDir, { recursive: true });
+    }
+
+    // 2. Coluna floor_plan_image em projects
+    const projectsTable = db.prepare("SELECT name FROM sqlite_master WHERE type='table' AND name='projects';").get();
+    if (projectsTable) {
+      const projInfo = db.prepare("PRAGMA table_info(projects);").all();
+      const hasFloorPlan = projInfo.some(c => c.name === 'floor_plan_image');
+      if (!hasFloorPlan) {
+        console.log('🔄 [DB Migration] A adicionar coluna floor_plan_image em projects...');
+        db.exec('ALTER TABLE projects ADD COLUMN floor_plan_image VARCHAR(255);');
+        console.log('✅ [DB Migration] Coluna floor_plan_image adicionada com sucesso!');
+      }
+
+      // Atribuir planta demonstrativa à Fnac Cascais (id: 1) se ainda não tiver planta
+      db.exec(`
+        UPDATE projects 
+        SET floor_plan_image = '/uploads/floor_plans/fnac_cascais_planta.svg' 
+        WHERE id = 1 AND (floor_plan_image IS NULL OR floor_plan_image = '');
+      `);
+    }
+
+    // 3. Colunas pos_x e pos_y em signage_players
+    const signageTable = db.prepare("SELECT name FROM sqlite_master WHERE type='table' AND name='signage_players';").get();
+    if (signageTable) {
+      const signInfo = db.prepare("PRAGMA table_info(signage_players);").all();
+      const hasPosX = signInfo.some(c => c.name === 'pos_x');
+      const hasPosY = signInfo.some(c => c.name === 'pos_y');
+
+      if (!hasPosX) {
+        console.log('🔄 [DB Migration] A adicionar coluna pos_x em signage_players...');
+        db.exec('ALTER TABLE signage_players ADD COLUMN pos_x DECIMAL(5, 2);');
+        console.log('✅ [DB Migration] Coluna pos_x adicionada com sucesso!');
+      }
+      if (!hasPosY) {
+        console.log('🔄 [DB Migration] A adicionar coluna pos_y em signage_players...');
+        db.exec('ALTER TABLE signage_players ADD COLUMN pos_y DECIMAL(5, 2);');
+        console.log('✅ [DB Migration] Coluna pos_y adicionada com sucesso!');
+      }
+
+      // Preencher posições de exemplo nos equipamentos de teste de Cascais caso estejam NULL
+      db.exec(`
+        UPDATE signage_players SET pos_x = 24.50, pos_y = 36.20 WHERE id = 1 AND pos_x IS NULL;
+        UPDATE signage_players SET pos_x = 81.20, pos_y = 29.80 WHERE id = 2 AND pos_x IS NULL;
+        UPDATE signage_players SET pos_x = 54.00, pos_y = 72.40 WHERE id = 4 AND pos_x IS NULL;
+        UPDATE signage_players SET pos_x = 30.00, pos_y = 25.00 WHERE id = 5 AND pos_x IS NULL;
+      `);
+    }
+  } catch (err) {
+    console.error('❌ [DB Migration Error] Erro ao migrar floor_plans:', err.message);
+  }
+}
+
 initSchema();
 migrateSchema();
 migrateSystemParameters();
 migrateSignageSerial();
 migrateActivityLogs();
 migrateRemoveNetworkFields();
+migrateFloorPlans();
 
 
 function checkpointWal() {
@@ -384,6 +444,7 @@ function reloadConnection() {
     migrateSignageSerial();
     migrateActivityLogs();
     migrateRemoveNetworkFields();
+    migrateFloorPlans();
     console.log('✅ [DB] Ligação à base de dados recarregada e esquemas verificados com sucesso!');
     return true;
   } catch (err) {

@@ -4834,3 +4834,542 @@ body.sidebar-locked {
   color: #EF4444;
   border-color: rgba(239, 68, 68, 0.35);
 }
+
+/* ==============================================================================
+   FASE 17: MÓDULO DE MAPEAMENTO INTERATIVO DE EQUIPAMENTOS EM PLANTA DE LOJA
+   ============================================================================== */
+
+.floorplan-workspace {
+  display: grid;
+  grid-template-columns: 1fr 340px;
+  gap: 16px;
+  min-height: 580px;
+  position: relative;
+}
+
+@media (max-width: 980px) {
+  .floorplan-workspace {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* 1. Área do Visualizador / Canvas da Planta */
+.floorplan-canvas-wrap {
+  position: relative;
+  background: #070B14;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  min-height: 520px;
+  box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.4);
+}
+
+.floorplan-canvas-wrap.is-fullscreen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 99999;
+  border-radius: 0;
+  border: none;
+}
+
+/* Barra de Ferramentas Flutuante */
+.floorplan-toolbar {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  z-index: 40;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(15, 23, 42, 0.88);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  padding: 5px 8px;
+  border-radius: 30px;
+  border: 1px solid var(--border-glass);
+  box-shadow: var(--shadow-md);
+}
+
+.floorplan-tool-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-white);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: var(--transition);
+  outline: none;
+}
+
+.floorplan-tool-btn:hover {
+  background: rgba(245, 176, 39, 0.2);
+  border-color: var(--fnac-gold);
+  color: var(--fnac-gold);
+}
+
+.floorplan-zoom-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-muted);
+  padding: 0 6px;
+  min-width: 48px;
+  text-align: center;
+}
+
+/* Banner de Notificação de Colocação */
+.floorplan-placing-banner {
+  position: absolute;
+  top: 14px;
+  left: 14px;
+  z-index: 40;
+  background: linear-gradient(135deg, rgba(245, 176, 39, 0.95), rgba(222, 155, 24, 0.95));
+  color: #000;
+  padding: 8px 14px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 4px 16px rgba(245, 176, 39, 0.4);
+  animation: bannerBounce 0.3s ease;
+}
+
+@keyframes bannerBounce {
+  from { transform: translateY(-10px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+.floorplan-btn-cancel-place {
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(0, 0, 0, 0.3);
+  color: #000;
+  border-radius: 12px;
+  padding: 2px 8px;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.floorplan-btn-cancel-place:hover {
+  background: #000;
+  color: #fff;
+}
+
+/* Viewport / Scroll Pan */
+.floorplan-viewport {
+  flex: 1;
+  overflow: auto;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  cursor: default;
+  touch-action: pan-x pan-y;
+}
+
+.floorplan-viewport.is-placing-mode {
+  cursor: crosshair !important;
+}
+
+.floorplan-map-surface {
+  position: relative;
+  display: inline-block;
+  transform-origin: center center;
+  transition: transform 0.15s ease-out;
+  border-radius: var(--radius-sm);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  user-select: none;
+}
+
+.floorplan-img {
+  display: block;
+  max-width: 100%;
+  max-height: 70vh;
+  object-fit: contain;
+  border-radius: var(--radius-sm);
+  pointer-events: none;
+}
+
+/* Layer de Pins */
+.floorplan-pins-layer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+/* Marcador / Pin de Equipamento */
+.floorplan-pin {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  pointer-events: auto;
+  cursor: grab;
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transition: transform 0.18s cubic-bezier(0.16, 1, 0.3, 1), z-index 0.1s;
+}
+
+.floorplan-pin:hover {
+  transform: translate(-50%, -50%) scale(1.18);
+  z-index: 50;
+}
+
+.floorplan-pin.is-dragging {
+  cursor: grabbing !important;
+  transform: translate(-50%, -50%) scale(1.25);
+  z-index: 100;
+  filter: brightness(1.2);
+}
+
+.floorplan-pin.is-highlighted {
+  z-index: 90;
+  animation: pinPulseHighlight 1.5s infinite;
+}
+
+@keyframes pinPulseHighlight {
+  0% { transform: translate(-50%, -50%) scale(1); }
+  50% { transform: translate(-50%, -50%) scale(1.3); }
+  100% { transform: translate(-50%, -50%) scale(1); }
+}
+
+.floorplan-pin-marker {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  border: 2px solid #fff;
+  transition: var(--transition);
+}
+
+.floorplan-pin-marker svg {
+  width: 16px;
+  height: 16px;
+  color: #fff;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.8));
+}
+
+/* Anel de Pulso / Radar de Conexão */
+.floorplan-pin-radar {
+  position: absolute;
+  top: -4px;
+  left: -4px;
+  right: -4px;
+  bottom: -4px;
+  border-radius: 50%;
+  pointer-events: none;
+  animation: pinRadarWave 2.2s infinite cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+@keyframes pinRadarWave {
+  0% { transform: scale(1); opacity: 0.8; }
+  70% { transform: scale(1.8); opacity: 0; }
+  100% { transform: scale(1.8); opacity: 0; }
+}
+
+/* Cores por Estado Operacional */
+.floorplan-pin.status-online .floorplan-pin-marker {
+  background: #059669;
+  border-color: #34D399;
+  box-shadow: 0 0 14px rgba(52, 211, 153, 0.6);
+}
+.floorplan-pin.status-online .floorplan-pin-radar {
+  border: 2px solid #34D399;
+}
+
+.floorplan-pin.status-syncing .floorplan-pin-marker {
+  background: #2563EB;
+  border-color: #60A5FA;
+  box-shadow: 0 0 14px rgba(96, 165, 250, 0.6);
+}
+.floorplan-pin.status-syncing .floorplan-pin-radar {
+  border: 2px solid #60A5FA;
+}
+
+.floorplan-pin.status-testing .floorplan-pin-marker {
+  background: #D97706;
+  border-color: #FBBF24;
+  box-shadow: 0 0 14px rgba(251, 191, 36, 0.6);
+}
+.floorplan-pin.status-testing .floorplan-pin-radar {
+  border: 2px solid #FBBF24;
+}
+
+.floorplan-pin.status-offline .floorplan-pin-marker {
+  background: #DC2626;
+  border-color: #F87171;
+  box-shadow: 0 0 14px rgba(248, 113, 113, 0.6);
+}
+.floorplan-pin.status-offline .floorplan-pin-radar {
+  border: 2px solid #F87171;
+}
+
+/* Etiqueta / Rótulo do Pin */
+.floorplan-pin-label {
+  margin-top: 4px;
+  background: rgba(15, 23, 42, 0.92);
+  color: #fff;
+  border: 1px solid var(--border-glass);
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 10px;
+  white-space: nowrap;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.5);
+  pointer-events: none;
+}
+
+/* Popover Flutuante de Inspeção Rápida */
+.floorplan-pin-popover {
+  position: absolute;
+  bottom: calc(100% + 12px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(15, 23, 42, 0.96);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid var(--border-glass);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-modal);
+  padding: 14px 16px;
+  min-width: 250px;
+  max-width: 320px;
+  z-index: 100;
+  pointer-events: auto;
+  text-align: left;
+  cursor: default;
+  animation: popoverFadeIn 0.2s ease-out;
+}
+
+.floorplan-pin-popover::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border-width: 6px;
+  border-style: solid;
+  border-color: rgba(15, 23, 42, 0.96) transparent transparent transparent;
+}
+
+@keyframes popoverFadeIn {
+  from { opacity: 0; transform: translate(-50%, 6px); }
+  to { opacity: 1; transform: translate(-50%, 0); }
+}
+
+.popover-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  border-bottom: 1px solid var(--border-subtle);
+  padding-bottom: 6px;
+}
+
+.popover-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-white);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.popover-body-item {
+  font-size: 11.5px;
+  color: var(--text-muted);
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 5px;
+}
+
+.popover-body-item strong {
+  color: var(--text-white);
+  font-weight: 600;
+}
+
+.popover-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 10px;
+  border-top: 1px solid var(--border-subtle);
+  padding-top: 8px;
+}
+
+/* 2. Área Lateral de Gestão de Equipamentos na Planta */
+.floorplan-sidebar {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.floorplan-sidebar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--border-subtle);
+  padding-bottom: 10px;
+}
+
+.floorplan-section-title {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-dim);
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.floorplan-list-container {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: 280px;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+.floorplan-hw-item {
+  background: var(--bg-base);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  padding: 10px 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  transition: var(--transition);
+}
+
+.floorplan-hw-item:hover {
+  background: var(--bg-surface-elevated);
+  border-color: var(--border-glass);
+}
+
+.floorplan-hw-item.is-selected {
+  border-color: var(--fnac-gold);
+  background: rgba(245, 176, 39, 0.08);
+}
+
+.floorplan-hw-item-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.floorplan-hw-name {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--text-white);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.floorplan-hw-sub {
+  font-size: 11px;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 2px;
+}
+
+.btn-pin-place {
+  padding: 4px 10px;
+  font-size: 11.5px;
+  font-weight: 600;
+  border-radius: 14px;
+  border: 1px solid var(--fnac-gold);
+  background: rgba(245, 176, 39, 0.15);
+  color: var(--fnac-gold);
+  cursor: pointer;
+  transition: var(--transition);
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.btn-pin-place:hover {
+  background: var(--fnac-gold);
+  color: #000;
+}
+
+.btn-pin-unpin {
+  padding: 4px 8px;
+  font-size: 11.5px;
+  border-radius: 6px;
+  border: 1px solid var(--border-subtle);
+  background: transparent;
+  color: var(--text-dim);
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.btn-pin-unpin:hover {
+  color: var(--darty-red);
+  border-color: rgba(239, 68, 68, 0.4);
+  background: rgba(239, 68, 68, 0.1);
+}
+
+/* 3. Empty State (Sem Planta) */
+.floorplan-empty-zone {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 24px;
+  border: 2px dashed var(--border-glass);
+  border-radius: var(--radius-md);
+  background: rgba(15, 23, 42, 0.4);
+  text-align: center;
+  transition: var(--transition);
+  min-height: 400px;
+  margin: 10px 0;
+}
+
+.floorplan-empty-zone.drag-over {
+  border-color: var(--fnac-gold);
+  background: rgba(245, 176, 39, 0.05);
+}
+
+.floorplan-empty-icon {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: rgba(245, 176, 39, 0.12);
+  border: 1px solid rgba(245, 176, 39, 0.3);
+  color: var(--fnac-gold);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 16px;
+}

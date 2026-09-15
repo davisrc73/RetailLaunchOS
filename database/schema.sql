@@ -41,6 +41,7 @@ CREATE TABLE IF NOT EXISTS projects (
     status VARCHAR(50) DEFAULT 'planeamento',   -- planeamento, em_curso, testes_signage, concluido, atrasado
     signage_status VARCHAR(50) DEFAULT 'pendente', -- pendente, configuracao, validacao, pronto
     playlist_version VARCHAR(50) DEFAULT 'v1.0.0-rc',
+    floor_plan_image VARCHAR(255),              -- URL ou caminho relativo da planta arquitetónica
     created_by INTEGER,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -157,6 +158,8 @@ CREATE TABLE IF NOT EXISTS signage_players (
     zone_location VARCHAR(100) NOT NULL,        -- 'Entrada Principal', 'Montra', 'Linha de Caixas', 'Auditório Fnac'
     resolution VARCHAR(50) DEFAULT '4K UHD',
     serial_number VARCHAR(100),                 -- N.º de Série ou Identificador Único de Ativo
+    pos_x DECIMAL(5, 2),                        -- Coordenada X na planta da loja (0.00% a 100.00%)
+    pos_y DECIMAL(5, 2),                        -- Coordenada Y na planta da loja (0.00% a 100.00%)
     status VARCHAR(30) DEFAULT 'online',        -- 'online', 'offline', 'testing', 'syncing'
     playlist_id INTEGER,
     current_firmware VARCHAR(50) DEFAULT 'v9.0.145',
@@ -181,14 +184,14 @@ INSERT OR IGNORE INTO playlists (id, code, name, brand, version, resolution, dur
 (3, 'PL-FNAC-INSTITUCIONAL', 'Fnac Brand Universe & Bilheteira', 'Fnac', 'v3.0-standard', '3840x2160 (4K)', 300, 'em_validacao', 1850.00, 24, 'Pacote de conteúdos universais para auditórios e áreas culturais.', 1),
 (4, 'PL-DARTY-SERVICE', 'Darty Contratos de Assistência & Entrega', 'Darty', 'v1.0-draft', '1920x1080 (FHD)', 120, 'draft', 450.00, 8, 'Em validação com o departamento de serviços e pós-venda.', 2);
 
--- Sementes Fase 4 & 14: Players e Telas Instaladas (com Serial Number)
-INSERT OR IGNORE INTO signage_players (id, project_id, name, device_model, zone_location, resolution, serial_number, status, playlist_id, current_firmware, last_ping) VALUES
-(1, 1, 'Video Wall Entrada 4x4 (LED Wall)', 'BrightSign XT1144 4K', 'Entrada Principal', '3840x2160 (4K)', 'SN-BS4K-2026-001', 'online', 1, 'v9.0.145', CURRENT_TIMESTAMP),
-(2, 1, 'Display Duplo Montra Shopping', 'Samsung SSP (Tizen 6.5)', 'Montra Lateral', '1920x1080 (FHD)', 'SN-SMG-TIZ-881', 'online', 1, 'v6.5.210', CURRENT_TIMESTAMP),
-(3, 1, 'Totem Interativo Bilheteira & Cultura', 'BrightSign HD224', 'Fórum Cultural', '1920x1080 (FHD)', 'SN-BSHD-2026-042', 'syncing', 3, 'v9.0.145', CURRENT_TIMESTAMP),
-(4, 1, 'Telas Menu Linha de Caixas (3 Displays)', 'Samsung SSP (Tizen 6.5)', 'Linha de Caixas', '1920x1080 (FHD)', 'SN-SMG-TIZ-902', 'testing', 1, 'v6.5.210', CURRENT_TIMESTAMP),
-(5, 2, 'Painel LED Montra Exterior', 'BrightSign XT1144 4K', 'Fachada Principal', 'Video Wall LED', 'SN-BS4K-2026-015', 'online', 2, 'v9.0.145', CURRENT_TIMESTAMP),
-(6, 2, 'Display Balcão Apoio ao Cliente', 'LG webOS Signage 6.0', 'Balcão de Serviços', '1920x1080 (FHD)', 'SN-LGW-2026-104', 'offline', 2, 'v6.0.102', CURRENT_TIMESTAMP);
+-- Sementes Fase 4, 14 & 17: Players e Telas Instaladas (com Serial Number e Coordenadas de Planta)
+INSERT OR IGNORE INTO signage_players (id, project_id, name, device_model, zone_location, resolution, serial_number, pos_x, pos_y, status, playlist_id, current_firmware, last_ping) VALUES
+(1, 1, 'Video Wall Entrada 4x4 (LED Wall)', 'BrightSign XT1144 4K', 'Entrada Principal', '3840x2160 (4K)', 'SN-BS4K-2026-001', 24.50, 36.20, 'online', 1, 'v9.0.145', CURRENT_TIMESTAMP),
+(2, 1, 'Display Duplo Montra Shopping', 'Samsung SSP (Tizen 6.5)', 'Montra Lateral', '1920x1080 (FHD)', 'SN-SMG-TIZ-881', 81.20, 29.80, 'online', 1, 'v6.5.210', CURRENT_TIMESTAMP),
+(3, 1, 'Totem Interativo Bilheteira & Cultura', 'BrightSign HD224', 'Fórum Cultural', '1920x1080 (FHD)', 'SN-BSHD-2026-042', NULL, NULL, 'syncing', 3, 'v9.0.145', CURRENT_TIMESTAMP),
+(4, 1, 'Telas Menu Linha de Caixas (3 Displays)', 'Samsung SSP (Tizen 6.5)', 'Linha de Caixas', '1920x1080 (FHD)', 'SN-SMG-TIZ-902', 54.00, 72.40, 'testing', 1, 'v6.5.210', CURRENT_TIMESTAMP),
+(5, 2, 'Painel LED Montra Exterior', 'BrightSign XT1144 4K', 'Fachada Principal', 'Video Wall LED', 'SN-BS4K-2026-015', 30.00, 25.00, 'online', 2, 'v9.0.145', CURRENT_TIMESTAMP),
+(6, 2, 'Display Balcão Apoio ao Cliente', 'LG webOS Signage 6.0', 'Balcão de Serviços', '1920x1080 (FHD)', 'SN-LGW-2026-104', NULL, NULL, 'offline', 2, 'v6.0.102', CURRENT_TIMESTAMP);
 
 -- ==============================================================================
 -- FASE 14: FEED DINÂMICO DE ATIVIDADE RECENTE & AUDITORIA OPERACIONAL

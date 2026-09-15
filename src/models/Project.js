@@ -179,7 +179,7 @@ class Project {
     const fields = [];
     const values = [];
 
-    const allowed = ['name', 'brand', 'store_format', 'location', 'go_live_date', 'target_completion_date', 'daily_cost', 'total_budget', 'status', 'signage_status', 'playlist_version'];
+    const allowed = ['name', 'brand', 'store_format', 'location', 'go_live_date', 'target_completion_date', 'daily_cost', 'total_budget', 'status', 'signage_status', 'playlist_version', 'floor_plan_image'];
 
     for (const key of allowed) {
       if (data[key] !== undefined) {

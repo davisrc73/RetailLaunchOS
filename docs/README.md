@@ -26,6 +26,7 @@ Este diretório armazena todos os registos históricos de planeamento técnico (
 | **14**| **Feed Dinâmico de Atividade Recente & Identificador Único de Hardware (ID/Serial)** | [FASE_14_PLANO.md](file:///Users/daviscorreia/Antigravity%20/RetailLaunchOS/docs/implementation_plans/FASE_14_PLANO.md) | [FASE_14_WALKTHROUGH.md](file:///Users/daviscorreia/Antigravity%20/RetailLaunchOS/docs/walkthroughs/FASE_14_WALKTHROUGH.md) | ✅ Concluído |
 | **15**| **Sistema de Design Responsivo e Otimização Mobile para Operações On-Site** | [FASE_15_PLANO.md](file:///Users/daviscorreia/Antigravity%20/RetailLaunchOS/docs/implementation_plans/FASE_15_PLANO.md) | [FASE_15_WALKTHROUGH.md](file:///Users/daviscorreia/Antigravity%20/RetailLaunchOS/docs/walkthroughs/FASE_15_WALKTHROUGH.md) | ✅ Concluído |
 | **16**| **Otimização do Catálogo de Hardware, Vistas Dedicadas & Remoção de IP/MAC** | [FASE_16_PLANO.md](file:///Users/daviscorreia/Antigravity%20/RetailLaunchOS/docs/implementation_plans/FASE_16_PLANO.md) | [FASE_16_WALKTHROUGH.md](file:///Users/daviscorreia/Antigravity%20/RetailLaunchOS/docs/walkthroughs/FASE_16_WALKTHROUGH.md) | ✅ Concluído |
+| **17**| **Mapeamento Interativo de Equipamentos em Planta de Loja (Floor Plan Pinning On-Site)** | [FASE_17_PLANO.md](file:///Users/daviscorreia/Antigravity%20/RetailLaunchOS/docs/implementation_plans/FASE_17_PLANO.md) | [FASE_17_WALKTHROUGH.md](file:///Users/daviscorreia/Antigravity%20/RetailLaunchOS/docs/walkthroughs/FASE_17_WALKTHROUGH.md) | ✅ Concluído |
 
 ---
 
