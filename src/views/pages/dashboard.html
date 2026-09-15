@@ -1896,15 +1896,6 @@
       cancelCatalogPlayerForm();
     }
 
-    const modalPlayersCatalogEl = document.getElementById('modalPlayersCatalog');
-    if (modalPlayersCatalogEl) {
-      modalPlayersCatalogEl.addEventListener('click', (e) => {
-        if (e.target === modalPlayersCatalogEl) {
-          closePlayersCatalog();
-        }
-      });
-    }
-
     async function loadPlayersCatalogData() {
       const tbody = document.getElementById('playersCatalogTableBody');
       const countLabel = document.getElementById('playersCatalogCountLabel');
