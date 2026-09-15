@@ -708,19 +708,29 @@
   </div>
 
   <!-- =========================================================================
-       MODAL: DETALHE DE PROJETO / MARCOS TÉCNICOS & DIGITAL SIGNAGE
+       PAINEL LATERAL DESLIZANTE (DRAWER): DETALHE DE PROJETO & PLANTA (FASE 18)
        ========================================================================= -->
-  <div class="modal-backdrop" id="modalDetalheProjeto">
-    <div class="modal-card modal-large">
+  <div class="modal-backdrop drawer-backdrop" id="modalDetalheProjeto">
+    <div class="modal-card modal-large drawer-card" id="modalDetalheProjetoCard">
       <div class="modal-header">
         <div class="modal-title" id="modalDetalheTitle">
           <span>Gestão da Abertura & Checklist Multimédia</span>
         </div>
-        <button class="modal-close-btn" id="btnCloseDetalheModal" aria-label="Fechar">
-          <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-          </svg>
-        </button>
+        <div class="drawer-header-actions">
+          <button type="button" class="btn-drawer-expand" id="btnToggleExpandDetalhe" onclick="toggleDrawerExpand('modalDetalheProjetoCard', 'btnToggleExpandDetalhe')" title="Expandir / Maximizar Painel">
+            <svg class="icon-expand" width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"></path>
+            </svg>
+            <svg class="icon-collapse" width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="display: none;">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 9L4 4m0 5h5V4m6 5l5-5m0 5h-5V4m-6 11l-5 5m5 0H4v-5m11 5l5-5m-5 5h5v-5"></path>
+            </svg>
+          </button>
+          <button class="modal-close-btn" id="btnCloseDetalheModal" aria-label="Fechar">
+            <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+            </svg>
+          </button>
+        </div>
       </div>
       <div class="modal-body" id="modalDetalheBody">
         <!-- Preenchido dinamicamente via JS -->
@@ -884,10 +894,10 @@
   </div>
 
   <!-- =========================================================================
-       MODAL: CATÁLOGO GLOBAL DE TELAS & PLAYERS (CONFIGURAÇÕES FASE 8 & 16)
+       PAINEL LATERAL DESLIZANTE (DRAWER): CATÁLOGO GLOBAL DE TELAS & PLAYERS (FASE 18)
        ========================================================================= -->
-  <div class="modal-backdrop" id="modalPlayersCatalog">
-    <div class="modal-card" id="modalPlayersCatalogCard" style="max-width: 1100px; width: 96%;">
+  <div class="modal-backdrop drawer-backdrop" id="modalPlayersCatalog">
+    <div class="modal-card drawer-card" id="modalPlayersCatalogCard">
       <div class="modal-header">
         <div class="modal-title">
           <div style="display: flex; align-items: center; gap: 10px;">
@@ -900,11 +910,21 @@
             <span id="modalPlayersCatalogTitle">Telas &amp; Players • Catálogo Global de Hardware</span>
           </div>
         </div>
-        <button class="modal-close-btn" id="btnClosePlayersCatalogModal" aria-label="Fechar">
-          <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-          </svg>
-        </button>
+        <div class="drawer-header-actions">
+          <button type="button" class="btn-drawer-expand" id="btnToggleExpandCatalog" onclick="toggleDrawerExpand('modalPlayersCatalogCard', 'btnToggleExpandCatalog')" title="Expandir / Maximizar Painel">
+            <svg class="icon-expand" width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"></path>
+            </svg>
+            <svg class="icon-collapse" width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="display: none;">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 9L4 4m0 5h5V4m6 5l5-5m0 5h-5V4m-6 11l-5 5m5 0H4v-5m11 5l5-5m-5 5h5v-5"></path>
+            </svg>
+          </button>
+          <button class="modal-close-btn" id="btnClosePlayersCatalogModal" aria-label="Fechar">
+            <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+            </svg>
+          </button>
+        </div>
       </div>
 
       <div class="modal-body" style="padding: 20px 24px;">
@@ -1874,6 +1894,15 @@
       const modal = document.getElementById('modalPlayersCatalog');
       if (modal) modal.classList.remove('active');
       cancelCatalogPlayerForm();
+    }
+
+    const modalPlayersCatalogEl = document.getElementById('modalPlayersCatalog');
+    if (modalPlayersCatalogEl) {
+      modalPlayersCatalogEl.addEventListener('click', (e) => {
+        if (e.target === modalPlayersCatalogEl) {
+          closePlayersCatalog();
+        }
+      });
     }
 
     async function loadPlayersCatalogData() {
@@ -3003,6 +3032,7 @@
         // 1. Inserir linha na Tabela Desktop
         if (tbody) {
           const tr = document.createElement('tr');
+          tr.setAttribute('data-id', p.id);
           tr.setAttribute('data-brand', p.brand);
           tr.setAttribute('data-status', p.status);
           tr.innerHTML = `
@@ -3059,6 +3089,7 @@
         if (mobileContainer) {
           const card = document.createElement('div');
           card.className = `mobile-project-card ${brandClass}-border`;
+          card.setAttribute('data-id', p.id);
           card.setAttribute('data-brand', p.brand);
           card.setAttribute('data-status', p.status);
           card.innerHTML = `
@@ -3569,7 +3600,7 @@
       });
     }
 
-    // Modal de Detalhe / Gerir Projeto
+    // Painel Lateral (Drawer) de Detalhe / Gerir Projeto & Planta
     const modalDetalhe = document.getElementById('modalDetalheProjeto');
     const btnCloseDetalhe = document.getElementById('btnCloseDetalheModal');
     const btnFecharDetalhe = document.getElementById('btnFecharDetalhe');
@@ -3578,6 +3609,29 @@
 
     let currentProjectIdInModal = null;
     let currentActiveTab = 'tabTasks';
+
+    // Alternar Expansão do Painel Lateral (760px padrão vs 94vw maximizado)
+    function toggleDrawerExpand(cardId, btnId) {
+      const card = document.getElementById(cardId);
+      const btn = document.getElementById(btnId);
+      if (!card) return;
+      const isExpanded = card.classList.toggle('drawer-expanded');
+      if (btn) {
+        const iconExpand = btn.querySelector('.icon-expand');
+        const iconCollapse = btn.querySelector('.icon-collapse');
+        if (iconExpand && iconCollapse) {
+          iconExpand.style.display = isExpanded ? 'none' : 'block';
+          iconCollapse.style.display = isExpanded ? 'block' : 'none';
+        }
+        btn.setAttribute('title', isExpanded ? 'Recolher Painel' : 'Expandir / Maximizar Painel');
+      }
+    }
+
+    function closeProjectDetails() {
+      if (modalDetalhe) modalDetalhe.classList.remove('active');
+      currentProjectIdInModal = null;
+      document.querySelectorAll('.master-row-selected').forEach(el => el.classList.remove('master-row-selected'));
+    }
 
     function switchModalTab(tabId, btn) {
       currentActiveTab = tabId;
@@ -3592,6 +3646,19 @@
     async function openProjectDetails(id, targetTab) {
       if (targetTab) currentActiveTab = targetTab;
       currentProjectIdInModal = id;
+
+      // Destacar linha da loja ativa na listagem Master-Detail
+      document.querySelectorAll('#projectsTableBody tr, .mobile-project-card').forEach(el => {
+        if (el.getAttribute('data-id') == id) {
+          el.classList.add('master-row-selected');
+        } else {
+          el.classList.remove('master-row-selected');
+        }
+      });
+
+      // Reset de scroll do conteúdo da gaveta
+      if (modalDetalheBody) modalDetalheBody.scrollTop = 0;
+
       try {
         const [resProj, resCosts, resPlayers, resPlaylists] = await Promise.all([
           fetch(`/api/v1/projects/${id}`),
@@ -4906,8 +4973,15 @@
       }
     }
 
-    if (btnCloseDetalhe) btnCloseDetalhe.addEventListener('click', () => modalDetalhe.classList.remove('active'));
-    if (btnFecharDetalhe) btnFecharDetalhe.addEventListener('click', () => modalDetalhe.classList.remove('active'));
+    if (btnCloseDetalhe) btnCloseDetalhe.addEventListener('click', closeProjectDetails);
+    if (btnFecharDetalhe) btnFecharDetalhe.addEventListener('click', closeProjectDetails);
+    if (modalDetalhe) {
+      modalDetalhe.addEventListener('click', (e) => {
+        if (e.target === modalDetalhe) {
+          closeProjectDetails();
+        }
+      });
+    }
 
 
 
@@ -6173,7 +6247,7 @@
         closeConfigParametersModal();
         closeDbMigrationModal();
         closeGlobalTasksModal();
-        if (modalDetalhe) modalDetalhe.classList.remove('active');
+        closeProjectDetails();
         if (modalHubSignage) modalHubSignage.classList.remove('active');
         const modalNova = document.getElementById('modalNovaAbertura');
         if (modalNova) modalNova.classList.remove('active');

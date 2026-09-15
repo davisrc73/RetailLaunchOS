@@ -808,6 +808,35 @@ A camada de apresentação foi reestruturada para suportar a diversidade de disp
 * **Pins Inteligentes**: Cada pin possui um ícone de classe de hardware, halo de radar pulsante de acordo com o status (`online` verde, `testing` âmbar, `syncing` azul, `offline` vermelho) e etiqueta flutuante.
 * **Popover Tático**: Ao interagir com um pin, abre-se um popover estilizado com telemetria do hardware, número de série (`serial_number`), playlist vinculada e um botão de ação rápida para executar o teste de Ping em tempo real, sem necessidade de navegar para outros ecrãs.
 
+---
+
+## 16. Arquitetura de Painel Lateral Deslizante à Direita (Slide-Over Drawer) & Modo Master-Detail (Fase 18)
+
+### 16.1. Transição de Modais Centrados para Off-Canvas Drawers
+* **Problema Resolvido**: Modais centrados tradicionais cobriam o dashboard por completo, quebravam o fluxo de trabalho ao comparar dados entre lojas e criavam restrições verticais com barras de rolagem duplas.
+* **Padrão Slide-Over**:
+  - Implementado em `#modalDetalheProjeto` e `#modalPlayersCatalog`.
+  - Contentor `.drawer-backdrop` com `align-items: stretch; justify-content: flex-end;`.
+  - O painel `.drawer-card` ocupa a altura total do viewport (`100vh` e `100dvh`), eliminando os cortes verticais e garantindo que listas longas de tarefas, custos e hardware beneficiam de rolagem contínua.
+
+### 16.2. Estrutura CSS com Aceleração por GPU e Animações Fluidas
+* **Transform 3D**: A entrada e saída do painel é executada estritamente através de `transform: translateX(100%)` para `translateX(0)`, sem alterar propriedades de layout geométrico (`left`, `right`, `margin`), garantindo renderização estável a 60 fps na GPU:
+  $$\text{transition}: \text{transform } 0.32s \text{ cubic-bezier}(0.16, 1, 0.3, 1)$$
+* **Backdrop Dimmer Translúcido**: O fundo `.drawer-backdrop` utiliza `rgba(4, 7, 13, 0.55)` com `backdrop-filter: blur(5px)`, mantendo os cartões e tabelas da aplicação percetíveis à esquerda para referência constante.
+
+### 16.3. Estado de Expansão (760px vs 94vw) e Integração com a Planta Arquitetónica
+* **Largura Flexível**:
+  - Modo Padrão: `width: 760px; max-width: 90vw;` (permite formular em 2 colunas e manter a listagem à esquerda).
+  - Modo Expandido (`.drawer-expanded`): `width: 94vw; max-width: 96vw;`, ativado via botão `⛶` (`#btnToggleExpandDetalhe` / `#btnToggleExpandCatalog`).
+* **Sinergia com a Planta de Loja (Fase 17)**: Em modo expandido, o visualizador arquitetónico `.floorplan-workspace` ganha amplitude total de monitor para colocação milimétrica de pins e inspeção detalhada de zonas comerciais.
+
+### 16.4. Sincronização de Estado Master-Detail e Resolução de Scroll
+* **Navegação Contínua Sem Fecho**:
+  - Quando a gaveta lateral está aberta, clicar no botão *"Gerir"* ou *"Planta"* de outra loja na tabela invoca `openProjectDetails(newId)` que atualiza diretamente os dados do DOM sem fechar a gaveta.
+  - A linha ativa recebe a classe `.master-row-selected` com contorno dourado (`var(--fnac-gold)`), sincronizando visualmente a seleção da tabela à esquerda com o conteúdo da gaveta à direita.
+  - A rolagem vertical do corpo (`.modal-body`) é reposta suavemente no topo (`scrollTop = 0`) a cada troca de loja.
+
+
 
 
 

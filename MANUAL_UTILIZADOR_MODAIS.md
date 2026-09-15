@@ -8,7 +8,7 @@ Este manual destina-se aos utilizadores e operadores do **Gabinete Multimédia**
 ## Índice
 1. [Visão Geral do Dashboard](#1-visão-geral-do-dashboard)
 2. [Modal: Registar Nova Abertura de Loja](#2-modal-registar-nova-abertura-de-loja)
-3. [Modal / Gaveta: Gestão da Loja (Abas: Marcos Técnicos, Custos, Telas e Planta)](#3-modal--gaveta-gestão-da-loja-abas-marcos-técnicos-custos-e-telas)
+3. [Painel Lateral Deslizante: Gestão da Loja (Abas: Marcos Técnicos, Custos, Telas e Planta)](#3-painel-lateral-deslizante-gestão-da-loja-abas-marcos-técnicos-custos-e-telas)
    - [3.1.1. Edição de Dados Estruturais da Loja (Fase 12)](#311-edição-de-dados-estruturais-da-loja-fase-12)
    - [3.2. Aba 1: Marcos Técnicos & Digital Signage](#32-aba-1-marcos-técnicos--digital-signage)
    - [3.3. Aba 2: Custos, Diárias & Orçamento (Fase 3)](#33-aba-2-custos-diárias--orçamento-fase-3)
@@ -61,6 +61,11 @@ Este manual destina-se aos utilizadores e operadores do **Gabinete Multimédia**
     - [18.4. Visualizador Tático: Zoom, Pan, Pins Coloridos e Radar de Estado](#184-visualizador-tático-zoom-pan-pins-coloridos-e-radar-de-estado)
     - [18.5. Teste de Conectividade (Ping) e Popovers de Telemetria no Mapa](#185-teste-de-conectividade-ping-e-popovers-de-telemetria-no-mapa)
     - [18.6. Persistência Atómica no Volume Synology NAS e Responsividade Mobile](#186-persistência-atómica-no-volume-synology-nas-e-responsividade-mobile)
+19. [Painel Lateral Deslizante à Direita (Slide-Over Drawer) & Modo Master-Detail (Fase 18)](#19-painel-lateral-deslizante-à-direita-slide-over-drawer--modo-master-detail-fase-18)
+    - [19.1. O Novo Paradigma Lateral: Fim das Janelas Flutuantes Centradas](#191-o-novo-paradigma-lateral-fim-das-janelas-flutuantes-centradas)
+    - [19.2. Preservação de Contexto & Navegação Contínua Master-Detail](#192-preservação-de-contexto--navegação-contínua-master-detail)
+    - [19.3. Botão de Expansão / Ecrã Inteiro (⛶ Maximizar Painel)](#193-botão-de-expansão--ecrã-inteiro-maximizar-painel)
+    - [19.4. Cabeçalho Fixo, Abas Sticky e Rolagem Vertical a 100% da Altura](#194-cabeçalho-fixo-abas-sticky-e-rolagem-vertical-a-100-da-altura)
 
 ---
 
@@ -104,13 +109,16 @@ No canto superior direito do Dashboard, clica no botão dourado **"+ Nova Abertu
 
 ---
 
-## 3. Modal / Gaveta: Gestão da Loja (Abas: Marcos Técnicos, Custos e Telas)
+## 3. Painel Lateral Deslizante: Gestão da Loja (Abas: Marcos Técnicos, Custos, Telas e Planta)
 
 ### 3.1. Como Aceder
-Na tabela **"Aberturas em Curso"**, clica no botão **"Gerir"** situado na coluna de ações de qualquer loja. O modal expandido (*large*) abrir-se-á com um sistema de 3 abas operacionais:
+Na tabela **"Aberturas em Curso"**, clica no botão **"Gerir"** (ou no atalho dourado **"🗺️ Planta"**) de qualquer loja. Em vez de uma janela flutuante clássica que tapa o ecrã, abre-se um moderno **Painel Lateral Deslizante à Direita (Slide-Over Drawer)** que ocupa 100% da altura vertical útil (`100vh`) e mantém a lista de lojas visível à esquerda. O painel integra 4 abas operacionais:
 * **Aba 1: Marcos Técnicos & Signage**
 * **Aba 2: Custos, Diárias & Orçamento**
 * **Aba 3: Telas & Players da Loja (Fase 4)**
+* **Aba 4: Planta & Telas Interativa da Loja (Fase 17)**
+
+No topo do painel, o botão **"⛶"** permite alternar instantaneamente entre a largura padrão (**760px**) e o modo maximizado (**94% da largura do ecrã**), especialmente indicado para calibrar a Planta Arquitetónica de Loja. Ao clicar noutra loja na tabela à esquerda com o painel aberto, o conteúdo atualiza-se de imediato em modo *Master-Detail*.
 
 ### 3.1.1. Edição de Dados Estruturais da Loja (Fase 12)
 No cabeçalho superior do modal de gestão de abertura, os utilizadores com perfil de **Administrador (`admin`)** ou **Gestor Multimédia (`multimedia_user`)** têm disponível o botão **"✏️ Editar Loja"** (`#btnToggleEditProject`).
@@ -926,6 +934,39 @@ Ao clicar ou tocar num pin afixado na planta, abre-se um **Popover Tático Flutu
   - O caminho de gravação local é `/app/database/uploads/floor_plans/`.
   - Como o `docker-compose.yml` mapeia o volume do host `/volume1/docker/retaillaunch/database:/app/database`, todos os ficheiros de plantas sobrevivem a paragens, migrações de hardware e recriações de contentores no Synology Container Manager.
 * **Otimização Mobile**: Em smartphones, a barra lateral de equipamentos dobra-se abaixo da planta com abas verticais táteis, garantindo que o técnico dispõe de 100% da largura do ecrã para inspecionar a planta com os dedos.
+
+---
+
+## 19. Painel Lateral Deslizante à Direita (Slide-Over Drawer) & Modo Master-Detail (Fase 18)
+
+Para responder à crescente densidade de informação operacional (marcos técnicos, custos diários, inventário de telas e mapeamento em planta de loja), o RetailLaunchOS abandonou o paradigma das janelas flutuantes centradas e adotou o conceito de **Painel Lateral Deslizante à Direita (*Slide-Over Drawer*)**.
+
+### 19.1. O Novo Paradigma Lateral: Fim das Janelas Flutuantes Centradas
+* **O Que Mudou**:
+  - Tanto o modal de **Gestão da Loja** (`#modalDetalheProjeto`) como o **Catálogo Global de Hardware** (`#modalPlayersCatalog`) deslizam a partir da margem direita do ecrã com uma transição suave acelerada por GPU.
+  - Deixam de existir cortes artificiais de altura: o painel estende-se ao longo de **100% da altura do ecrã (`100vh`)**, eliminando barras de rolagem duplas.
+* **Abertura e Fecho Ergonómico**:
+  - Para fechar, basta clicar no botão **"✕"**, premir a tecla `Escape` ou clicar em qualquer ponto do dashboard escurecido à esquerda da gaveta.
+
+### 19.2. Preservação de Contexto & Navegação Contínua Master-Detail
+* **Visão Contínua do Dashboard**: Ao inspecionar uma loja ou o catálogo de hardware, a tabela de aberturas, os KPIs agregados e o feed de atividades recentes continuam visíveis à esquerda.
+* **Comutação Rápida entre Lojas**:
+  - Com o painel aberto, se o operador clicar em **"Gerir"** ou **"🗺️ Planta"** noutra loja na tabela, o conteúdo da gaveta lateral atualiza-se instantaneamente para a nova loja selecionada sem fechar nem reabrir.
+  - A loja atualmente ativa na gaveta fica com realce visual na tabela (`.master-row-selected`), facilitando o controlo visual em postos de controlo com dezenas de obras em simultâneo.
+
+### 19.3. Botão de Expansão / Ecrã Inteiro (⛶ Maximizar Painel)
+* No cabeçalho da gaveta lateral encontra-se o botão **"⛶"** (`#btnToggleExpandDetalhe` / `#btnToggleExpandCatalog`):
+  - **Modo Padrão (760px)**: Largura calibrada para formular dados em 2 colunas mantendo o dashboard de referência à vista.
+  - **Modo Maximizado (94vw)**: Com um clique, a gaveta expande para quase a largura total do ecrã (94% da largura útil), oferecendo uma tela ampla perfeita para posicionar e arrastar displays na **Planta Arquitetónica de Loja**.
+  - Um novo clique no botão volta a recolher o painel para a largura padrão.
+
+### 19.4. Cabeçalho Fixo, Abas Sticky e Rolagem Vertical a 100% da Altura
+* **Fixação Inteligente**:
+  - O título da obra e os botões de ação ficam fixos no topo do painel (`sticky header`).
+  - O seletor de abas (`1. Marcos Técnicos`, `2. Custos`, `3. Telas`, `4. Planta`) permanece ancorado por baixo do cabeçalho durante a rolagem.
+  - O rodapé com as ações estruturais (editar, eliminar e fechar) permanece sempre acessível na base da gaveta (`sticky footer`).
+* **Adaptação Mobile**: Em ecrãs móveis (`<= 768px`), o painel assume automaticamente largura total (`100vw`) com cantos retos, assegurando compatibilidade perfeita com a operação tátil em campo.
+
 
 
 

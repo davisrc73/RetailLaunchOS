@@ -160,3 +160,13 @@ Uma dúvida comum é: *Ao fazer `git pull` e reconstruir o contentor no NAS no f
 3. **Regra de Ouro**: Apenas **NUNCA** deves correr `docker compose down -v` (com a flag `-v`), pois a flag `-v` remove volumes de dados. A atualização padrão com `docker compose up -d --build --force-recreate` preserva 100% dos dados.
 4. **Auto-Migrações Idempotentes no Arranque (`db.js`)**: Sempre que o contentor reinicia após um `git pull` com novas funcionalidades estruturais (como a coluna `serial_number` em `signage_players` ou a nova tabela `activity_logs` da Fase 14), o módulo de arranque da base de dados executa automaticamente as migrações necessárias sem que o operador precise de executar comandos SQL manuais. Os dados existentes são integralmente preservados e as novas colunas e tabelas ficam imediatamente disponíveis.
 
+---
+
+## 7. Experiência de Interface: Painel Lateral Deslizante (Slide-Over Drawer) & Tablets de Loja
+
+Com a **Fase 18**, o RetailLaunchOS adotou painéis laterais deslizantes (`.drawer-card`) para a **Gestão Completa de Loja** e o **Catálogo Global de Hardware**:
+* **Postos de Controlo e Monitores Ultrawide / Multiecrãs**: Em estações de trabalho ligadas ao NAS, o operador pode consultar e editar todo o detalhe de uma loja (custos, cronograma, telas e planta arquitetónica interativa) mantendo visível a tabela de projetos à esquerda. Alternar entre lojas na lista atualiza o painel instantaneamente sem cliques adicionais de fecho e reabertura.
+* **Tablets e Dispositivos Móveis no Terreno**: Em tablets ou smartphones acedendo ao Synology via rede Wi-Fi de loja ou VPN, o painel assume automaticamente a largura total de visualização (`100vw`), permitindo aos técnicos e responsáveis de loja interagir com formulários e plantas sem restrições nem barras de scroll duplas.
+* **Modo Maximizado (`⛶`)**: Útil em ecrãs de menores dimensões para trabalhar a planta arquitetónica de loja em quase toda a extensão do navegador (`94vw`).
+
+
