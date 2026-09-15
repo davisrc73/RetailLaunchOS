@@ -90,6 +90,7 @@ class SignagePlayer {
     const device_model = data.device_model || 'BrightSign XT1144 4K';
     const zone_location = data.zone_location ? data.zone_location.trim() : 'Entrada Principal';
     const resolution = data.resolution || '4K UHD';
+    const serial_number = data.serial_number ? data.serial_number.trim() : null;
     const ip_address = data.ip_address ? data.ip_address.trim() : '192.168.1.100';
     const mac_address = data.mac_address ? data.mac_address.trim() : '00:10:18:00:00:00';
     const status = data.status || 'online';
@@ -100,22 +101,22 @@ class SignagePlayer {
 
     const sql = `
       INSERT INTO signage_players (
-        project_id, name, device_model, zone_location, resolution,
+        project_id, name, device_model, zone_location, resolution, serial_number,
         ip_address, mac_address, status, playlist_id, current_firmware, last_ping
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
     `;
 
     const result = db.run(sql, [
-      projectId, name, device_model, zone_location, resolution,
+      projectId, name, device_model, zone_location, resolution, serial_number,
       ip_address, mac_address, status, playlist_id, current_firmware
     ]);
 
     return this.findById(result.lastInsertRowid);
   }
 
-  // Atualiza dados de um player (ex: loja, IP, zona, playlist vinculada, status)
+  // Atualiza dados de um player (ex: loja, IP, zona, serial, playlist vinculada, status)
   static async update(id, data) {
-    const allowed = ['project_id', 'name', 'device_model', 'zone_location', 'resolution', 'ip_address', 'mac_address', 'status', 'playlist_id', 'current_firmware'];
+    const allowed = ['project_id', 'name', 'device_model', 'zone_location', 'resolution', 'serial_number', 'ip_address', 'mac_address', 'status', 'playlist_id', 'current_firmware'];
     const updates = [];
     const params = [];
 
@@ -125,6 +126,8 @@ class SignagePlayer {
         let val = data[key];
         if (key === 'project_id' || key === 'playlist_id') {
           val = (val !== null && val !== '' && val !== 'none' && !isNaN(val)) ? parseInt(val, 10) : null;
+        } else if (key === 'serial_number') {
+          val = (val !== null && val !== undefined) ? val.trim() : null;
         }
         params.push(val);
       }

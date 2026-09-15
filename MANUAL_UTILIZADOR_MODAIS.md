@@ -44,6 +44,10 @@ Este manual destina-se aos utilizadores e operadores do **Gabinete Multimédia**
     - [15.1. Como Aceder](#151-como-aceder)
     - [15.2. Funcionalidades do Modal](#152-funcionalidades-do-modal)
     - [15.3. Fluxo de Migração Rápida Mac ➔ Synology NAS (1-Clique)](#153-fluxo-de-migração-rápida-mac--synology-nas-1-clique)
+16. [Feed Dinâmico de Atividade Recente & Identificador Único (ID/Serial) de Hardware (Fase 14)](#16-feed-dinâmico-de-atividade-recente--identificador-único-idserial-de-hardware-fase-14)
+    - [16.1. Normalização do Título: "Atividade Recente"](#161-normalização-do-título-atividade-recente)
+    - [16.2. Auditoria e Telemetria em Tempo Real de Eventos Operacionais](#162-auditoria-e-telemetria-em-tempo-real-de-eventos-operacionais)
+    - [16.3. Identificador Único (ID/Serial) de Equipamentos de Hardware](#163-identificador-único-idserial-de-equipamentos-de-hardware)
 
 ---
 
@@ -195,6 +199,7 @@ Esta aba permite gerir o inventário de ecrãs, totens e media players instalado
 #### A. Lista de Ecrãs Instalados
 Cada display é apresentado com:
 * **Identificação & Localização**: Designação do ponto de exibição (ex: *Video Wall Entrada 4x4*), zona na loja (*Montra*, *Linha de Caixas*, *Auditório*) e modelo de hardware (*BrightSign XT1144 4K*, *Samsung SSP Tizen 6.5*, *LG webOS Signage*).
+* **ID / Serial (N.º Série)**: Badge identificador único de património ou número de série do equipamento (ex: `🏷️ BS-XT1144-88412`), facilitando a assistência técnica e auditoria física.
 * **Resolução**: Badge indicativo (`4K UHD`, `1920x1080 (FHD)` ou `Video Wall LED`).
 * **Endereço de Rede**: IP configurado na VLAN técnica da loja e MAC Address.
 * **Seletor Rápido de Playlist**: Menu dropdown direto para associar uma campanha do catálogo a este ecrã específico, com atualização instantânea na base de dados.
@@ -208,8 +213,8 @@ Cada display é apresentado com:
 
 #### B. Associar Novo Ecrã / Player
 1. Clica no botão **"+ Associar Novo Ecrã / Player"** no cabeçalho da lista.
-2. Preenche: Nome do ecrã, Zona na loja, Modelo de hardware, Resolução de saída, Endereço IP e Playlist inicial.
-3. Clica em **"Gravar Ecrã"**: O registo é gravado via `POST /api/v1/projects/:id/players` e integrado no cálculo de prontidão de Digital Signage.
+2. Preenche: Nome do ecrã, ID / Serial (N.º Série), Zona na loja, Modelo de hardware, Resolução de saída, Endereço IP e Playlist inicial.
+3. Clica em **"Gravar Ecrã"**: O registo é gravado via `POST /api/v1/projects/:id/players`, gera automaticamente um evento na auditoria de *Atividade Recente* e é integrado no cálculo de prontidão de Digital Signage.
 
 ---
 
@@ -482,6 +487,7 @@ Na barra lateral de navegação, na secção **"Configurações"**, clica em **"
 1. No topo do modal do catálogo, clica no botão **"＋ Novo Ecrã / Player"** (disponível para perfis *Admin* e *Técnico Multimédia*).
 2. O painel superior expande-se com o formulário de hardware:
    * **Nome do Ecrã / Display \***: Nome descritivo (ex: `Video Wall Entrada 4x4`, `Totem Interativo Montra`).
+   * **ID / Serial (N.º Série)**: Identificador único de equipamento ou número de série do fabricante (ex: `BS-XT1144-88412`, `S24B40091`, `PAT-FNAC-00912`), essencial para inventário técnico e garantia.
    * **Modelo de Hardware**: Selecionar na lista (`BrightSign XT1144 4K`, `Samsung SSP Tizen`, `LG webOS Signage`, `Display Android Genérico`, `Mini PC Windows / Linux`).
    * **Zona / Localização \***: Zona física na loja ou armazém (ex: `Entrada Principal`, `Montra`, `Linha de Caixas`, `Stock Central`).
    * **Resolução / Formato**: Resolução nativa (`4K UHD`, `FHD 1080p`, `HD 720p`, `Video Wall LED`, `Formato Vertical 9:16`).
@@ -491,17 +497,17 @@ Na barra lateral de navegação, na secção **"Configurações"**, clica em **"
    * **Versão de Firmware**: Versão instalada no media player (ex: `v9.0.145`).
    * **Loja / Projeto Associado**: Selecionar a loja correspondente (`Fnac Cascais`, `Darty Alfragide`, etc.) ou deixar em **"— Em Stock / Não Associado a Projeto —"** para ecrãs de reserva ou catálogo.
    * **Playlist Vinculada**: Selecionar opcionalmente a versão de playlist do catálogo para sincronização de conteúdos.
-3. Clica em **"💾 Guardar Hardware"**. O dispositivo é imediatamente registado e exibido na tabela.
+3. Clica em **"💾 Guardar Hardware"**. O dispositivo é imediatamente registado, adicionado à auditoria de *Atividade Recente* e exibido na tabela com a respetiva badge de serial `🏷️`.
 
 ### 11.4. Editar Hardware e Reatribuição de Loja
 1. Na linha correspondente ao ecrã/player, clica no botão **"✏️ Editar"**.
-2. Os dados atuais são carregados para o painel de formulário.
-3. Altera qualquer parâmetro, incluindo a **reatribuição de loja** (ex: transferir um display de *Stock* para uma loja ou de uma loja para outra).
+2. Os dados atuais são carregados para o painel de formulário (incluindo o N.º de Série / ID).
+3. Altera qualquer parâmetro, incluindo o número de série ou a **reatribuição de loja** (ex: transferir um display de *Stock* para uma loja ou de uma loja para outra).
 4. Clica em **"💾 Guardar Hardware"**. As alterações são refletidas de imediato.
 
 ### 11.5. Teste de Conectividade (Ping em Tempo Real)
 * Na coluna de ações de cada linha, clica no botão **"📡 Ping"**.
-* O sistema envia um sinal de handshake e atualiza o estado operacional e o timestamp `last_ping` do player.
+* O sistema envia um sinal de handshake, atualiza o estado operacional e o timestamp `last_ping` do player, e gera automaticamente um registo de atividade operacional.
 
 ### 11.6. Eliminar Ecrã / Player do Catálogo
 1. Clica no botão com o ícone de caixote do lixo **"🗑️"** na linha do dispositivo.
@@ -511,7 +517,7 @@ Na barra lateral de navegação, na secção **"Configurações"**, clica em **"
 ### 11.7. Filtros Rápidos e Pesquisa Dinâmica
 * **Filtro de Associação**: Permite filtrar entre *Todas as Associações*, *📦 Em Stock / Sem Loja*, *🟡 Fnac* ou *🔴 Darty*.
 * **Filtro de Estado**: Permite filtrar por *Online*, *Syncing*, *Testing* ou *Offline*.
-* **Campo de Pesquisa**: Filtra instantaneamente conforme o operador digita nome, modelo, IP, MAC, zona ou loja.
+* **Campo de Pesquisa**: Filtra instantaneamente conforme o operador digita nome, modelo, ID / Número de Série (`serial_number`), IP, MAC, zona ou loja.
 
 ---
 
@@ -707,6 +713,44 @@ Permite substituir a base de dados do servidor (Mac ou NAS) através de upload d
 3. Seleciona o ficheiro `.sqlite` descarregado e clica em **"⬆️ Confirmar Restauro / Migração"**.
 4. Concluído! O NAS passa a ter exatamente as mesmas lojas, datas, tarefas e parâmetros do teu Mac.
 5. Nas próximas atualizações de código com `git pull` e `docker compose`, o volume persistente do NAS mantém todos estes dados permanentemente salvaguardados.
+
+---
+
+## 16. Feed Dinâmico de Atividade Recente & Identificador Único (ID/Serial) de Hardware (Fase 14)
+
+### 16.1. Normalização do Título: "Atividade Recente"
+O cartão de auditoria situado na coluna direita do Dashboard foi simplificado e normalizado:
+* **Título Atual**: **"Atividade Recente"** (substituindo a denominação anterior *"Atividade Recente • Gabinete Multimédia"*).
+* **Botão de Refresh Manual**: O cabeçalho do cartão inclui o botão **"🔄"** (`#btnRefreshActivityFeed`) para permitir aos operadores forçar a leitura imediata dos últimos eventos registados no servidor sem necessidade de recarregar a página inteira.
+
+### 16.2. Auditoria e Telemetria em Tempo Real de Eventos Operacionais
+O cartão "Atividade Recente" deixou de ter registos fixos e passa a consumir a API REST em tempo real (`GET /api/v1/activities?limit=15`). Todas as ações executadas no sistema geram um rasto de auditoria persistido na base de dados SQLite:
+
+| Tipo de Ação | Ícone | Gatilho Operacional | Detalhe Apresentado |
+| :--- | :---: | :--- | :--- |
+| **Abertura Criada / Atualizada** | 🏪 | Registo de nova loja ou alteração de dados estruturais | Nome da loja, insígnia e autor da operação |
+| **Marco Concluído** | ✅ | Conclusão de uma tarefa técnica de abertura | Título do marco e loja associada |
+| **Marco Reaberto** | ↩️ | Reabertura de uma tarefa técnica pendente | Título do marco e loja associada |
+| **Nova Tarefa Adicionada** | 📋 | Criação de um novo marco na checklist | Nome da tarefa, prioridade e loja |
+| **Custo / Diária Registada** | 💶 | Lançamento de despesa, diária ou licença | Montante (€), categoria de custo e loja |
+| **Hardware Registado / Editado** | 🖥️ | Adição ou alteração de player no catálogo ou loja | Nome do ecrã, zona, N.º de Série e loja |
+| **Ping de Conectividade** | 📡 | Disparo de sinal de telemetria / handshake de rede | IP do equipamento e estado de resposta |
+| **Parâmetros Alterados** | ⚙️ | Gestão de modelos, zonas ou resoluções | Categoria e valor do parâmetro |
+
+* **Tempo Relativo Inteligente**: Cada entrada exibe o carimbo temporal formatado em linguagem humana e reativa (*"Agora mesmo"*, *"há 5m"*, *"há 2h"*, *"ontem às 14:30"*, *"12 de mar às 10:15"*).
+* **Auto-Atualização Coordenada**: O feed de atividades atualiza-se automaticamente no carregamento da página, no ciclo de polling de KPIs e imediatamente após qualquer operação de criação/edição no Dashboard.
+
+### 16.3. Identificador Único (ID/Serial) de Equipamentos de Hardware
+Para responder aos requisitos de gestão patrimonial, rastreabilidade física e suporte com fornecedores de hardware (BrightSign, Samsung, LG):
+1. **Identificador Único (`serial_number`)**:
+   - Disponível em todos os formulários de hardware (tanto no **Catálogo Global de "Configurações"** como na **Aba "Telas & Players" do Detalhe da Loja**).
+   - Permite registar quer o número de série oficial do fabricante (ex: `SN-49810293`), quer o identificador de património interno Fnac/Darty (ex: `PAT-LEI-0012`).
+2. **Visualização Monospace e Badges**:
+   - Apresentado com destaque visual em tipografia monospace (`🏷️ BS-XT1144-88412`).
+   - Se um equipamento não tiver número de série atribuído, o sistema indica com elegância `🏷️ Sem S/N`.
+3. **Pesquisa Instantânea**:
+   - O campo de pesquisa do Catálogo Global pesquisa instantaneamente por qualquer fragmento do número de série ou ID.
+
 
 
 

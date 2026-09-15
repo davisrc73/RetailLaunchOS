@@ -549,53 +549,23 @@
 
         <!-- Feed de Operações Recentes -->
         <div class="feed-card">
-          <div class="section-title-wrap">
-            <h2 style="font-size: 15px; font-weight: 700; color: var(--text-white);">Atividade Recente • Gabinete
-              Multimédia</h2>
-            <p style="font-size: 12px; color: var(--text-muted);">Sincronização de equipamentos, testes de som e
-              validação de players</p>
+          <div class="section-title-wrap" style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 8px;">
+            <div>
+              <h2 style="font-size: 15px; font-weight: 700; color: var(--text-white);">Atividade Recente</h2>
+              <p style="font-size: 12px; color: var(--text-muted);">Histórico operacional, sincronização de equipamentos e registos do ecossistema em tempo real</p>
+            </div>
+            <button type="button" class="btn-secondary" onclick="loadRecentActivities()" style="font-size: 11px; padding: 4px 10px; display: inline-flex; align-items: center; gap: 5px; height: 26px;" title="Atualizar feed de atividade">
+              <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+              </svg>
+              <span>Atualizar</span>
+            </button>
           </div>
 
-          <div class="feed-item-list">
-            <div class="feed-item">
-              <div class="feed-item-icon" style="background: rgba(16, 185, 129, 0.12); color: #10B981;">
-                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-                </svg>
-              </div>
-              <div class="feed-item-text">
-                <div><strong>Video Wall de Entrada (4x4)</strong> validado com sucesso em <strong>Fnac Cascais</strong>.
-                </div>
-                <div class="feed-timestamp">Há 25 minutos • BrightSign UHD Player #01</div>
-              </div>
-            </div>
-
-            <div class="feed-item">
-              <div class="feed-item-icon" style="background: rgba(245, 158, 11, 0.12); color: var(--fnac-gold);">
-                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                    d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                </svg>
-              </div>
-              <div class="feed-item-text">
-                <div>Diária técnica registada em SQLite: <strong>€ 485,50</strong> atribuídos a <strong>Fnac
-                    Cascais</strong>.</div>
-                <div class="feed-timestamp">Há 2 horas • Lançado por Admin Multimédia</div>
-              </div>
-            </div>
-
-            <div class="feed-item">
-              <div class="feed-item-icon" style="background: rgba(59, 130, 246, 0.12); color: #60A5FA;">
-                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                    d="M13.19 8.688a4.5 4.5 0 011.242 7.244l-4.5 4.5a4.5 4.5 0 01-6.364-6.364l1.757-1.757m13.35-.622l1.757-1.757a4.5 4.5 0 00-6.364-6.364l-4.5 4.5a4.5 4.5 0 001.242 7.244">
-                  </path>
-                </svg>
-              </div>
-              <div class="feed-item-text">
-                <div>Topologia de rede e switch PoE provisionados para <strong>Darty Parque das Nações</strong>.</div>
-                <div class="feed-timestamp">Ontem às 17:40 • Departamento Redes & IT</div>
-              </div>
+          <div class="feed-item-list" id="recentActivityFeed">
+            <div style="padding: 24px; text-align: center; color: var(--text-muted); font-size: 13px;">
+              <span class="loading-spinner" style="width: 18px; height: 18px; border-width: 2px; margin: 0 auto 8px;"></span>
+              <div>A carregar atividade recente...</div>
             </div>
           </div>
         </div>
@@ -938,6 +908,10 @@
                 <label class="form-label" for="playerCatalogName">Nome do Ecrã / Display *</label>
                 <input type="text" id="playerCatalogName" class="form-input" placeholder="ex: Video Wall Entrada 4x4"
                   required>
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="playerCatalogSerial">ID / Serial (N.º Série)</label>
+                <input type="text" id="playerCatalogSerial" class="form-input" placeholder="ex: SN-BS4K-2026-001">
               </div>
               <div class="form-group">
                 <label class="form-label" for="playerCatalogModel">Modelo de Hardware</label>
@@ -2421,8 +2395,9 @@
             <div class="player-item-name">
               <span style="font-size: 18px;">🖥️</span>
               <div>
-                <div>${p.name}</div>
-                <div class="player-item-meta">
+                <div style="font-weight: 600; color: var(--text-white);">${p.name}</div>
+                <div class="player-item-meta" style="margin-top: 4px; display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
+                  <span class="player-serial-badge" title="ID / Número de Série Único">🏷️ ${p.serial_number || 'Sem S/N'}</span>
                   <span class="player-model-chip">${p.device_model || 'Player'}</span>
                   <span class="player-res-chip">${p.resolution || '4K UHD'}</span>
                 </div>
@@ -2474,6 +2449,7 @@
       if (q) {
         filtered = filtered.filter(p =>
           (p.name && p.name.toLowerCase().includes(q)) ||
+          (p.serial_number && p.serial_number.toLowerCase().includes(q)) ||
           (p.device_model && p.device_model.toLowerCase().includes(q)) ||
           (p.zone_location && p.zone_location.toLowerCase().includes(q)) ||
           (p.ip_address && p.ip_address.toLowerCase().includes(q)) ||
@@ -2492,6 +2468,7 @@
       if (!panel) return;
 
       document.getElementById('formCatalogPlayerCrud').reset();
+      if (document.getElementById('playerCatalogSerial')) document.getElementById('playerCatalogSerial').value = '';
       if (editId) editId.value = '';
       if (title) title.textContent = '➕ Registar Novo Ecrã / Player';
       panel.style.display = '';
@@ -2511,6 +2488,9 @@
       if (title) title.textContent = `✏️ Editar Hardware: ${p.name}`;
 
       document.getElementById('playerCatalogName').value = p.name || '';
+      if (document.getElementById('playerCatalogSerial')) {
+        document.getElementById('playerCatalogSerial').value = p.serial_number || '';
+      }
       setSelectValueOrAppend(document.getElementById('playerCatalogModel'), p.device_model || '');
       setSelectValueOrAppend(document.getElementById('playerCatalogZone'), p.zone_location || '');
       setSelectValueOrAppend(document.getElementById('playerCatalogResolution'), p.resolution || '');
@@ -2530,6 +2510,7 @@
       if (panel) panel.style.display = 'none';
       const form = document.getElementById('formCatalogPlayerCrud');
       if (form) form.reset();
+      if (document.getElementById('playerCatalogSerial')) document.getElementById('playerCatalogSerial').value = '';
       const editId = document.getElementById('editCatalogPlayerId');
       if (editId) editId.value = '';
     }
@@ -2544,6 +2525,7 @@
 
       const payload = {
         name: document.getElementById('playerCatalogName')?.value?.trim(),
+        serial_number: document.getElementById('playerCatalogSerial')?.value?.trim() || null,
         device_model: document.getElementById('playerCatalogModel')?.value,
         zone_location: document.getElementById('playerCatalogZone')?.value?.trim(),
         resolution: document.getElementById('playerCatalogResolution')?.value,
@@ -2573,6 +2555,7 @@
           cancelCatalogPlayerForm();
           await loadPlayersCatalogData();
           if (typeof loadKpis === 'function') loadKpis();
+          if (typeof loadRecentActivities === 'function') loadRecentActivities();
         } else {
           showToast(json.message || 'Erro ao guardar hardware.', 'error');
         }
@@ -3253,9 +3236,127 @@
               signageValEl.innerText = `${ss.pronto || 0} Pronto • ${ss.configuracao || 0} Config • ${ss.pendente || 0} Pendente`;
             }
           }
+
+          // Atualizar feed de atividade recente em paralelo com os KPIs
+          loadRecentActivities();
         }
       } catch (err) {
         console.error('Erro ao carregar KPIs:', err);
+      }
+    }
+
+    // Formatar timestamp relativo em português
+    function formatRelativeTime(dateString) {
+      if (!dateString) return 'Recentemente';
+      try {
+        const date = new Date(dateString.includes('T') ? dateString : dateString.replace(' ', 'T') + 'Z');
+        const now = new Date();
+        const diffSeconds = Math.floor((now - date) / 1000);
+
+        if (isNaN(diffSeconds)) return dateString;
+
+        if (diffSeconds < 60) return 'Há instantes';
+        if (diffSeconds < 3600) {
+          const mins = Math.floor(diffSeconds / 60);
+          return `Há ${mins} ${mins === 1 ? 'minuto' : 'minutos'}`;
+        }
+        if (diffSeconds < 86400) {
+          const hours = Math.floor(diffSeconds / 3600);
+          return `Há ${hours} ${hours === 1 ? 'hora' : 'horas'}`;
+        }
+        if (diffSeconds < 172800) {
+          const time = date.toLocaleTimeString('pt-PT', { hour: '2-digit', minute: '2-digit' });
+          return `Ontem às ${time}`;
+        }
+        return date.toLocaleDateString('pt-PT', { day: '2-digit', month: '2-digit' }) + ' às ' + date.toLocaleTimeString('pt-PT', { hour: '2-digit', minute: '2-digit' });
+      } catch (e) {
+        return dateString;
+      }
+    }
+
+    // Carregar Feed Dinâmico de Atividade Recente
+    async function loadRecentActivities() {
+      const feedEl = document.getElementById('recentActivityFeed');
+      if (!feedEl) return;
+
+      try {
+        const res = await fetch('/api/v1/activities?limit=15', { cache: 'no-store' });
+        const json = await res.json();
+
+        if (!json.success || !Array.isArray(json.data) || json.data.length === 0) {
+          feedEl.innerHTML = `
+            <div style="padding: 28px; text-align: center; color: var(--text-muted); font-size: 13px;">
+              <div style="font-size: 24px; margin-bottom: 6px;">📋</div>
+              <div>Nenhuma atividade recente registada no ecossistema.</div>
+            </div>
+          `;
+          return;
+        }
+
+        const iconConfigs = {
+          success: {
+            bg: 'rgba(16, 185, 129, 0.12)',
+            color: '#10B981',
+            svg: '<svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>'
+          },
+          cost: {
+            bg: 'rgba(245, 158, 11, 0.12)',
+            color: 'var(--fnac-gold)',
+            svg: '<svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>'
+          },
+          hardware: {
+            bg: 'rgba(59, 130, 246, 0.12)',
+            color: '#60A5FA',
+            svg: '<svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>'
+          },
+          project: {
+            bg: 'rgba(168, 85, 247, 0.12)',
+            color: '#C084FC',
+            svg: '<svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>'
+          },
+          warning: {
+            bg: 'rgba(239, 68, 68, 0.12)',
+            color: '#F87171',
+            svg: '<svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>'
+          },
+          info: {
+            bg: 'rgba(59, 130, 246, 0.12)',
+            color: '#60A5FA',
+            svg: '<svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>'
+          }
+        };
+
+        feedEl.innerHTML = json.data.map(item => {
+          const cfg = iconConfigs[item.icon_type] || iconConfigs.info;
+          const timeRel = formatRelativeTime(item.created_at);
+          const metaParts = [];
+          if (item.project_name) metaParts.push(`<strong>${item.project_name}</strong>`);
+          if (item.user_name) metaParts.push(item.user_name);
+
+          return `
+            <div class="feed-item" style="transition: transform 0.2s ease, background 0.2s ease;">
+              <div class="feed-item-icon" style="background: ${cfg.bg}; color: ${cfg.color}; flex-shrink: 0;">
+                ${cfg.svg}
+              </div>
+              <div class="feed-item-text" style="flex: 1; min-width: 0;">
+                <div style="font-size: 13px; color: var(--text-main); line-height: 1.4;">
+                  <strong>${item.title}</strong>
+                </div>
+                ${item.description ? `<div style="font-size: 12px; color: var(--text-muted); margin-top: 2px;">${item.description}</div>` : ''}
+                <div class="feed-timestamp" style="margin-top: 4px; font-size: 11px;">
+                  ${timeRel} ${metaParts.length > 0 ? '• ' + metaParts.join(' • ') : ''}
+                </div>
+              </div>
+            </div>
+          `;
+        }).join('');
+      } catch (err) {
+        console.error('Erro ao carregar atividade recente:', err);
+        feedEl.innerHTML = `
+          <div style="padding: 16px; text-align: center; color: var(--text-dim); font-size: 12px;">
+            Não foi possível carregar as atividades recentes.
+          </div>
+        `;
       }
     }
 
@@ -3570,8 +3671,11 @@
                         <span class="tag-res ${resClass}">${sp.resolution}</span>
                         <span class="tag-hw-model">${sp.device_model}</span>
                       </div>
-                      <div style="font-size: 12px; color: var(--text-muted); margin-top: 3px;">
-                        Zona: <strong>${sp.zone_location}</strong> • IP: <code style="color: var(--fnac-gold); font-family: 'JetBrains Mono', monospace;">${sp.ip_address || 'DHCP'}</code> • MAC: ${sp.mac_address || 'N/A'}
+                      <div style="font-size: 12px; color: var(--text-muted); margin-top: 3px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                        <span>Zona: <strong>${sp.zone_location}</strong></span>
+                        <span class="player-serial-badge" style="font-size: 10.5px;">🏷️ ${sp.serial_number || 'Sem S/N'}</span>
+                        <span>IP: <code style="color: var(--fnac-gold); font-family: 'JetBrains Mono', monospace;">${sp.ip_address || 'DHCP'}</code></span>
+                        <span>MAC: ${sp.mac_address || 'N/A'}</span>
                       </div>
                       <div style="display: flex; align-items: center; gap: 8px; margin-top: 6px;">
                         <span style="font-size: 11px; color: var(--text-dim);">Playlist:</span>
@@ -3978,15 +4082,19 @@
                         <input type="text" id="newPlayerName" class="form-input" placeholder="Ex: Video Wall Entrada 4x4" required>
                       </div>
                       <div class="form-group">
+                        <label class="form-label">ID / Serial (N.º Série)</label>
+                        <input type="text" id="newPlayerSerial" class="form-input" placeholder="Ex: SN-BS4K-2026-004">
+                      </div>
+                    </div>
+
+                    <div class="form-grid-2" style="margin-top: 10px;">
+                      <div class="form-group">
                         <label class="form-label">Zona / Localização na Loja *</label>
                         <select id="newPlayerZone" class="form-select" required>
                           <option value="">-- Selecione a Zona --</option>
                           ${storeZoneOptions}
                         </select>
                       </div>
-                    </div>
-
-                    <div class="form-grid-2" style="margin-top: 10px;">
                       <div class="form-group">
                         <label class="form-label">Modelo de Hardware *</label>
                         <select id="newPlayerModel" class="form-select" required>
@@ -3994,6 +4102,9 @@
                           ${storeHwOptions}
                         </select>
                       </div>
+                    </div>
+
+                    <div class="form-grid-2" style="margin-top: 10px;">
                       <div class="form-group">
                         <label class="form-label">Resolução de Saída *</label>
                         <select id="newPlayerResolution" class="form-select" required>
@@ -4001,20 +4112,18 @@
                           ${storeResOptions}
                         </select>
                       </div>
-                    </div>
-
-                    <div class="form-grid-2" style="margin-top: 10px;">
                       <div class="form-group">
                         <label class="form-label">Endereço IP (VLAN Técnica)</label>
                         <input type="text" id="newPlayerIp" class="form-input" placeholder="Ex: 192.168.142.20">
                       </div>
-                      <div class="form-group">
-                        <label class="form-label">Playlist a Associar</label>
-                        <select id="newPlayerPlaylist" class="form-select">
-                          <option value="">-- Nenhuma Playlist --</option>
-                          ${playlists.map(pl => `<option value="${pl.id}">${pl.name} (${pl.version})</option>`).join('')}
-                        </select>
-                      </div>
+                    </div>
+
+                    <div class="form-group" style="margin-top: 10px;">
+                      <label class="form-label">Playlist a Associar</label>
+                      <select id="newPlayerPlaylist" class="form-select">
+                        <option value="">-- Nenhuma Playlist --</option>
+                        ${playlists.map(pl => `<option value="${pl.id}">${pl.name} (${pl.version})</option>`).join('')}
+                      </select>
                     </div>
 
                     <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 14px;">
@@ -4699,6 +4808,7 @@
     async function handleCreatePlayer(e, projectId) {
       e.preventDefault();
       const name = document.getElementById('newPlayerName').value;
+      const serial_number = document.getElementById('newPlayerSerial')?.value?.trim() || null;
       const zone_location = document.getElementById('newPlayerZone').value;
       const device_model = document.getElementById('newPlayerModel').value;
       const resolution = document.getElementById('newPlayerResolution').value;
@@ -4709,7 +4819,7 @@
         const res = await fetch(`/api/v1/projects/${projectId}/players`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ name, zone_location, device_model, resolution, ip_address, playlist_id: playlist_id ? parseInt(playlist_id, 10) : null })
+          body: JSON.stringify({ name, serial_number, zone_location, device_model, resolution, ip_address, playlist_id: playlist_id ? parseInt(playlist_id, 10) : null })
         });
 
         const json = await res.json();
@@ -4717,6 +4827,7 @@
           showToast('Novo ecrã/player associado com sucesso!', 'success');
           await openProjectDetails(projectId);
           await loadKpis();
+          if (typeof loadRecentActivities === 'function') loadRecentActivities();
         } else {
           showToast(json.message || 'Erro ao associar ecrã', 'error');
         }
@@ -5365,8 +5476,9 @@
       // 2. Carregar Parâmetros do Sistema (Modelos, Zonas, Resoluções)
       await loadConfigParameters();
 
-      // 3. Carregar KPIs e Projetos em paralelo
+      // 3. Carregar KPIs, Atividade Recente e Projetos em paralelo
       loadKpis();
+      loadRecentActivities();
       loadProjects();
 
       // 4. Vincular cliques nos blocos do Card Checklists & Prazos

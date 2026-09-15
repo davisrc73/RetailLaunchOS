@@ -5,6 +5,7 @@
 
 const Task = require('../models/Task');
 const Project = require('../models/Project');
+const ActivityLog = require('../models/ActivityLog');
 
 const taskController = {
   // Lista todas as tarefas em escala global com filtros (Fase 10)
@@ -62,6 +63,15 @@ const taskController = {
 
       const stats = await Task.getStats(projectId);
 
+      ActivityLog.log({
+        action_type: 'task_created',
+        title: `Novo Marco Técnico: ${newTask.title}`,
+        description: `Tarefa atribuída ao departamento ${newTask.department} (Prioridade: ${newTask.priority}).`,
+        project_id: projectId,
+        user_name: req.user?.name || 'Gabinete Multimédia',
+        icon_type: 'info'
+      });
+
       return res.status(201).json({
         success: true,
         message: 'Marco técnico adicionado com sucesso!',
@@ -85,6 +95,17 @@ const taskController = {
 
       const stats = await Task.getStats(updated.project_id);
 
+      if (updated.status === 'concluido') {
+        ActivityLog.log({
+          action_type: 'task_completed',
+          title: `Marco Concluído: ${updated.title}`,
+          description: `Validação técnica finalizada para o departamento ${updated.department}.`,
+          project_id: updated.project_id,
+          user_name: req.user?.name || 'Gabinete Multimédia',
+          icon_type: 'success'
+        });
+      }
+
       return res.status(200).json({
         success: true,
         message: 'Marco técnico atualizado',
@@ -107,6 +128,18 @@ const taskController = {
       }
 
       const stats = await Task.getStats(toggled.project_id);
+      const isDone = toggled.status === 'concluido';
+
+      ActivityLog.log({
+        action_type: isDone ? 'task_completed' : 'task_reopened',
+        title: isDone ? `Marco Concluído: ${toggled.title}` : `Marco Reaberto: ${toggled.title}`,
+        description: isDone
+          ? `Validação técnica de ${toggled.title} concluída no departamento ${toggled.department}.`
+          : `Marco técnico ${toggled.title} reaberto para acompanhamento operacional.`,
+        project_id: toggled.project_id,
+        user_name: req.user?.name || 'Gabinete Multimédia',
+        icon_type: isDone ? 'success' : 'warning'
+      });
 
       return res.status(200).json({
         success: true,

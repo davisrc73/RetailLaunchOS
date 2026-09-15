@@ -15,6 +15,7 @@ const signageController = require('./src/controllers/signageController');
 const authController = require('./src/controllers/authController');
 const configController = require('./src/controllers/configController');
 const databaseController = require('./src/controllers/databaseController');
+const activityController = require('./src/controllers/activityController');
 const authMiddleware = require('./src/middleware/authMiddleware');
 
 // Helper para responder JSON em servidor HTTP nativo
@@ -618,6 +619,29 @@ const server = http.createServer(async (req, res) => {
           await databaseController.restore(req, mockRes);
         } catch (err) {
           sendJson(res, 500, { success: false, message: 'Erro ao processar restauro: ' + err.message });
+        }
+      });
+      return;
+    }
+  }
+
+  // --- API ROUTES: /api/v1/activities (Feed de Atividade Recente) ---
+  if (pathname.startsWith('/api/v1/activities')) {
+    if ((pathname === '/api/v1/activities' || pathname === '/api/v1/activities/') && method === 'GET') {
+      req.query = parsedUrl.query;
+      const mockRes = { status: (code) => ({ json: (data) => sendJson(res, code, data) }) };
+      return activityController.getRecent(req, mockRes);
+    }
+    if ((pathname === '/api/v1/activities' || pathname === '/api/v1/activities/') && method === 'POST') {
+      let body = '';
+      req.on('data', chunk => { body += chunk.toString(); });
+      req.on('end', async () => {
+        try {
+          req.body = body ? JSON.parse(body) : {};
+          const mockRes = { status: (code) => ({ json: (data) => sendJson(res, code, data) }) };
+          await activityController.create(req, mockRes);
+        } catch (err) {
+          sendJson(res, 400, { success: false, message: 'JSON Inválido: ' + err.message });
         }
       });
       return;

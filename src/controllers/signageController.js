@@ -6,6 +6,7 @@
 const Playlist = require('../models/Playlist');
 const SignagePlayer = require('../models/SignagePlayer');
 const Project = require('../models/Project');
+const ActivityLog = require('../models/ActivityLog');
 
 const signageController = {
   // ===========================================================================
@@ -151,6 +152,20 @@ const signageController = {
       }
 
       const newPlayer = await SignagePlayer.create(req.body);
+
+      // Registo de auditoria operacional
+      const serialLabel = newPlayer.serial_number ? ` [ID/Serial: ${newPlayer.serial_number}]` : '';
+      const storeText = newPlayer.store_name ? ` para ${newPlayer.store_name}` : ' no Catálogo Global';
+      ActivityLog.log({
+        action_type: 'player_created',
+        title: `Novo Hardware Registado: ${newPlayer.name}`,
+        description: `Ecrã ${newPlayer.name}${serialLabel} (${newPlayer.device_model || 'Hardware'}) registado${storeText}.`,
+        project_id: newPlayer.project_id,
+        project_name: newPlayer.store_name,
+        user_name: req.user?.name || 'Gabinete Multimédia',
+        icon_type: 'hardware'
+      });
+
       return res.status(201).json({
         success: true,
         message: 'Registo de ecrã/player gravado com sucesso no catálogo!',
@@ -170,6 +185,18 @@ const signageController = {
       if (!updated) {
         return res.status(404).json({ success: false, message: 'Ecrã/Player não encontrado' });
       }
+
+      const serialLabel = updated.serial_number ? ` [ID/Serial: ${updated.serial_number}]` : '';
+      ActivityLog.log({
+        action_type: 'player_updated',
+        title: `Hardware Atualizado: ${updated.name}`,
+        description: `Configurações de ${updated.name}${serialLabel} (${updated.status}) atualizadas no ecossistema.`,
+        project_id: updated.project_id,
+        project_name: updated.store_name,
+        user_name: req.user?.name || 'Gabinete Multimédia',
+        icon_type: 'hardware'
+      });
+
       return res.status(200).json({
         success: true,
         message: 'Configurações do ecrã atualizadas com sucesso!',
@@ -189,6 +216,17 @@ const signageController = {
       if (!player) {
         return res.status(404).json({ success: false, message: 'Ecrã/Player não encontrado' });
       }
+
+      ActivityLog.log({
+        action_type: 'player_ping',
+        title: `Teste de Ping Estabelecido: ${player.name}`,
+        description: `Comunicação bidirecional validada via IP ${player.ip_address || 'DHCP'} com estado ${player.status}.`,
+        project_id: player.project_id,
+        project_name: player.store_name,
+        user_name: req.user?.name || 'Gabinete Multimédia',
+        icon_type: 'info'
+      });
+
       return res.status(200).json({
         success: true,
         message: `Comunicação estabelecida com ${player.name} (${player.ip_address})`,

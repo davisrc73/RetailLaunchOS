@@ -5,6 +5,7 @@
 
 const Cost = require('../models/Cost');
 const Project = require('../models/Project');
+const ActivityLog = require('../models/ActivityLog');
 
 const costController = {
   // Lista todos os custos e sumário orçamental de um projeto
@@ -44,6 +45,16 @@ const costController = {
       });
 
       const updatedSummary = await Cost.getProjectFinancialSummary(projectId);
+
+      const formattedVal = '€ ' + parseFloat(newCost.amount).toFixed(2).replace('.', ',');
+      ActivityLog.log({
+        action_type: 'cost_logged',
+        title: `Lançamento Orçamental: ${formattedVal}`,
+        description: `${newCost.description || 'Diária ou despesa técnica'} registada com data ${newCost.entry_date}.`,
+        project_id: projectId,
+        user_name: req.user?.name || 'Admin Multimédia',
+        icon_type: 'cost'
+      });
 
       return res.status(201).json({
         success: true,

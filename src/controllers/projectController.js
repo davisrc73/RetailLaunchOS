@@ -4,6 +4,7 @@
 // ==============================================================================
 
 const Project = require('../models/Project');
+const ActivityLog = require('../models/ActivityLog');
 
 const projectController = {
   // Lista todos os projetos piloto e aberturas em curso
@@ -49,6 +50,17 @@ const projectController = {
       }
 
       const newProject = await Project.create(req.body);
+
+      ActivityLog.log({
+        action_type: 'project_created',
+        title: `Nova Loja em Planeamento: ${newProject.name}`,
+        description: `Abertura ${newProject.name} (${newProject.brand}) registada. Previsão de inauguração: ${newProject.go_live_date}.`,
+        project_id: newProject.id,
+        project_name: newProject.name,
+        user_name: req.user?.name || 'Direção de Expansão',
+        icon_type: 'project'
+      });
+
       return res.status(201).json({
         success: true,
         message: 'Abertura de loja criada com sucesso!',
@@ -68,6 +80,17 @@ const projectController = {
       if (!updated) {
         return res.status(404).json({ success: false, message: 'Projeto não encontrado' });
       }
+
+      ActivityLog.log({
+        action_type: 'project_updated',
+        title: `Loja Atualizada: ${updated.name}`,
+        description: `Parâmetros de abertura alterados (Estado: ${updated.status}, Go-Live: ${updated.go_live_date}).`,
+        project_id: updated.id,
+        project_name: updated.name,
+        user_name: req.user?.name || 'Gabinete Multimédia',
+        icon_type: 'project'
+      });
+
       return res.status(200).json({ success: true, message: 'Abertura atualizada com sucesso', data: updated });
     } catch (error) {
       console.error('[projectController.update]', error);
@@ -110,6 +133,17 @@ const projectController = {
       if (!updated) {
         return res.status(404).json({ success: false, message: 'Projeto não encontrado' });
       }
+
+      ActivityLog.log({
+        action_type: 'project_updated',
+        title: `Digital Signage Atualizado: ${updated.name}`,
+        description: `Estado de signage: ${updated.signage_status} • Playlist: ${updated.playlist_version || 'Pendente'}.`,
+        project_id: updated.id,
+        project_name: updated.name,
+        user_name: req.user?.name || 'Gabinete Multimédia',
+        icon_type: 'hardware'
+      });
+
       return res.status(200).json({
         success: true,
         message: 'Configuração de Digital Signage atualizada com sucesso!',

@@ -160,9 +160,168 @@ function migrateSystemParameters() {
   }
 }
 
+// Migração transparente Fase 14: Adiciona coluna serial_number em signage_players
+function migrateSignageSerial() {
+  try {
+    const tableCheck = db.prepare("SELECT name FROM sqlite_master WHERE type='table' AND name='signage_players';").get();
+    if (!tableCheck) return;
+
+    const tableInfo = db.prepare("PRAGMA table_info(signage_players);").all();
+    const hasSerial = tableInfo.some(c => c.name === 'serial_number');
+
+    if (!hasSerial) {
+      console.log('🔄 [DB Migration] A adicionar coluna serial_number em signage_players...');
+      db.exec('ALTER TABLE signage_players ADD COLUMN serial_number VARCHAR(100);');
+      db.exec('CREATE INDEX IF NOT EXISTS idx_signage_serial ON signage_players(serial_number);');
+
+      // Preencher seriais nos equipamentos semente caso estejam a NULL
+      db.exec(`
+        UPDATE signage_players SET serial_number = 'SN-BS4K-2026-001' WHERE id = 1 AND (serial_number IS NULL OR serial_number = '');
+        UPDATE signage_players SET serial_number = 'SN-SMG-TIZ-881' WHERE id = 2 AND (serial_number IS NULL OR serial_number = '');
+        UPDATE signage_players SET serial_number = 'SN-BSHD-2026-042' WHERE id = 3 AND (serial_number IS NULL OR serial_number = '');
+        UPDATE signage_players SET serial_number = 'SN-SMG-TIZ-902' WHERE id = 4 AND (serial_number IS NULL OR serial_number = '');
+        UPDATE signage_players SET serial_number = 'SN-BS4K-2026-015' WHERE id = 5 AND (serial_number IS NULL OR serial_number = '');
+        UPDATE signage_players SET serial_number = 'SN-LGW-2026-104' WHERE id = 6 AND (serial_number IS NULL OR serial_number = '');
+      `);
+      console.log('✅ [DB Migration] Coluna serial_number criada e sementes atualizadas com sucesso!');
+    }
+  } catch (err) {
+    console.error('❌ [DB Migration Error] Erro ao migrar serial_number:', err.message);
+  }
+}
+
+// Migração transparente Fase 14: Criação da tabela activity_logs e sementes iniciais
+function migrateActivityLogs() {
+  try {
+    const tableCheck = db.prepare("SELECT name FROM sqlite_master WHERE type='table' AND name='activity_logs';").get();
+    if (!tableCheck) {
+      console.log('🔄 [DB Migration] A criar tabela activity_logs para auditoria de atividade em tempo real...');
+      db.exec(`
+        CREATE TABLE IF NOT EXISTS activity_logs (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            action_type VARCHAR(50) NOT NULL,
+            title VARCHAR(255) NOT NULL,
+            description TEXT,
+            project_id INTEGER,
+            project_name VARCHAR(150),
+            user_id INTEGER,
+            user_name VARCHAR(150) DEFAULT 'Gabinete Multimédia',
+            icon_type VARCHAR(50) DEFAULT 'info',
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (project_id) REFERENCES projects(id) ON DELETE SET NULL,
+            FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL
+        );
+        CREATE INDEX IF NOT EXISTS idx_activity_created ON activity_logs(created_at DESC);
+        CREATE INDEX IF NOT EXISTS idx_activity_action ON activity_logs(action_type);
+        CREATE INDEX IF NOT EXISTS idx_activity_project ON activity_logs(project_id);
+      `);
+      console.log('✅ [DB Migration] Tabela activity_logs criada com sucesso!');
+    }
+
+    // Inicializar registos históricos se estiver vazia
+    const count = db.prepare('SELECT COUNT(*) as count FROM activity_logs;').get()?.count || 0;
+    if (count === 0) {
+      console.log('🔄 [DB Seed] A inicializar registos históricos de atividade recente...');
+      const insertStmt = db.prepare(`
+        INSERT INTO activity_logs (action_type, title, description, project_id, project_name, user_name, icon_type, created_at)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?);
+      `);
+
+      // 1. Players instalados
+      const players = db.prepare(`
+        SELECT sp.name, sp.device_model, sp.zone_location, sp.serial_number, p.id as project_id, p.name as project_name
+        FROM signage_players sp
+        JOIN projects p ON sp.project_id = p.id
+        ORDER BY sp.id ASC LIMIT 3;
+      `).all() || [];
+
+      for (const p of players) {
+        const serialTag = p.serial_number ? ` [ID/Serial: ${p.serial_number}]` : '';
+        insertStmt.run(
+          'player_created',
+          `Equipamento Multimédia Instalado: ${p.name}`,
+          `${p.name}${serialTag} (${p.device_model}) operacional na zona ${p.zone_location}.`,
+          p.project_id,
+          p.project_name,
+          'Gabinete Multimédia',
+          'hardware',
+          new Date(Date.now() - 25 * 60 * 1000).toISOString()
+        );
+      }
+
+      // 2. Custos recentes
+      const costs = db.prepare(`
+        SELECT c.amount, c.description, c.entry_date, p.id as project_id, p.name as project_name
+        FROM project_costs c
+        JOIN projects p ON c.project_id = p.id
+        ORDER BY c.id DESC LIMIT 2;
+      `).all() || [];
+
+      for (const c of costs) {
+        insertStmt.run(
+          'cost_logged',
+          `Lançamento Orçamental: € ${parseFloat(c.amount).toFixed(2).replace('.', ',')}`,
+          `${c.description || 'Despesa técnica'} imputada ao projeto ${c.project_name}.`,
+          c.project_id,
+          c.project_name,
+          'Admin Multimédia',
+          'cost',
+          new Date(Date.now() - 2 * 3600 * 1000).toISOString()
+        );
+      }
+
+      // 3. Tarefas concluídas
+      const tasks = db.prepare(`
+        SELECT t.title, t.department, p.id as project_id, p.name as project_name
+        FROM tasks t
+        JOIN projects p ON t.project_id = p.id
+        WHERE t.status = 'concluido'
+        LIMIT 2;
+      `).all() || [];
+
+      for (const t of tasks) {
+        insertStmt.run(
+          'task_completed',
+          `Marco Concluído: ${t.title}`,
+          `Validação técnica do departamento ${t.department} finalizada em ${t.project_name}.`,
+          t.project_id,
+          t.project_name,
+          'Técnico Digital Signage',
+          'success',
+          new Date(Date.now() - 18 * 3600 * 1000).toISOString()
+        );
+      }
+
+      // 4. Criação de Lojas
+      const projects = db.prepare(`
+        SELECT id, name, brand, store_format FROM projects ORDER BY id ASC LIMIT 2;
+      `).all() || [];
+
+      for (const pr of projects) {
+        insertStmt.run(
+          'project_created',
+          `Nova Abertura em Planeamento: ${pr.name}`,
+          `Abertura de loja formato ${pr.store_format} da insígnia ${pr.brand} registada no ecossistema.`,
+          pr.id,
+          pr.name,
+          'Direção de Expansão',
+          'project',
+          new Date(Date.now() - 48 * 3600 * 1000).toISOString()
+        );
+      }
+
+      console.log('✅ [DB Seed] Feed inicial de atividade recente populado com sucesso!');
+    }
+  } catch (err) {
+    console.error('❌ [DB Migration Error] Erro ao criar activity_logs:', err.message);
+  }
+}
+
 initSchema();
 migrateSchema();
 migrateSystemParameters();
+migrateSignageSerial();
+migrateActivityLogs();
 
 
 function checkpointWal() {
@@ -187,6 +346,8 @@ function reloadConnection() {
     initSchema();
     migrateSchema();
     migrateSystemParameters();
+    migrateSignageSerial();
+    migrateActivityLogs();
     console.log('✅ [DB] Ligação à base de dados recarregada e esquemas verificados com sucesso!');
     return true;
   } catch (err) {

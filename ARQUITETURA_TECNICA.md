@@ -27,7 +27,10 @@ RetailLaunchOS/
 │   │   ├── projectController.js     # Gestão de aberturas de lojas e métricas
 │   │   ├── taskController.js        # Checklist de marcos técnicos e progresso
 │   │   ├── costController.js        # Registo de custos, diárias e sumários orçamentais
-│   │   └── signageController.js     # Catálogo de playlists, versionamento e monitorização de telas
+│   │   ├── signageController.js     # Catálogo de playlists, versionamento e monitorização de telas
+│   │   ├── parameterController.js   # Gestão de parâmetros multimédia (modelos, zonas, resoluções)
+│   │   ├── databaseController.js    # Telemetria, backup e migração atómica da base de dados
+│   │   └── activityController.js    # Feed de auditoria operacional em tempo real (Fase 14)
 │   ├── database/                    # Abstração de ligação e auto-bootstrap da BD
 │   │   └── db.js                    # Conexão nativa via node:sqlite com WAL e PRAGMAs
 │   ├── middleware/                  # Intercetores de pedidos
@@ -39,7 +42,9 @@ RetailLaunchOS/
 │   │   ├── Task.js                  # Marcos técnicos e toggle de estado
 │   │   ├── Cost.js                  # Custos diários, agregações e sumário financeiro
 │   │   ├── Playlist.js              # Versões de playlists, resoluções e catálogo central
-│   │   └── SignagePlayer.js         # Parque de telas, associação de playlists e telemetria ping
+│   │   ├── SignagePlayer.js         # Parque de telas, serial_number, associação e telemetria
+│   │   ├── SystemParameter.js       # Parâmetros estruturais de hardware e multimédia
+│   │   └── ActivityLog.js           # Rasto de auditoria de eventos e atividades recentes (Fase 14)
 │   ├── routes/                      # Definição e mapeamento de rotas
 │   │   ├── api/                     # Rotas de dados JSON (/api/v1/...)
 │   │   │   └── projects.js          # Endpoints REST de projetos
@@ -85,10 +90,12 @@ erDiagram
     PROJECTS ||--o{ TASKS : "possui"
     PROJECTS ||--o{ PROJECT_COSTS : "regista"
     PROJECTS ||--o{ SIGNAGE_PLAYERS : "aloja"
+    PROJECTS ||--o{ ACTIVITY_LOGS : "regista_atividade"
     PLAYLISTS ||--o{ SIGNAGE_PLAYERS : "reproduz_em"
     USERS ||--o{ TASKS : "responsavel"
     USERS ||--o{ PROJECT_COSTS : "lanca"
     USERS ||--o{ PLAYLISTS : "aprova"
+    USERS ||--o{ ACTIVITY_LOGS : "executa"
 
     ROLES {
         int id PK
@@ -163,6 +170,7 @@ erDiagram
         int id PK
         int project_id FK
         string player_code UK
+        string serial_number
         string name
         string zone
         string resolution
@@ -186,6 +194,19 @@ erDiagram
         int is_active
         timestamp created_at
         timestamp updated_at
+    }
+
+    ACTIVITY_LOGS {
+        int id PK
+        string action_type
+        string title
+        text description
+        int project_id FK
+        string project_name
+        int user_id FK
+        string user_name
+        string icon_type
+        timestamp created_at
     }
 ```
 
@@ -271,15 +292,15 @@ Os modelos encapsulam a lógica de negócio e queries SQL parametrizadas (evitan
 * **`Playlist.getStats()`**:
   * Fornece estatísticas consolidadas do repositório: total de playlists, ativas/aprovadas, em rascunho e obsoletas.
 
-### 3.5. Modelo `SignagePlayer.js` (Fase 4)
+### 3.5. Modelo `SignagePlayer.js` (Fase 4 & 14)
 * **`SignagePlayer.findByProject(projectId)`**:
-  * Lista todas as telas/players instalados numa loja específica, com dados completos da playlist associada (`playlist_version`, `playlist_name`, `resolution`).
+  * Lista todas as telas/players instalados numa loja específica, com dados completos da playlist associada (`playlist_version`, `playlist_name`, `resolution`) e o identificador único `serial_number`.
 * **`SignagePlayer.findAll({ status, brand, projectId })`**:
-  * Retorna o parque global de ecrãs de todas as lojas, com detalhes do projeto (loja, código, insígnia) e playlist vinculada.
+  * Retorna o parque global de ecrãs de todas as lojas, com detalhes do projeto (loja, código, insígnia), playlist vinculada e `serial_number`.
 * **`SignagePlayer.create(data)`**:
-  * Adiciona um novo ecrã ao projeto com validação e geração automática de código (`player_code`), zona, orientação, IP, MAC e modelo de hardware.
+  * Adiciona um novo ecrã ao projeto ou catálogo global com validação e geração automática de código (`player_code`), `serial_number` (sanitizado com trim), zona, orientação, IP, MAC e modelo de hardware.
 * **`SignagePlayer.update(id, data)`**:
-  * Permite reatribuir playlists, atualizar endereços IP, notas de instalação ou alterar o estado operacional.
+  * Permite reatribuir playlists, atualizar `serial_number`, endereços IP, notas de instalação ou alterar o estado operacional.
 * **`SignagePlayer.ping(id)`**:
   * Simula/executa telemetria e teste de conectividade com o player, atualizando `last_ping_at = CURRENT_TIMESTAMP` e definindo o estado como `online`.
 * **`SignagePlayer.delete(id)`**:
@@ -321,6 +342,14 @@ Os modelos encapsulam a lógica de negócio e queries SQL parametrizadas (evitan
 * **`SystemParameter.delete(id)`**:
   * Remove fisicamente o parâmetro da base de dados.
 
+### 3.9. Modelo `ActivityLog.js` (Fase 14)
+* **`ActivityLog.log({ action_type, title, description, project_id, project_name, user_id, user_name, icon_type })`**:
+  * Cria de forma não bloqueante um novo registo de auditoria com resolução automática de loja (`project_name`) e utilizador (`user_name`).
+* **`ActivityLog.getRecent(limit = 15)`**:
+  * Retorna as atividades operacionais mais recentes ordenadas por `created_at DESC, id DESC`.
+* **`ActivityLog.findById(id)`**:
+  * Localiza um evento de auditoria pelo ID primário.
+
 ---
 
 ## 4. Controladores e API REST (`projectController`, `taskController`, `costController`, `signageController`, `authController`)
@@ -356,22 +385,20 @@ A API segue os padrões RESTful com payloads JSON e códigos de resposta HTTP se
 | **GET** | `/api/v1/costs/summary` | — | Todos | Sumário financeiro global consolidado |
 | **DELETE**| `/api/v1/costs/:id` | `:id` (Cost ID) | `admin`, `multimedia_user` | Elimina um registo de despesa e recalcula saldo |
 
-### 4.4. Endpoints de Digital Signage & Playlists (`/api/v1/signage` & `/api/v1/projects/:id/players`) (Fases 4 & 8)
+### 4.4. Endpoints de Digital Signage & Playlists (`/api/v1/signage` & `/api/v1/projects/:id/players`) (Fases 4, 8 & 14)
 | Método | Endpoint | Parâmetros | Permissões | Descrição |
 | :--- | :--- | :--- | :---: | :--- |
 | **GET** | `/api/v1/signage/stats` | — | Todos | Métricas globais de Digital Signage |
 | **GET** | `/api/v1/signage/playlists`| `?brand=Fnac&status=aprovado` | Todos | Catálogo de playlists e contagem de telas vinculadas |
 | **POST** | `/api/v1/signage/playlists`| Body JSON com versão/resolução | `admin`, `multimedia_user` | Cria uma nova versão de playlist no catálogo central |
 | **PATCH**| `/api/v1/signage/playlists/:id/status` | `{ status }` | `admin`, `multimedia_user` | Altera estado da playlist |
-| **GET** | `/api/v1/signage/players` | `?status=online&projectId=1` | Todos | Inventário global de ecrãs/players do catálogo e das lojas |
-| **POST** | `/api/v1/signage/players` | Body JSON com dados da tela (`project_id` opcional) | `admin`, `multimedia_user` | Regista novo ecrã/player no catálogo global (em stock ou para loja) |
-| **PATCH**| `/api/v1/signage/players/:id` | `:id` + Body JSON (`project_id`, `name`, `status`, etc.) | `admin`, `multimedia_user` | Atualiza hardware ou reatribui/desassocia projeto |
+| **GET** | `/api/v1/signage/players` | `?status=online&projectId=1` | Todos | Inventário global de ecrãs/players do catálogo e das lojas (inclui `serial_number`) |
+| **POST** | `/api/v1/signage/players` | Body JSON com dados da tela (`serial_number`, `project_id` opcional) | `admin`, `multimedia_user` | Regista novo ecrã/player no catálogo global (em stock ou para loja) com rasto de auditoria |
+| **PATCH**| `/api/v1/signage/players/:id` | `:id` + Body JSON (`serial_number`, `project_id`, `name`, etc.) | `admin`, `multimedia_user` | Atualiza hardware ou reatribui/desassocia projeto |
 | **GET** | `/api/v1/projects/:id/players` | `:id` (Project ID) | Todos | Lista os ecrãs e players instalados na loja |
-| **POST** | `/api/v1/projects/:id/players` | Body JSON com dados da tela | `admin`, `multimedia_user` | Associa um novo ecrã/player à loja especificada |
-| **POST** | `/api/v1/signage/players/:id/ping` | `:id` (Player ID) | `admin`, `multimedia_user`, `store_manager` | Executa teste de conectividade (ping) |
+| **POST** | `/api/v1/projects/:id/players` | Body JSON com dados da tela (`serial_number` suportado) | `admin`, `multimedia_user` | Associa um novo ecrã/player à loja especificada com rasto de auditoria |
+| **POST** | `/api/v1/signage/players/:id/ping` | `:id` (Player ID) | `admin`, `multimedia_user`, `store_manager` | Executa teste de conectividade (ping) e regista telemetria em `activity_logs` |
 | **DELETE**| `/api/v1/signage/players/:id` | `:id` (Player ID) | `admin`, `multimedia_user` | Remove permanentemente uma tela/player do catálogo |
-
-
 
 ### 4.5. Endpoints de Autenticação e Perfis (`/api/v1/auth`, `/api/v1/users`, `/api/v1/roles`) (Fases 5 & 7)
 | Método | Endpoint | Parâmetros | Permissões | Descrição |
@@ -398,6 +425,12 @@ A API segue os padrões RESTful com payloads JSON e códigos de resposta HTTP se
 | **GET** | `/api/v1/database/info` | — | `admin`, `multimedia_user` | Retorna o caminho, tamanho em disco, data da última escrita e contagem de lojas/tarefas/players |
 | **GET** | `/api/v1/database/backup` | — | `admin` | Executa checkpoint WAL e descarrega o binário `retaillaunch.sqlite` consolidado |
 | **POST** | `/api/v1/database/restore` | Body binário (`.sqlite`) | `admin` | Valida integridade SQLite 3, cria cópia `.bak`, substitui o ficheiro e recarrega a ligação |
+
+### 4.8. Endpoints de Atividades Recentes e Auditoria (`/api/v1/activities`) (Fase 14)
+| Método | Endpoint | Parâmetros | Permissões | Descrição |
+| :--- | :--- | :--- | :---: | :--- |
+| **GET** | `/api/v1/activities` | `?limit=15` | Todos | Retorna a lista cronológica de eventos operacionais recentes (`created_at DESC, id DESC`) |
+| **POST** | `/api/v1/activities` | Body JSON com `{ action_type, title, description, project_id, icon_type }` | `admin`, `multimedia_user` | Cria um evento manual de auditoria operacional |
 
 ---
 
@@ -660,6 +693,21 @@ A migração entre o Mac (desenvolvimento) e o Synology NAS (produção) é real
 * **Volume Docker (`retaillaunch_data:/app/database`)**: A pasta de dados `/app/database` é mantida fora do sistema de ficheiros efémero do contentor.
 * **Isolamento via Git (`.gitignore`)**: Como `database/*.sqlite*` está no `.gitignore`, os comandos de atualização `git pull origin main` no NAS não interagem com o ficheiro de base de dados de produção.
 * **Reconstrução Segura**: Ao executar `docker compose build --no-cache && docker compose up -d --force-recreate`, o Docker reconstrói o contentor com o código mais recente, mas religa automaticamente o volume `retaillaunch_data` com todos os dados intactos.
+
+---
+
+## 12. Arquitetura do Feed de Atividades em Tempo Real & Rastreabilidade de Hardware (Fase 14)
+
+### 12.1. Rasto de Auditoria Desacoplado & Não-Bloqueante (`ActivityLog`)
+* **Modelo `ActivityLog.js`**: Implementa o método estático `log()` protegido por blocos `try/catch` para garantir que eventuais falhas de registo de auditoria nunca abortam ou bloqueiam a transação principal de negócio (criação de projetos, tarefas, custos ou hardware).
+* **Resolução Automática de Contexto**: Se o autor da ação não for explicitamente fornecido, o modelo resolve automaticamente o utilizador através de `user_id` ou recorre ao operador piloto ativo (`Fnac Multimedia`). Se `project_id` for fornecido sem `project_name`, o modelo efetua uma consulta relacional rápida para preencher o nome e insígnia da loja.
+* **Auto-Sementeira Histórica Idempotente**: Durante o bootstrap em `src/database/db.js` (`migrateActivityLogs`), se a tabela `activity_logs` for criada de raiz ou estiver vazia, o sistema gera retroativamente eventos reais com base nos registos já existentes em `projects`, `tasks`, `project_costs` e `signage_players`, garantindo que o dashboard nunca apresenta cartões vazios mesmo em bases de dados migradas.
+
+### 12.2. Pipeline de Rastreabilidade Única de Hardware (`serial_number`)
+* **Coluna `serial_number`**: Adicionada à tabela `signage_players` (`VARCHAR(100)`) com índice B-Tree dedicado `idx_signage_serial`.
+* **Sanitização de Entrada**: Nos métodos `SignagePlayer.create` e `SignagePlayer.update`, os valores são sanitizados com `.trim()` ou definidos como `null` quando vazios, assegurando consistência nas queries de pesquisa.
+* **Filtragem Indexada no Frontend**: A função `filterPlayersCatalog()` no cliente faz a comparação do termo de pesquisa contra `player_code`, `name`, `hardware_model`, `zone`, `ip_address`, `mac_address` e `serial_number`.
+
 
 
 

@@ -156,6 +156,7 @@ CREATE TABLE IF NOT EXISTS signage_players (
     device_model VARCHAR(100) DEFAULT 'BrightSign XT1144 4K', -- 'BrightSign XT1144', 'Samsung SSP Tizen', 'LG webOS Signage'
     zone_location VARCHAR(100) NOT NULL,        -- 'Entrada Principal', 'Montra', 'Linha de Caixas', 'Auditório Fnac'
     resolution VARCHAR(50) DEFAULT '4K UHD',
+    serial_number VARCHAR(100),                 -- N.º de Série ou Identificador Único de Ativo
     ip_address VARCHAR(45),                     -- Ex: '192.168.142.10'
     mac_address VARCHAR(20),                    -- Ex: '00:10:18:A4:21:01'
     status VARCHAR(30) DEFAULT 'online',        -- 'online', 'offline', 'testing', 'syncing'
@@ -168,11 +169,12 @@ CREATE TABLE IF NOT EXISTS signage_players (
     FOREIGN KEY (playlist_id) REFERENCES playlists(id) ON DELETE SET NULL
 );
 
--- Índices Fase 4
+-- Índices Fase 4 & Fase 14
 CREATE INDEX IF NOT EXISTS idx_playlists_brand ON playlists(brand);
 CREATE INDEX IF NOT EXISTS idx_playlists_status ON playlists(status);
 CREATE INDEX IF NOT EXISTS idx_signage_project ON signage_players(project_id);
 CREATE INDEX IF NOT EXISTS idx_signage_status ON signage_players(status);
+CREATE INDEX IF NOT EXISTS idx_signage_serial ON signage_players(serial_number);
 
 -- Sementes Fase 4: Playlists
 INSERT OR IGNORE INTO playlists (id, code, name, brand, version, resolution, duration_seconds, status, file_size_mb, media_count, notes, created_by) VALUES
@@ -181,14 +183,38 @@ INSERT OR IGNORE INTO playlists (id, code, name, brand, version, resolution, dur
 (3, 'PL-FNAC-INSTITUCIONAL', 'Fnac Brand Universe & Bilheteira', 'Fnac', 'v3.0-standard', '3840x2160 (4K)', 300, 'em_validacao', 1850.00, 24, 'Pacote de conteúdos universais para auditórios e áreas culturais.', 1),
 (4, 'PL-DARTY-SERVICE', 'Darty Contratos de Assistência & Entrega', 'Darty', 'v1.0-draft', '1920x1080 (FHD)', 120, 'draft', 450.00, 8, 'Em validação com o departamento de serviços e pós-venda.', 2);
 
--- Sementes Fase 4: Players e Telas Instaladas
-INSERT OR IGNORE INTO signage_players (id, project_id, name, device_model, zone_location, resolution, ip_address, mac_address, status, playlist_id, current_firmware, last_ping) VALUES
-(1, 1, 'Video Wall Entrada 4x4 (LED Wall)', 'BrightSign XT1144 4K', 'Entrada Principal', '3840x2160 (4K)', '192.168.142.10', '00:10:18:A4:21:01', 'online', 1, 'v9.0.145', CURRENT_TIMESTAMP),
-(2, 1, 'Display Duplo Montra Shopping', 'Samsung SSP (Tizen 6.5)', 'Montra Lateral', '1920x1080 (FHD)', '192.168.142.12', '00:10:18:B2:14:88', 'online', 1, 'v6.5.210', CURRENT_TIMESTAMP),
-(3, 1, 'Totem Interativo Bilheteira & Cultura', 'BrightSign HD224', 'Fórum Cultural', '1920x1080 (FHD)', '192.168.142.15', '00:10:18:C9:83:02', 'syncing', 3, 'v9.0.145', CURRENT_TIMESTAMP),
-(4, 1, 'Telas Menu Linha de Caixas (3 Displays)', 'Samsung SSP (Tizen 6.5)', 'Linha de Caixas', '1920x1080 (FHD)', '192.168.142.18', '00:10:18:D1:45:90', 'testing', 1, 'v6.5.210', CURRENT_TIMESTAMP),
-(5, 2, 'Painel LED Montra Exterior', 'BrightSign XT1144 4K', 'Fachada Principal', 'Video Wall LED', '192.168.150.10', '00:10:18:E7:22:19', 'online', 2, 'v9.0.145', CURRENT_TIMESTAMP),
-(6, 2, 'Display Balcão Apoio ao Cliente', 'LG webOS Signage 6.0', 'Balcão de Serviços', '1920x1080 (FHD)', '192.168.150.14', '00:10:18:F3:11:44', 'offline', 2, 'v6.0.102', CURRENT_TIMESTAMP);
+-- Sementes Fase 4 & 14: Players e Telas Instaladas (com Serial Number)
+INSERT OR IGNORE INTO signage_players (id, project_id, name, device_model, zone_location, resolution, serial_number, ip_address, mac_address, status, playlist_id, current_firmware, last_ping) VALUES
+(1, 1, 'Video Wall Entrada 4x4 (LED Wall)', 'BrightSign XT1144 4K', 'Entrada Principal', '3840x2160 (4K)', 'SN-BS4K-2026-001', '192.168.142.10', '00:10:18:A4:21:01', 'online', 1, 'v9.0.145', CURRENT_TIMESTAMP),
+(2, 1, 'Display Duplo Montra Shopping', 'Samsung SSP (Tizen 6.5)', 'Montra Lateral', '1920x1080 (FHD)', 'SN-SMG-TIZ-881', '192.168.142.12', '00:10:18:B2:14:88', 'online', 1, 'v6.5.210', CURRENT_TIMESTAMP),
+(3, 1, 'Totem Interativo Bilheteira & Cultura', 'BrightSign HD224', 'Fórum Cultural', '1920x1080 (FHD)', 'SN-BSHD-2026-042', '192.168.142.15', '00:10:18:C9:83:02', 'syncing', 3, 'v9.0.145', CURRENT_TIMESTAMP),
+(4, 1, 'Telas Menu Linha de Caixas (3 Displays)', 'Samsung SSP (Tizen 6.5)', 'Linha de Caixas', '1920x1080 (FHD)', 'SN-SMG-TIZ-902', '192.168.142.18', '00:10:18:D1:45:90', 'testing', 1, 'v6.5.210', CURRENT_TIMESTAMP),
+(5, 2, 'Painel LED Montra Exterior', 'BrightSign XT1144 4K', 'Fachada Principal', 'Video Wall LED', 'SN-BS4K-2026-015', '192.168.150.10', '00:10:18:E7:22:19', 'online', 2, 'v9.0.145', CURRENT_TIMESTAMP),
+(6, 2, 'Display Balcão Apoio ao Cliente', 'LG webOS Signage 6.0', 'Balcão de Serviços', '1920x1080 (FHD)', 'SN-LGW-2026-104', '192.168.150.14', '00:10:18:F3:11:44', 'offline', 2, 'v6.0.102', CURRENT_TIMESTAMP);
+
+-- ==============================================================================
+-- FASE 14: FEED DINÂMICO DE ATIVIDADE RECENTE & AUDITORIA OPERACIONAL
+-- ==============================================================================
+
+-- 8. TABELA: ACTIVITY_LOGS (Eventos, Atualizações de Tarefas, Custos e Hardware)
+CREATE TABLE IF NOT EXISTS activity_logs (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    action_type VARCHAR(50) NOT NULL,           -- 'project_created', 'project_updated', 'task_completed', 'task_created', 'cost_logged', 'player_created', 'player_updated', 'player_ping'
+    title VARCHAR(255) NOT NULL,
+    description TEXT,
+    project_id INTEGER,
+    project_name VARCHAR(150),
+    user_id INTEGER,
+    user_name VARCHAR(150) DEFAULT 'Gabinete Multimédia',
+    icon_type VARCHAR(50) DEFAULT 'info',       -- 'success', 'warning', 'info', 'hardware', 'cost', 'project'
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (project_id) REFERENCES projects(id) ON DELETE SET NULL,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL
+);
+
+CREATE INDEX IF NOT EXISTS idx_activity_created ON activity_logs(created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_activity_action ON activity_logs(action_type);
+CREATE INDEX IF NOT EXISTS idx_activity_project ON activity_logs(project_id);
 -- ==============================================================================
 -- FASE 11: GESTÃO DE PARÂMETROS MULTIMÉDIA (MODELOS, ZONAS & RESOLUÇÕES)
 -- ==============================================================================

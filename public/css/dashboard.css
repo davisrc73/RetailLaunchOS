@@ -3285,6 +3285,21 @@ body {
   border: 1px solid var(--border-subtle);
 }
 
+.player-serial-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 7px;
+  border-radius: var(--radius-sm);
+  background: rgba(99, 102, 241, 0.12);
+  color: #A5B4FC;
+  border: 1px solid rgba(99, 102, 241, 0.28);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  letter-spacing: 0.2px;
+}
+
 .player-res-chip {
   display: inline-block;
   font-size: 10px;
