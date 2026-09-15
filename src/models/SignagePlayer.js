@@ -91,8 +91,6 @@ class SignagePlayer {
     const zone_location = data.zone_location ? data.zone_location.trim() : 'Entrada Principal';
     const resolution = data.resolution || '4K UHD';
     const serial_number = data.serial_number ? data.serial_number.trim() : null;
-    const ip_address = data.ip_address ? data.ip_address.trim() : '192.168.1.100';
-    const mac_address = data.mac_address ? data.mac_address.trim() : '00:10:18:00:00:00';
     const status = data.status || 'online';
     const playlist_id = (data.playlist_id !== undefined && data.playlist_id !== null && data.playlist_id !== '' && data.playlist_id !== 'none')
       ? parseInt(data.playlist_id, 10)
@@ -102,21 +100,21 @@ class SignagePlayer {
     const sql = `
       INSERT INTO signage_players (
         project_id, name, device_model, zone_location, resolution, serial_number,
-        ip_address, mac_address, status, playlist_id, current_firmware, last_ping
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
+        status, playlist_id, current_firmware, last_ping
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
     `;
 
     const result = db.run(sql, [
       projectId, name, device_model, zone_location, resolution, serial_number,
-      ip_address, mac_address, status, playlist_id, current_firmware
+      status, playlist_id, current_firmware
     ]);
 
     return this.findById(result.lastInsertRowid);
   }
 
-  // Atualiza dados de um player (ex: loja, IP, zona, serial, playlist vinculada, status)
+  // Atualiza dados de um player (ex: loja, zona, serial, playlist vinculada, status)
   static async update(id, data) {
-    const allowed = ['project_id', 'name', 'device_model', 'zone_location', 'resolution', 'serial_number', 'ip_address', 'mac_address', 'status', 'playlist_id', 'current_firmware'];
+    const allowed = ['project_id', 'name', 'device_model', 'zone_location', 'resolution', 'serial_number', 'status', 'playlist_id', 'current_firmware'];
     const updates = [];
     const params = [];
 

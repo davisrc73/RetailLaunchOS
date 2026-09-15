@@ -218,7 +218,7 @@ Cada display é apresentado com:
 
 #### B. Associar Novo Ecrã / Player
 1. Clica no botão **"+ Associar Novo Ecrã / Player"** no cabeçalho da lista.
-2. Preenche: Nome do ecrã, ID / Serial (N.º Série), Zona na loja, Modelo de hardware, Resolução de saída, Endereço IP e Playlist inicial.
+2. Preenche: Nome do ecrã, ID / Serial (N.º Série), Zona na loja, Modelo de hardware, Resolução de saída e Playlist inicial.
 3. Clica em **"Gravar Ecrã"**: O registo é gravado via `POST /api/v1/projects/:id/players`, gera automaticamente um evento na auditoria de *Atividade Recente* e é integrado no cálculo de prontidão de Digital Signage.
 
 ---
@@ -485,30 +485,29 @@ A secção **"Configurações"** na barra lateral do dashboard centraliza as fer
 Na barra lateral de navegação, na secção **"Configurações"**, clica em **"Telas & Players"**. O modal **"Telas & Players • Catálogo Global de Hardware"** abre-se centralmente no ecrã.
 
 ### 11.2. Estrutura do Catálogo Global vs Associações por Loja
-* **Catálogo Global em "Configurações" (Fase 8)**: Gere o **inventário físico de hardware** (dispositivos BrightSign, Samsung Tizen, LG webOS, Mini PCs). Permite registar displays mesmo antes de serem atribuídos a uma obra/loja (ficando identificados como `📦 Em Stock / Sem Loja`), editar especificações técnicas (IP, MAC, resolução, firmware) e desassociar/reassociar entre projetos.
-* **Aba "Telas & Players" no Detalhe da Loja (Fase 4)**: Permite visualizar e controlar apenas os displays instalados naquela obra específica.
+* **Catálogo Global em "Configurações" (Fase 8 & 16)**: Gere o **inventário físico de hardware** (dispositivos BrightSign, Samsung Tizen, LG webOS, Mini PCs). Permite registar displays mesmo antes de serem atribuídos a uma obra/loja (ficando identificados como `📦 Em Stock / Sem Loja`), editar especificações técnicas (modelo, resolução, firmware, serial number) e desassociar/reassociar entre projetos.
+* **Aba "Telas & Players" no Detalhe da Loja (Fase 4 & 16)**: Permite visualizar e controlar apenas os displays instalados naquela obra específica.
 
-### 11.3. Registar Novo Ecrã / Player
+### 11.3. Registar Novo Ecrã / Player (Vista Dedicada sem Amostragem)
 1. No topo do modal do catálogo, clica no botão **"＋ Novo Ecrã / Player"** (disponível para perfis *Admin* e *Técnico Multimédia*).
-2. O painel superior expande-se com o formulário de hardware:
+2. A vista da tabela é temporariamente ocultada, abrindo uma janela limpa, dedicada e focada exclusivamente no formulário de registo (eliminando qualquer conflito de largura ou overscroll horizontal).
+3. Preenche os campos do formulário:
    * **Nome do Ecrã / Display \***: Nome descritivo (ex: `Video Wall Entrada 4x4`, `Totem Interativo Montra`).
    * **ID / Serial (N.º Série)**: Identificador único de equipamento ou número de série do fabricante (ex: `BS-XT1144-88412`, `S24B40091`, `PAT-FNAC-00912`), essencial para inventário técnico e garantia.
    * **Modelo de Hardware**: Selecionar na lista (`BrightSign XT1144 4K`, `Samsung SSP Tizen`, `LG webOS Signage`, `Display Android Genérico`, `Mini PC Windows / Linux`).
    * **Zona / Localização \***: Zona física na loja ou armazém (ex: `Entrada Principal`, `Montra`, `Linha de Caixas`, `Stock Central`).
    * **Resolução / Formato**: Resolução nativa (`4K UHD`, `FHD 1080p`, `HD 720p`, `Video Wall LED`, `Formato Vertical 9:16`).
-   * **Endereço IP**: Endereço IPv4 atribuído na rede da loja ou laboratório (ex: `192.168.142.10`).
-   * **Endereço MAC**: Identificador físico de rede (ex: `00:10:18:A4:21:01`).
    * **Estado Operacional**: `Online`, `Testing`, `Syncing` ou `Offline`.
    * **Versão de Firmware**: Versão instalada no media player (ex: `v9.0.145`).
    * **Loja / Projeto Associado**: Selecionar a loja correspondente (`Fnac Cascais`, `Darty Alfragide`, etc.) ou deixar em **"— Em Stock / Não Associado a Projeto —"** para ecrãs de reserva ou catálogo.
    * **Playlist Vinculada**: Selecionar opcionalmente a versão de playlist do catálogo para sincronização de conteúdos.
-3. Clica em **"💾 Guardar Hardware"**. O dispositivo é imediatamente registado, adicionado à auditoria de *Atividade Recente* e exibido na tabela com a respetiva badge de serial `🏷️`.
+4. Clica em **"💾 Guardar Hardware"** (ou em **"← Voltar ao Catálogo"** para cancelar). Ao guardar, o dispositivo é gravado com sucesso, gera um evento na auditoria de *Atividade Recente* e o sistema regressa de imediato à vista do catálogo total com a listagem atualizada.
 
 ### 11.4. Editar Hardware e Reatribuição de Loja
 1. Na linha correspondente ao ecrã/player, clica no botão **"✏️ Editar"**.
-2. Os dados atuais são carregados para o painel de formulário (incluindo o N.º de Série / ID).
+2. A tabela de hardware é ocultada e abre-se a janela de edição dedicada com os dados atuais pré-preenchidos.
 3. Altera qualquer parâmetro, incluindo o número de série ou a **reatribuição de loja** (ex: transferir um display de *Stock* para uma loja ou de uma loja para outra).
-4. Clica em **"💾 Guardar Hardware"**. As alterações são refletidas de imediato.
+4. Clica em **"💾 Guardar Hardware"**: as alterações são salvas e o ecrã regressa automaticamente à listagem do catálogo total.
 
 ### 11.5. Teste de Conectividade (Ping em Tempo Real)
 * Na coluna de ações de cada linha, clica no botão **"📡 Ping"**.
@@ -516,13 +515,14 @@ Na barra lateral de navegação, na secção **"Configurações"**, clica em **"
 
 ### 11.6. Eliminar Ecrã / Player do Catálogo
 1. Clica no botão com o ícone de caixote do lixo **"🗑️"** na linha do dispositivo.
-2. É solicitada a confirmação explícita de eliminação irreversível.
-3. Após confirmação, o dispositivo é removido permanentemente do catálogo e da base de dados.
+2. O sistema aciona a ação com segurança absoluta por ID numérico (eliminando qualquer falha mesmo em equipamentos que contenham aspas no nome, como `LCD Samsung 32"`).
+3. É solicitada a confirmação explícita de eliminação irreversível.
+4. Após confirmação, o dispositivo é removido permanentemente do catálogo e da base de dados.
 
 ### 11.7. Filtros Rápidos e Pesquisa Dinâmica
 * **Filtro de Associação**: Permite filtrar entre *Todas as Associações*, *📦 Em Stock / Sem Loja*, *🟡 Fnac* ou *🔴 Darty*.
 * **Filtro de Estado**: Permite filtrar por *Online*, *Syncing*, *Testing* ou *Offline*.
-* **Campo de Pesquisa**: Filtra instantaneamente conforme o operador digita nome, modelo, ID / Número de Série (`serial_number`), IP, MAC, zona ou loja.
+* **Campo de Pesquisa**: Filtra instantaneamente conforme o operador digita nome, modelo, ID / Número de Série (`serial_number`), zona ou loja.
 
 ---
 

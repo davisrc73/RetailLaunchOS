@@ -217,10 +217,11 @@ const signageController = {
         return res.status(404).json({ success: false, message: 'Ecrã/Player não encontrado' });
       }
 
+      const serialLabel = player.serial_number ? ` (S/N: ${player.serial_number})` : '';
       ActivityLog.log({
         action_type: 'player_ping',
         title: `Teste de Ping Estabelecido: ${player.name}`,
-        description: `Comunicação bidirecional validada via IP ${player.ip_address || 'DHCP'} com estado ${player.status}.`,
+        description: `Comunicação bidirecional validada com sucesso com estado ${player.status}.${serialLabel}`,
         project_id: player.project_id,
         project_name: player.store_name,
         user_name: req.user?.name || 'Gabinete Multimédia',
@@ -229,7 +230,7 @@ const signageController = {
 
       return res.status(200).json({
         success: true,
-        message: `Comunicação estabelecida com ${player.name} (${player.ip_address})`,
+        message: `Comunicação estabelecida com ${player.name}${serialLabel}`,
         data: player
       });
     } catch (error) {

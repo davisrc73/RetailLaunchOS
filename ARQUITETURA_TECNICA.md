@@ -175,8 +175,6 @@ erDiagram
         string zone
         string resolution
         string orientation
-        string ip_address
-        string mac_address
         string hardware_model
         string os_version
         int current_playlist_id FK
@@ -706,7 +704,7 @@ A migração entre o Mac (desenvolvimento) e o Synology NAS (produção) é real
 ### 12.2. Pipeline de Rastreabilidade Única de Hardware (`serial_number`)
 * **Coluna `serial_number`**: Adicionada à tabela `signage_players` (`VARCHAR(100)`) com índice B-Tree dedicado `idx_signage_serial`.
 * **Sanitização de Entrada**: Nos métodos `SignagePlayer.create` e `SignagePlayer.update`, os valores são sanitizados com `.trim()` ou definidos como `null` quando vazios, assegurando consistência nas queries de pesquisa.
-* **Filtragem Indexada no Frontend**: A função `filterPlayersCatalog()` no cliente faz a comparação do termo de pesquisa contra `player_code`, `name`, `hardware_model`, `zone`, `ip_address`, `mac_address` e `serial_number`.
+* **Filtragem Indexada no Frontend**: A função `filterPlayersCatalog()` no cliente faz a comparação do termo de pesquisa contra `player_code`, `name`, `hardware_model`, `zone` e `serial_number`.
 
 ---
 
@@ -742,6 +740,29 @@ A camada de apresentação foi reestruturada para suportar a diversidade de disp
 * **Abas com Rolagem Horizontal Livre**: O contentor `.modal-nav-tabs` utiliza `overflow-x: auto; flex-wrap: nowrap;` com barras de rolagem invisíveis (`scrollbar-width: none`), impedindo quebras inestéticas de abas no modal da loja.
 * **Prevenção de Zoom Indesejado**: Todos os controlos de formulário (`.form-input`, `.form-select`, `.form-textarea`) aplicam `font-size: 16px` no mobile, evitando o comportamento forçado de zoom automático do motor WebKit (iOS Safari).
 * **Safe-Area Insets**: Respeito pelas áreas seguras de notch e barra de gestos através de `env(safe-area-inset-top)` e `env(safe-area-inset-bottom)`.
+
+---
+
+## 14. Arquitetura de Vistas Dedicadas no Catálogo de Hardware & Eliminação Segura (Fase 16)
+
+### 14.1. Eliminação Segura por ID Numérico & Desacoplamento de Nomes
+* **Vulnerabilidade de Sintaxe Resolvida**: O manipulador inline anterior interpolava strings de nome de hardware diretamente no atributo HTML `onclick="deleteCatalogPlayerAction(${p.id}, '${p.name}')"`. Equipamentos com aspas no nome (muito frequentes em polegadas de monitores de retalho, como `LCD Samsung 32"`) quebravam o delimitador de atributo do navegador, impedindo o disparo do evento `click`.
+* **Solução por Lookup Seguro**: O botão passa estritamente o identificador numérico `onclick="deleteCatalogPlayerAction(${p.id})"`. A função JavaScript cliente realiza o lookup seguro do objeto via `_allCatalogPlayers.find(item => item.id === playerId)`, garantindo 100% de resiliência e integridade referencial independentemente de caracteres especiais no nome. O mesmo desacoplamento foi aplicado ao botão de teste de conectividade `pingCatalogPlayerAction(${p.id})`.
+
+### 14.2. Separação de Vistas no Modal de Telas & Players (Single-View Mode)
+* **Problema Resolvido**: A abertura do formulário de registo e edição de hardware sobrepunha-se à listagem de dispositivos com 7 colunas, provocando poluição visual, sobreposição de controlos e barras de rolagem horizontal desnecessárias.
+* **Arquitetura de Vistas Alternadas**:
+  - `#catalogTableView`: Contém a barra de ferramentas de pesquisa/filtros e a tabela consolidada de hardware (agora com 6 colunas, sem campos de rede legados).
+  - `#catalogPlayerFormView`: Contém o formulário de hardware isolado em contentor dedicado (`.player-form-panel`), sem amostragem residual da tabela.
+  - **Fluxo de Navegação**:
+    * Ao carregar em `＋ Novo Ecrã / Player` ou `✏️ Editar`: `#catalogTableView` é ocultado (`display: none`) e `#catalogPlayerFormView` é exibido (`display: block`), ajustando o título do modal dinamicamente.
+    * Ao carregar em `💾 Guardar Hardware` ou `← Voltar ao Catálogo`: O formulário é reiniciado e ocultado, `#catalogTableView` é restaurado e os dados da base de dados são recarregados e re-renderizados de imediato.
+* **Layout Anti-Overscroll**: A grelha de formulário `.player-form-grid` foi calibrada para 2 colunas no desktop (`grid-template-columns: repeat(2, minmax(0, 1fr))`) e 1 coluna em ecrãs estreitos, com `overflow-x: hidden; width: 100%; box-sizing: border-box;`, eliminando de raiz o scroll horizontal.
+
+### 14.3. Descontinuação e Remoção Integral de Endereços IP e MAC
+* **Remoção na Base de Dados**: As colunas legadas `ip_address` e `mac_address` foram removidas do esquema oficial em `database/schema.sql`.
+* **Migração Transparente**: O motor SQLite central em `src/database/db.js` executa a rotina `migrateRemoveNetworkFields()` via `ALTER TABLE signage_players DROP COLUMN` caso essas colunas ainda existam em bases de dados existentes.
+* **Consolidação no Identificador Único (`serial_number`)**: A rastreabilidade técnica e contratual de cada tela/player passa a residir exclusivamente no campo `serial_number`, refletido em todos os endpoints REST, modelos, tabelas do catálogo global, detalhe da loja e auditoria em tempo real (`activity_logs`).
 
 
 

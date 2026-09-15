@@ -317,11 +317,46 @@ function migrateActivityLogs() {
   }
 }
 
+// Migração transparente Fase 16: Remove colunas legadas ip_address e mac_address de signage_players
+function migrateRemoveNetworkFields() {
+  try {
+    const tableCheck = db.prepare("SELECT name FROM sqlite_master WHERE type='table' AND name='signage_players';").get();
+    if (!tableCheck) return;
+
+    const tableInfo = db.prepare("PRAGMA table_info(signage_players);").all();
+    const hasIp = tableInfo.some(c => c.name === 'ip_address');
+    const hasMac = tableInfo.some(c => c.name === 'mac_address');
+
+    if (hasIp) {
+      console.log('🔄 [DB Migration] A remover coluna legada ip_address de signage_players...');
+      try {
+        db.exec('ALTER TABLE signage_players DROP COLUMN ip_address;');
+        console.log('✅ [DB Migration] Coluna ip_address removida com sucesso!');
+      } catch (dropErr) {
+        console.warn('[DB Migration Warning] Não foi possível executar DROP COLUMN ip_address:', dropErr.message);
+      }
+    }
+
+    if (hasMac) {
+      console.log('🔄 [DB Migration] A remover coluna legada mac_address de signage_players...');
+      try {
+        db.exec('ALTER TABLE signage_players DROP COLUMN mac_address;');
+        console.log('✅ [DB Migration] Coluna mac_address removida com sucesso!');
+      } catch (dropErr) {
+        console.warn('[DB Migration Warning] Não foi possível executar DROP COLUMN mac_address:', dropErr.message);
+      }
+    }
+  } catch (err) {
+    console.error('❌ [DB Migration Error] Erro ao remover colunas legadas de rede:', err.message);
+  }
+}
+
 initSchema();
 migrateSchema();
 migrateSystemParameters();
 migrateSignageSerial();
 migrateActivityLogs();
+migrateRemoveNetworkFields();
 
 
 function checkpointWal() {
@@ -348,6 +383,7 @@ function reloadConnection() {
     migrateSystemParameters();
     migrateSignageSerial();
     migrateActivityLogs();
+    migrateRemoveNetworkFields();
     console.log('✅ [DB] Ligação à base de dados recarregada e esquemas verificados com sucesso!');
     return true;
   } catch (err) {
