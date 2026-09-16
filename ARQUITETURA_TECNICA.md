@@ -836,6 +836,31 @@ A camada de apresentação foi reestruturada para suportar a diversidade de disp
   - A linha ativa recebe a classe `.master-row-selected` com contorno dourado (`var(--fnac-gold)`), sincronizando visualmente a seleção da tabela à esquerda com o conteúdo da gaveta à direita.
   - A rolagem vertical do corpo (`.modal-body`) é reposta suavemente no topo (`scrollTop = 0`) a cada troca de loja.
 
+---
+
+## 17. Arquitetura de Usabilidade Final, Sidebar Retrátil & Unificação Global de Drawers (Fase 19)
+
+### 17.1. Mecânica da Barra Lateral Retrátil (Sidebar Retraction & Zero-Layout-Shift)
+* **Arquitetura de Transição CSS**:
+  - `body.sidebar-collapsed .app-sidebar`: `transform: translateX(-100%); transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);`.
+  - `body.sidebar-collapsed .app-main`: `margin-left: 0; transition: margin-left 0.3s cubic-bezier(0.16, 1, 0.3, 1);`.
+  - A aceleração por GPU no `transform` e a transição fluida na margem esquerda garantem que não ocorrem saltos ou trepidações (*layout shifts*) durante a alternância.
+* **Prevenção de FOUC (*Flash of Unstyled Content*)**:
+  - Script síncrono no `<head>` lê `localStorage.getItem('retaillaunch_sidebar_collapsed')` e aplica imediatamente `html.sidebar-collapsed` antes da renderização dos elementos do DOM.
+* **Múltiplos Gatilhos de Controlo**:
+  1. `#btnToggleSidebar`: Botão no cabeçalho com alternância de ícones SVG (`.icon-sidebar-collapse` e `.icon-sidebar-expand`).
+  2. `#btnCollapseSidebarInternal`: Botão discreto `◀` no bloco de marca da barra lateral.
+  3. Atalho de teclado universal: Event listener para `(e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'b'`.
+
+### 17.2. Unificação Global de 100% dos Modais em Slide-Over Drawers
+Todos os 9 modais da aplicação passam a partilhar a mesma matriz arquitetural `.drawer-backdrop` + `.drawer-card`, com três variantes de largura calibradas:
+1. **Padrão / Amplo (`760px` -> `94vw`)**: Utilizado nos módulos densos de informação (`#modalDetalheProjeto`, `#modalHubSignage`, `#modalUsersManagement`, `#modalPlayersCatalog`, `#modalConfigParameters`, `#modalGlobalTasks`).
+2. **Formulário Médio (`.drawer-form` de `640px` -> `94vw`)**: Utilizado em formulários estruturais (`#modalNovaAbertura`, `#modalDatabaseMigration`).
+3. **Compacto (`.drawer-compact` de `520px` -> `94vw`)**: Utilizado em autenticação e troca de perfil (`#modalAuthLogin`).
+
+Todos os componentes contam com botão de maximização `⛶` (`toggleDrawerExpand(cardId, btnId)`) e fecho centralizado via backdrop click e tecla `Escape`.
+
+
 
 
 

@@ -66,6 +66,11 @@ Este manual destina-se aos utilizadores e operadores do **Gabinete Multimédia**
     - [19.2. Preservação de Contexto & Navegação Contínua Master-Detail](#192-preservação-de-contexto--navegação-contínua-master-detail)
     - [19.3. Botão de Expansão / Ecrã Inteiro (⛶ Maximizar Painel)](#193-botão-de-expansão--ecrã-inteiro-maximizar-painel)
     - [19.4. Cabeçalho Fixo, Abas Sticky e Rolagem Vertical a 100% da Altura](#194-cabeçalho-fixo-abas-sticky-e-rolagem-vertical-a-100-da-altura)
+20. [Usabilidade Final • Unificação Geral de Drawers, Barra Lateral Retrátil (⌘B) & Cabeçalho Otimizado (Fase 19)](#20-usabilidade-final--unificação-geral-de-drawers-barra-lateral-retrátil-b--cabeçalho-otimizado-fase-19)
+    - [20.1. Título Oficial Normalizado: 'Dashboard • Expansão Fnac/Darty'](#201-título-oficial-normalizado-dashboard--expansão-fnacdarty)
+    - [20.2. Mecânica de Barra Lateral Retrátil (Esconder à Esquerda & Atalho ⌘B)](#202-mecânica-de-barra-lateral-retrátil-esconder-à-esquerda--atalho-b)
+    - [20.3. Remoção do Badge Estático de Telemetria Signage](#203-remoção-do-badge-estático-de-telemetria-signage)
+    - [20.4. Unificação Integral de 100% dos Modais em Slide-Over Drawers](#204-unificação-integral-de-100-dos-modais-em-slide-over-drawers)
 
 ---
 
@@ -966,6 +971,48 @@ Para responder à crescente densidade de informação operacional (marcos técni
   - O seletor de abas (`1. Marcos Técnicos`, `2. Custos`, `3. Telas`, `4. Planta`) permanece ancorado por baixo do cabeçalho durante a rolagem.
   - O rodapé com as ações estruturais (editar, eliminar e fechar) permanece sempre acessível na base da gaveta (`sticky footer`).
 * **Adaptação Mobile**: Em ecrãs móveis (`<= 768px`), o painel assume automaticamente largura total (`100vw`) com cantos retos, assegurando compatibilidade perfeita com a operação tátil em campo.
+
+---
+
+## 20. Usabilidade Final • Unificação Geral de Drawers, Barra Lateral Retrátil (⌘B) & Cabeçalho Otimizado (Fase 19)
+
+A **Fase 19** consolida a maturidade operacional e ergonómica do RetailLaunchOS, respondendo à necessidade de rentabilizar ao máximo o espaço de ecrã em computadores de secretária e portáteis, uniformizando 100% das janelas da aplicação sob o conceito de gaveta lateral.
+
+### 20.1. Título Oficial Normalizado: 'Dashboard • Expansão Fnac/Darty'
+* O cabeçalho principal da aplicação passa a exibir a designação executiva oficial: **Dashboard • Expansão Fnac/Darty**.
+* Substitui a designação provisória de piloto, refletindo a maturidade do sistema enquanto plataforma corporativa de gestão de expansão e remodelações do parque de lojas.
+
+### 20.2. Mecânica de Barra Lateral Retrátil (Esconder à Esquerda & Atalho ⌘B)
+* **Objetivo**: Permitir aos gestores de projeto e técnicos focar-se totalmente nas tabelas de obras, na auditoria de checklists e nas plantas de piso sem desperdício de espaço útil.
+* **Como Recolher e Expandir a Barra Lateral**:
+  1. **Botão no Cabeçalho (`#btnToggleSidebar`)**: Clicar no botão localizado à esquerda do título do dashboard para recolher ou expandir a barra lateral num instante.
+  2. **Botão na Marca da Barra (`#btnCollapseSidebarInternal`)**: Clicar na seta discreta `◀` junto ao logótipo da barra lateral para a recolher imediatamente para a esquerda.
+  3. **Atalho de Teclado Universal (`⌘B` no Mac ou `Ctrl+B` no Windows/Linux)**: Pressionar o atalho para alternar instantaneamente a visibilidade da barra sem retirar as mãos do teclado.
+* **Persistência de Preferência**: O sistema memoriza automaticamente o estado escolhido (`localStorage`). Se o operador fechar a barra lateral e recarregar a página, a aplicação inicia diretamente no modo recolhido (*anti-FOUC*).
+* **Transição Fluida com Aceleração por GPU**: A barra lateral desliza suavemente para fora do ecrã (`transform: translateX(-100%)`) e o dashboard expande a margem para 100% da largura (`margin-left: 0`).
+
+### 20.3. Remoção do Badge Estático de Telemetria Signage
+* A antiga etiqueta visual *"Rede Signage Ativa (BrightSign / Samsung SSP)"* foi eliminada do cabeçalho.
+* A monitorização do estado de telas e players reside agora de forma fidedigna e dinâmica na coluna **Estado Signage** da tabela de aberturas, no mapa de calor da planta arquitetónica (Fase 17) e no teste ativo de ping via rede de loja.
+
+### 20.4. Unificação Integral de 100% dos Modais em Slide-Over Drawers
+Todas as 9 janelas da aplicação foram convertidas para o padrão de **Painel Lateral Deslizante à Direita (`.drawer-card`)**:
+1. **Registar Nova Abertura de Loja** (`#modalNovaAbertura`): Gaveta de formulário calibrada (`640px`) com foco em dados essenciais (insígnia, nome, formato, go-live).
+2. **Gestão Completa da Loja** (`#modalDetalheProjeto`): Gaveta operacional (`760px` / `94vw`) com abas de Marcos, Custos, Telas e Planta.
+3. **Hub Central de Digital Signage & Playlists** (`#modalHubSignage`): Gaveta ampla (`760px`) com catálogo global de campanhas e telas associadas.
+4. **Gestão de Utilizadores** (`#modalUsersManagement`): Gaveta de equipa (`760px`) com listagem, pesquisa e formulário CRUD.
+5. **Catálogo Global de Hardware** (`#modalPlayersCatalog`): Gaveta de inventário (`760px` / `94vw`) com filtros por insígnia e status.
+6. **Modelos, Zonas & Formatos** (`#modalConfigParameters`): Gaveta de configurações de sistema (`760px`) com abas de categorias.
+7. **Controlo de Acessos & Sessão de Operador** (`#modalAuthLogin`): Gaveta compacta (`520px`) com seletor de papéis RBAC e login corporativo.
+8. **Checklist Global de Aberturas & Tarefas** (`#modalGlobalTasks`): Gaveta alargada (`760px` / `94vw`) para acompanhamento tático de pendências.
+9. **Base de Dados, Backup & Migração** (`#modalDatabaseMigration`): Gaveta de dados (`640px`) com estatísticas de armazenamento e migração para o Synology NAS.
+
+* **Vantagens Práticas Obtidas**:
+  - Altura vertical a 100% sem limites de caixa;
+  - Botão de expansão `⛶` disponível em todos os cabeçalhos para trabalhar em quase ecrã inteiro (`94vw`);
+  - Preservação visual do dashboard de fundo;
+  - Fecho com a tecla `Escape`, botão `&times;` ou clique no backdrop.
+
 
 
 

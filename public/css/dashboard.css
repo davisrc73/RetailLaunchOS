@@ -239,7 +239,7 @@ body.sidebar-locked {
   left: 0;
   z-index: 100;
   padding: 24px 18px;
-  transition: background-color 0.25s ease, border-color 0.25s ease;
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.25s ease, border-color 0.25s ease;
 }
 
 .sidebar-brand {
@@ -443,6 +443,73 @@ body.sidebar-locked {
   flex-direction: column;
   position: relative;
   z-index: 1;
+  transition: margin-left 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Estado Recolhido da Barra Lateral (Desktop & Ecrãs Médios) */
+body.sidebar-collapsed .app-sidebar {
+  transform: translateX(-100%);
+}
+
+body.sidebar-collapsed .app-main {
+  margin-left: 0;
+}
+
+/* Botão de Alternância da Barra Lateral no Cabeçalho */
+.btn-sidebar-toggle {
+  width: 38px;
+  height: 38px;
+  border-radius: var(--radius-md);
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-muted);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: var(--transition);
+  flex-shrink: 0;
+  padding: 0;
+}
+
+.btn-sidebar-toggle:hover {
+  background: var(--bg-glass-hover);
+  color: var(--text-white);
+  border-color: var(--border-glass);
+}
+
+.btn-sidebar-toggle:active {
+  transform: scale(0.94);
+}
+
+/* Indicador visual quando recolhida */
+body.sidebar-collapsed .btn-sidebar-toggle {
+  background: rgba(245, 176, 39, 0.12);
+  border-color: rgba(245, 176, 39, 0.35);
+  color: var(--fnac-gold);
+}
+
+/* Botão subtil de recolha rápida dentro da própria sidebar brand */
+.btn-sidebar-collapse-brand {
+  margin-left: auto;
+  width: 28px;
+  height: 28px;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  border: 1px solid transparent;
+  color: var(--text-muted);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: var(--transition);
+  padding: 0;
+}
+
+.btn-sidebar-collapse-brand:hover {
+  background: var(--bg-glass-hover);
+  border-color: var(--border-subtle);
+  color: var(--text-white);
 }
 
 /* Header */
@@ -5435,6 +5502,18 @@ body.sidebar-locked {
 .drawer-card.drawer-expanded {
   width: 94vw !important;
   max-width: 96vw !important;
+}
+
+/* Modo Formulário Intermédio (640px para formulários de criação e migração) */
+.drawer-card.drawer-form {
+  width: 640px;
+  max-width: 90vw;
+}
+
+/* Modo Compacto (520px para login e alternância de perfis) */
+.drawer-card.drawer-compact {
+  width: 520px;
+  max-width: 90vw;
 }
 
 /* Cabeçalho do Drawer */

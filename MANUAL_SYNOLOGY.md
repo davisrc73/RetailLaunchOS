@@ -162,11 +162,13 @@ Uma dúvida comum é: *Ao fazer `git pull` e reconstruir o contentor no NAS no f
 
 ---
 
-## 7. Experiência de Interface: Painel Lateral Deslizante (Slide-Over Drawer) & Tablets de Loja
+## 7. Experiência de Interface: Barra Lateral Retrátil (⌘B) & Unificação Global de Drawers (Fases 18 e 19)
 
-Com a **Fase 18**, o RetailLaunchOS adotou painéis laterais deslizantes (`.drawer-card`) para a **Gestão Completa de Loja** e o **Catálogo Global de Hardware**:
-* **Postos de Controlo e Monitores Ultrawide / Multiecrãs**: Em estações de trabalho ligadas ao NAS, o operador pode consultar e editar todo o detalhe de uma loja (custos, cronograma, telas e planta arquitetónica interativa) mantendo visível a tabela de projetos à esquerda. Alternar entre lojas na lista atualiza o painel instantaneamente sem cliques adicionais de fecho e reabertura.
-* **Tablets e Dispositivos Móveis no Terreno**: Em tablets ou smartphones acedendo ao Synology via rede Wi-Fi de loja ou VPN, o painel assume automaticamente a largura total de visualização (`100vw`), permitindo aos técnicos e responsáveis de loja interagir com formulários e plantas sem restrições nem barras de scroll duplas.
-* **Modo Maximizado (`⛶`)**: Útil em ecrãs de menores dimensões para trabalhar a planta arquitetónica de loja em quase toda a extensão do navegador (`94vw`).
+Com as **Fases 18 e 19**, o RetailLaunchOS uniformizou 100% das janelas flutuantes como **Painéis Laterais Deslizantes à Direita (`.drawer-card`)** e introduziu a **Barra Lateral Retrátil**:
+* **Postos de Controlo e Monitores Ultrawide / Multiecrãs**: Em estações de trabalho ligadas ao NAS, o operador pode esconder a barra lateral esquerda pressionando `⌘B` (Mac) ou `Ctrl+B` (Windows/Linux) ou clicando no botão do cabeçalho, libertando 100% da largura útil para a tabela de aberturas, auditoria de checklists e visualização de plantas.
+* **Unificação Total de Janelas**: Todas as 9 janelas da aplicação (Nova Abertura, Gestão de Loja, Hub Signage, Utilizadores, Catálogo de Hardware, Parâmetros, Acessos/Sessão, Checklists e Base de Dados/Migração) abrem como gavetas à direita, sem sobreposição cega nem quebra de fluxo.
+* **Tablets e Dispositivos Móveis no Terreno**: Em tablets ou smartphones acedendo ao Synology via Wi-Fi de loja ou VPN, qualquer gaveta assume automaticamente a largura total de visualização (`100vw`), permitindo aos técnicos interagir com formulários e plantas sem restrições nem barras de scroll duplas.
+* **Modo Maximizado (`⛶`)**: Disponível em todos os drawers para expandir instantaneamente até quase a largura total do navegador (`94vw`), ideal para trabalhar plantas arquitetónicas e listas densas.
+
 
 
